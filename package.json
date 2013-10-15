@@ -1,0 +1,50 @@
+{
+  "name": "js-2dmath",
+  "version": "0.2.2",
+  "description": "fast 2d geometry math module: Vector2, Rectangle, Matrix3, intersection, distance",
+  "main": "./index.js",
+  "keywords": [
+    "abstract",
+    "class",
+    "classes",
+    "instanceof",
+    "typeof",
+    "extends",
+    "implements",
+    "events",
+    "object oriented"
+  ],
+  "directories": {
+    "lib": ".",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap test/test-*.js",
+    "coveralls": "jscoverage lib && YOURPACKAGE_COVERAGE=1 tap test/test-*.js | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/llafuente/js-math-2d.git"
+  },
+  "author": {
+    "name": "Luis Lafuente",
+    "email": "llafuente@noboxout.com",
+    "url": "http://www.noboxout.com"
+  },
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.4"
+  },
+  "dependencies": {
+    "function-enhancements": "*",
+    "array-enhancements": "*",
+    "object-enhancements": "*",
+    "coveralls": "*",
+    "object-enhancements": "*"
+  },
+  "devDependencies": {
+    "tap": "~0.4.4",
+    "jscoverage": "*",
+    "coveralls": "*"
+  }
+}
