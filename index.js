@@ -20,4 +20,19 @@ module.exports = {
         console.log(v, " distance is missing");
     }
 });
+
+var i,
+    j,
+    text;
+for (i in module.exports) {
+    console.log("### ", i);
+    for (j in module.exports[i]) {
+        text = module.exports[i][j].toString();
+        text = text.split("\n");
+        text = text[0].trim();
+        text = text.substring(9, text.length - 1).trim();
+        console.log("*", j, text);
+    }
+    console.log();
+}
 */
