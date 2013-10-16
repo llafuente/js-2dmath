@@ -27,7 +27,7 @@ test("Vec2 init", function(t) {
 
     t.equal(l1[0][0], 10, "t1-3");
     t.equal(l1[0][1], 10, "t2-3");
-    t.equal(l1[1], -1, "t3-");
+    t.equal(l1[1], 1, "t3-");
 
     t.end();
 });
