@@ -2,10 +2,10 @@ var path = require("path"),
     tap = require("tap"),
     test = tap.test,
     Intersection = require("../index.js").Intersection,
-    Vec2 = require("../index.js").Vec2,
-    Circle = require("../index.js").Circle,
-    Line2 = require("../index.js").Line2,
-    Rectangle = require("../index.js").Rectangle;
+    Vec2 = require("../index.js").Vec2.create,
+    Circle = require("../index.js").Circle.create,
+    Line2 = require("../index.js").Line2.create,
+    Rectangle = require("../index.js").Rectangle.create;
 
 function near(a, b) {
     return a > b - Math.EPS && a < b + Math.EPS;
@@ -98,7 +98,16 @@ test("intersection_rectangle_vs_vec2", function(t) {
         v1 = Vec2(-1, -1),
         v2 = Vec2(0, 1),
         v3 = Vec2(3, 3),
-        v4 = Vec2(10, 10);
+        v4 = Vec2(10, 10),
+
+        v5 = Vec2(2, -5), // down
+        v6 = Vec2(2, 10), // up
+
+        v7 = Vec2(-5, 2), // left
+        v8 = Vec2(10, 2), // right
+
+        v9 = Vec2(10, 10),
+        v10 = Vec2(-10, -10);
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v1),
         { success: false, reason: Intersection.OUTSIDE, distance: null},
@@ -113,6 +122,30 @@ test("intersection_rectangle_vs_vec2", function(t) {
         "intersection_rectangle_vs_rectangle inside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v4),
+        { success: false, reason: Intersection.OUTSIDE, distance: null},
+        "intersection_rectangle_vs_rectangle outside");
+
+    t.deepEqual(Intersection.rectangle_vec2(r1, v5),
+        { success: false, reason: Intersection.OUTSIDE, distance: null},
+        "intersection_rectangle_vs_rectangle outside");
+
+    t.deepEqual(Intersection.rectangle_vec2(r1, v6),
+        { success: false, reason: Intersection.OUTSIDE, distance: null},
+        "intersection_rectangle_vs_rectangle outside");
+
+    t.deepEqual(Intersection.rectangle_vec2(r1, v7),
+        { success: false, reason: Intersection.OUTSIDE, distance: null},
+        "intersection_rectangle_vs_rectangle outside");
+
+    t.deepEqual(Intersection.rectangle_vec2(r1, v8),
+        { success: false, reason: Intersection.OUTSIDE, distance: null},
+        "intersection_rectangle_vs_rectangle outside");
+
+    t.deepEqual(Intersection.rectangle_vec2(r1, v9),
+        { success: false, reason: Intersection.OUTSIDE, distance: null},
+        "intersection_rectangle_vs_rectangle outside");
+
+    t.deepEqual(Intersection.rectangle_vec2(r1, v10),
         { success: false, reason: Intersection.OUTSIDE, distance: null},
         "intersection_rectangle_vs_rectangle outside");
 
@@ -149,7 +182,7 @@ test("intersection_rectangle_vs_rectangle", function(t) {
 
     t.deepEqual(Intersection.rectangle_rectangle(r1, r2),
         { success: true, reason: Intersection.COLLIDE, points: [], lines: [] },
-        "intersection_rectangle_vs_rectangle inside");
+        "intersection_rectangle_vs_rectangle collide");
 
     t.deepEqual(Intersection.rectangle_rectangle(r1, r3),
         { success: false, reason: Intersection.INSIDE },

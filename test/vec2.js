@@ -7,8 +7,8 @@ var tap = require("tap"),
 //setup
 
 test("Vec2 init", function(t) {
-    var v1 = Vec2(10, 15),
-        v2 = Vec2(15, 10),
+    var v1 = Vec2.create(10, 15),
+        v2 = Vec2.create(15, 10),
         out = Vec2.zero();
 
     t.equal(v1[0], 10, "t1");
@@ -47,7 +47,7 @@ test("Vec2 init", function(t) {
     t.equal(v1[1], 25, "t17");
 
     //reset
-    v1 = Vec2(10, 15);
+    v1 = Vec2.create(10, 15);
     Vec2.sub(v1, v1, v2);
     t.equal(v1[0], -5, "t18");
     t.equal(v1[1], 5, "t19");

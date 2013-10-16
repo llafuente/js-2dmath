@@ -8,9 +8,9 @@ var tap = require("tap"),
 //setup
 
 test("Vec2 init", function(t) {
-    var m2d1 = Matrix2D(),
-        m2d2 = Matrix2D(),
-        m2d3 = Matrix2D();
+    var m2d1 = Matrix2D.create(),
+        m2d2 = Matrix2D.create(),
+        m2d3 = Matrix2D.create();
 
     Matrix2D.identity(m2d2);
 

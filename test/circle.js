@@ -2,13 +2,12 @@ require("../lib/math.js");
 
 var tap = require("tap"),
     test = tap.test,
-    Vec2 = require("../lib/vec2.js"),
     Circle = require("../lib/circle.js");
 
 //setup
 
-test("Vec2 init", function(t) {
-    var c1 = Circle(0, 0, 10);
+test("Circle init", function(t) {
+    var c1 = Circle.create(0, 0, 10);
 
     // normalized
     t.equal(c1[0][0], 0, "t1");

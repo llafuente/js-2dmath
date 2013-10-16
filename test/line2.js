@@ -2,13 +2,12 @@ require("../lib/math.js");
 
 var tap = require("tap"),
     test = tap.test,
-    Vec2 = require("../lib/vec2.js"),
     Line2 = require("../lib/line2.js");
 
 //setup
 
-test("Vec2 init", function(t) {
-    var l1 = Line2(0, 0, 1);
+test("Line2 init", function(t) {
+    var l1 = Line2.create(0, 0, 1);
 
     // normalized
     t.equal(l1[0][0], 0, "t1-1");

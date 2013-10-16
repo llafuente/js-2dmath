@@ -8,8 +8,8 @@ var tap = require("tap"),
 //setup
 
 test("Vec2 init", function(t) {
-    var rec1 = Rectangle(0, 0, 10, 10),
-        rec2 = Rectangle(10, 10, 0, 0),
+    var rec1 = Rectangle.create(0, 0, 10, 10),
+        rec2 = Rectangle.create(10, 10, 0, 0),
         rec3 = Rectangle.zero(),
         v = Vec2.zero();
 

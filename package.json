@@ -1,6 +1,6 @@
 {
   "name": "js-2dmath",
-  "version": "0.2.2",
+  "version": "0.0.2",
   "description": "fast 2d geometry math module: Vector2, Rectangle, Matrix3, intersection, distance",
   "main": "./index.js",
   "keywords": [
@@ -19,8 +19,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap test/*.js",
-    "coveralls": "jscoverage lib && YOURPACKAGE_COVERAGE=1 tap test/test-*.js | coveralls"
+    "test": "tap test/*.js"
   },
   "repository": {
     "type": "git",
@@ -36,15 +35,8 @@
     "node": ">=0.4"
   },
   "dependencies": {
-    "function-enhancements": "*",
-    "array-enhancements": "*",
-    "object-enhancements": "*",
-    "coveralls": "*",
-    "object-enhancements": "*"
   },
   "devDependencies": {
-    "tap": "~0.4.4",
-    "jscoverage": "*",
-    "coveralls": "*"
+    "tap": "~0.4.4"
   }
 }
