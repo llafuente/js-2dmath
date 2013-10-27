@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/llafuente/js-math-2d.git"
+    "url": "git://github.com/llafuente/js-2dmath.git"
   },
   "author": {
     "name": "Luis Lafuente",
