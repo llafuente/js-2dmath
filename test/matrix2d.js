@@ -16,10 +16,9 @@ test("Vec2 init", function(t) {
 
     t.deepEqual(m2d1, m2d2, "t1");
 
-
     Matrix2D.translate(m2d2, m2d2, [10, 10]);
 
-    t.deepEqual(m2d2, [1, 0, 0, 1, 20, 11, [1, 1, 0, 0, 0], true], "t1");
+    t.deepEqual(m2d2, [1, 0, 0, 1, 10, 10, [1, 1, 0, 0, 0], true], "t1");
 
     Matrix2D.copy(m2d1, m2d2);
     t.deepEqual(m2d1, m2d2, "t1");
