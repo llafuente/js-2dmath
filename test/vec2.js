@@ -1,8 +1,6 @@
-require("../lib/math.js");
-
 var tap = require("tap"),
     test = tap.test,
-    Vec2 = require("../lib/vec2.js");
+    Vec2 = require("../index.js").Vec2;
 
 //setup
 

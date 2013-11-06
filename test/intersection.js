@@ -12,10 +12,10 @@ function near(a, b) {
 }
 
 test("intersection_circle_vs_circle", function(t) {
-    var c1 = new Circle(0,0,5),
-        c2 = new Circle(5,5,1),
-        c3 = new Circle(2,2,5),
-        c4 = new Circle(0,0,2);
+    var c1 = Circle(0,0,5),
+        c2 = Circle(5,5,1),
+        c3 = Circle(2,2,5),
+        c4 = Circle(0,0,2);
 
     t.deepEqual(Intersection.circle_circle(c1, c2, true),
         { success: false, reason: Intersection.OUTSIDE},

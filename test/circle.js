@@ -1,8 +1,6 @@
-require("../lib/math.js");
-
 var tap = require("tap"),
     test = tap.test,
-    Circle = require("../lib/circle.js");
+    Circle = require("../index.js").Circle;
 
 //setup
 

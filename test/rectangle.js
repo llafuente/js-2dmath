@@ -1,9 +1,7 @@
-require("../lib/math.js");
-
 var tap = require("tap"),
     test = tap.test,
     Vec2 = require("../lib/vec2.js"),
-    Rectangle = require("../lib/rectangle.js");
+    Rectangle = require("../index.js").Rectangle;
 
 //setup
 

@@ -1,7 +1,7 @@
 {
   "name": "js-2dmath",
-  "version": "0.0.5",
-  "description": "fast 2d geometry math module: Vector2, Rectangle, Matrix3, intersection, distance",
+  "version": "0.0.6",
+  "description": "Fast 2d geometry math: Vector2, Rectangle, Circle, Matrix2x3 (2D transformation), Circle, BoundingBox, Line2, Segment2, Intersections, Distances, Transitions (animation/tween)",
   "main": "./index.js",
   "keywords": [
     "abstract",

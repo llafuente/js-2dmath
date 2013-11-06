@@ -9,7 +9,8 @@ module.exports = {
     Circle: require("./lib/circle.js"),
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
-    Intersection: require("./lib/intersection.js")
+    Intersection: require("./lib/intersection.js"),
+    Transitions: require("./lib/transitions.js")
 };
 
 

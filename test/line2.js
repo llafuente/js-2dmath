@@ -1,8 +1,6 @@
-require("../lib/math.js");
-
 var tap = require("tap"),
     test = tap.test,
-    Line2 = require("../lib/line2.js");
+    Line2 = require("../index.js").Line2;
 
 //setup
 

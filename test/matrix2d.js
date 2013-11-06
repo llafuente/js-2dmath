@@ -1,9 +1,7 @@
-require("../lib/math.js");
-
 var tap = require("tap"),
     test = tap.test,
     Vec2 = require("../lib/vec2.js"),
-    Matrix2D = require("../lib/matrix2d.js");
+    Matrix2D = require("../index.js").Matrix2D;
 
 //setup
 
