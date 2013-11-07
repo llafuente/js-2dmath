@@ -18,6 +18,13 @@ function Vector() {
 
 util.inherits(Vector, events.EventEmitter);
 
+function Movable() {
+    events.EventEmitter.call(this);
+    this.position = [0, 0];
+}
+
+util.inherits(Movable, events.EventEmitter);
+
 
 test("Transitions", function (t) {
     var v = new Vector();
@@ -256,5 +263,44 @@ test("Transitions stop", function (t) {
     v.emit("tick", 1000);
 
     t.equal(v.x, 0, "x is 0");
+    t.end();
+});
+
+
+
+test("array input/output", function (t) {
+    var v = new Movable();
+
+    Transitions.tween(v, {
+        "100%" : {
+            "position": [100, 100]
+        }
+    }, {
+        time: 1000,
+        //apply factor to a vector
+        applyFactor: function (k0, k1, rfactor) {
+            return [
+                ((k1[0] - k0[0]) * rfactor) + k0[0],
+                ((k1[1] - k0[1]) * rfactor) + k0[1]
+            ];
+        },
+        //render to a vector
+        render: function (obj, prop, value) {
+            obj[prop][0] = value[0];
+            obj[prop][1] = value[1];
+        }
+    });
+
+
+    // x 100-50-75
+    // y 100-100-100
+    // z 0-50-50
+    t.deepEqual(v.position, [0, 0], "x is [0,0]");
+
+    v.emit("tick", 500);
+    t.deepEqual(v.position, [50, 50], "x is [50,50]");
+
+    v.emit("tick", 500);
+    t.deepEqual(v.position, [100, 100], "x is [100,100]");
     t.end();
 });
