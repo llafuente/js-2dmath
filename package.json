@@ -43,7 +43,8 @@
     "node": ">=0.4"
   },
   "dependencies": {
-    "array-enhancements" : "*"
+    "array-enhancements" : "*",
+    "object-enhancements" : "*"
   },
   "devDependencies": {
     "tap": "~0.4.4"
