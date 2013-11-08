@@ -10,7 +10,9 @@ module.exports = {
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
     Intersection: require("./lib/intersection.js"),
-    Transitions: require("./lib/transitions.js")
+    Transitions: require("./lib/transitions.js"),
+    Xorshift: require("./lib/xorshift.js"),
+    Noise: require("./lib/noise.js")
 };
 
 
