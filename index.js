@@ -18,7 +18,7 @@ module.exports = {
 
 /*
 // todo list
-["Vec2", "Line2", "Segment2", "Rectangle", "Circle"].forEach(function(v) {
+["Vec2", "Line2", "Segment2", "Rectangle", "Circle", "BB2"].forEach(function(v) {
     //console.log(v, module.exports[v]);
     if("function" !== typeof module.exports[v].distance) {
         console.log(v, " distance is missing");
@@ -29,9 +29,18 @@ module.exports = {
     if("function" !== typeof module.exports[v].area) {
         console.log(v, " area is missing");
     }
+
+    ["Vec2", "Line2", "Segment2", "Rectangle", "Circle"].forEach(function(v2) {
+        if (v == v2) {
+            return;
+        }
+        if (!module.exports.Intersection[v.toLowerCase() + "_" + v2.toLowerCase()]) {
+            console.log(v.toLowerCase() + "_" + v2.toLowerCase(), " intersection is missing");
+        }
+    });
 });
 
-
+*/
 //fast doc
 var i,
     j,
@@ -47,4 +56,3 @@ for (i in module.exports) {
     }
     console.log();
 }
-*/

@@ -159,6 +159,8 @@ function draw_test(draw1, val1, draw2, val2, int_fn) {
     }
 }
 
+draw_test(draw_circle, Circle.create(35, 35, 20), draw_bb2, BB2.create(10, 0, 50, 80), Intersection.circle_bb2);
+
 
 
 draw_test(draw_circle, Circle.create(35, 100, 20), draw_circle, Circle.create(35, 100, 30), Intersection.circle_circle);
