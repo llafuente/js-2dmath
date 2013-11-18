@@ -98,13 +98,33 @@ ctx.translate(640 * 0.5, 480 * 0.5);
 
 
 var v = Vec2.create(50, 50),
-    prep = [];
-Vec2.perp(prep, v);
+    a = Vec2.create(100, 75),
+    b = Vec2.create(100, 0),
+    aux = [];
 
 
 draw_vec2(v, "red", "vec2");
-draw_vec2(prep, "red", "prep");
 
+Vec2.perp(aux, v);
+draw_vec2(aux, "red", "prep");
+
+Vec2.rerp(aux, v);
+draw_vec2(aux, "red", "rperp");
+
+draw_vec2(a, "red", "a");
+draw_vec2(b, "red", "b");
+
+Vec2.interpolate(aux, a, b, 2)
+console.log(aux);
+draw_vec2(aux, "red", "interpolate(a,b,2)");
+
+Vec2.interpolate(aux, a, b, 3)
+console.log(aux);
+draw_vec2(aux, "red", "interpolate(a,b,3)");
+
+Vec2.interpolate(aux, b, a, 2)
+console.log(aux);
+draw_vec2(aux, "red", "interpolate(b,a,2)");
 
 
 </script>
