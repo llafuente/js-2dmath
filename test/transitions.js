@@ -82,7 +82,6 @@ test("Transitions", function (t) {
 });
 
 
-
 test("Transitions", function (t) {
     var v = new Vector();
 

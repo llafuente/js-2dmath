@@ -13,10 +13,10 @@ test("Vec2 init", function(t) {
 
     // normalized
     t.equal(rec1[0][0], 0, "t1");
-    t.equal(rec1[0][1], 10, "t2");
+    t.equal(rec1[0][1], 0, "t2");
 
     t.equal(rec1[1][0], 10, "t1");
-    t.equal(rec1[1][1], 0, "t2");
+    t.equal(rec1[1][1], 10, "t2");
 
 
     t.deepEqual(Rectangle.center(v, rec1), [5,5], "t2");

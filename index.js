@@ -40,7 +40,7 @@ module.exports = {
     });
 });
 
-*/
+
 //fast doc
 var i,
     j,
@@ -56,3 +56,4 @@ for (i in module.exports) {
     }
     console.log();
 }
+*/

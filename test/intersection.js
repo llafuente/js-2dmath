@@ -17,20 +17,30 @@ test("intersection_circle_vs_circle", function(t) {
         c3 = Circle(2,2,5),
         c4 = Circle(0,0,2);
 
-    t.deepEqual(Intersection.circle_circle(c1, c2, true),
-        { success: false, reason: Intersection.OUTSIDE},
+    t.deepEqual(Intersection.circle_circle(c1, c2, true, true),
+        {reason: Intersection.COLLIDE, points: [
+            [2.609128788536429,4.790871211463569],
+            [4.790871211463569,2.609128788536429]
+        ]},
         "intersection_circle_vs_circle outside");
 
     t.deepEqual(Intersection.circle_circle(c1, c4, true),
-        { success: false, reason: Intersection.INSIDE },
+        {reason: Intersection.INSIDE },
         "intersection_circle_vs_circle inside");
 
     t.deepEqual(Intersection.circle_circle(c1, c3, true, true),
-        { success: true,
-          reason: Intersection.COLLIDE,
-          //points: [ { x: 0.625, y: 1.375 }, { x: 1.375, y: 0.625 } ] },
-          points: [ [0.25, 1.75], [1.75, 0.25] ]},
-        "intersection_circle_vs_circle intersects");
+        { reason: Intersection.COLLIDE,
+
+        "points" : [
+          [
+            -2.3911649915626336,
+            4.391164991562634
+          ],
+          [
+            4.391164991562634,
+            -2.3911649915626336
+          ]
+        ]},"intersection_circle_vs_circle intersects");
 
     t.end();
 });
@@ -42,15 +52,15 @@ test("distance_line2_vs_line2", function(t) {
         l4 = Line2(5, 0, 1);
 
     t.deepEqual(Intersection.line2_line2(l1, l2, true, true),
-        { success: true, reason: Intersection.COLLIDE, points: [[0, 0]] },
+        {reason: Intersection.COLLIDE, points: [[0, 0]] },
         "intersection_line2_vs_line2 collide");
 
     t.deepEqual(Intersection.line2_line2(l1, l1),
-        { success: false, reason: Intersection.COINCIDENT },
+        {reason: Intersection.COINCIDENT },
         "intersection_line2_vs_line2 coincident");
 
     t.deepEqual(Intersection.line2_line2(l1, l4),
-        { success: false, reason: Intersection.PARALLEL },
+        {reason: Intersection.PARALLEL },
         "intersection_line2_vs_line2 parallel");
 
     t.end();
@@ -64,15 +74,15 @@ test("intersection_circle_vs_line2", function(t) {
         s3 = new Segment2(10, 10, 15, 15);
 
     t.deepEqual(Math.intersection_circle_vs_segment2(c1, s1),
-        { success: true, reason: "collide", points: [ { x: 3.5355339059327378, y: 3.5355339059327378 } ] },
+        {reason: "collide", points: [ { x: 3.5355339059327378, y: 3.5355339059327378 } ] },
         "intersection_circle_vs_circle collide");
 
     t.deepEqual(Math.intersection_circle_vs_segment2(c1, s2),
-        { success: false, reason: "inside" },
+        {reason: "inside" },
         "intersection_circle_vs_circle inside");
 
     t.deepEqual(Math.intersection_circle_vs_segment2(c1, s3),
-        { success: false, reason: "outside" },
+        {reason: "outside" },
         "intersection_circle_vs_circle outside");
     t.end();
 });
@@ -83,11 +93,11 @@ test("distance_rectangle_vs_rectangle", function(t) {
         p1 = new Polygon([0,0, 2,0, 2,2, 0,2]);
 
     t.deepEqual(Math.intersection_segment_vs_polygon(s1, p1),
-        { success: true, reason: 'collide', points: [ { x: 0, y: 0 }, { x: 2, y: 2 } ] },
+        {reason: 'collide', points: [ { x: 0, y: 0 }, { x: 2, y: 2 } ] },
         "intersection_segment_vs_polygon collide");
 
     t.deepEqual(Math.intersection_segment_vs_polygon(s2, p1),
-        { success: false, reason: 'no-intersection'},
+        {reason: 'no-intersection'},
         "intersection_segment_vs_polygon no collide");
     t.end();
 });
@@ -110,44 +120,44 @@ test("intersection_rectangle_vs_vec2", function(t) {
         v10 = Vec2(-10, -10);
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v1),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
-    t.deepEqual(Intersection.rectangle_vec2(r1, v2),
-        { success: true, reason: Intersection.COLLIDE, distance: 0, points: [v2]},
-        "intersection_rectangle_vs_rectangle collide");
+    t.deepEqual(Intersection.rectangle_vec2(r1, v2, true, true),
+        {reason: Intersection.COLLIDE, points: [v2]},
+        "rectangle_vec2 collide");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v3),
-        { success: false, reason: Intersection.INSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle inside");
+        {reason: Intersection.INSIDE},
+        "rectangle_vec2 inside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v4),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v5),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v6),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v7),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v8),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v9),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.deepEqual(Intersection.rectangle_vec2(r1, v10),
-        { success: false, reason: Intersection.OUTSIDE, distance: null},
-        "intersection_rectangle_vs_rectangle outside");
+        {reason: Intersection.OUTSIDE},
+        "rectangle_vec2 outside");
 
     t.end();
 });
@@ -159,16 +169,16 @@ test("distance_rectangle_vs_rectangle", function(t) {
         v3 = Vec2(10, 10);
 
 
-    t.deepEqual(Intersection.circle_vec2(c1, v1),
-        { success: true, reason: Intersection.COLLIDE, points: [[3.5355339059327378, 3.5355339059327378]]},
+    t.deepEqual(Intersection.circle_vec2(c1, v1, true, true),
+        {reason: Intersection.COLLIDE, points: [[3.5355339059327378, 3.5355339059327378]]},
         "intersection_circle_vs_vec2 collide");
 
     t.deepEqual(Intersection.circle_vec2(c1, v2),
-        { success: false, reason: Intersection.INSIDE, distance: 5 },
+        {reason: Intersection.INSIDE, distance: 5 },
         "intersection_circle_vs_vec2 inside");
 
     t.deepEqual(Intersection.circle_vec2(c1, v3),
-        { success: false, reason: Intersection.OUTSIDE, distance: 9.142135623730951 },
+        {reason: Intersection.OUTSIDE, distance: 9.142135623730951 },
         "intersection_circle_vs_vec2 outside");
 
     t.end();
@@ -180,16 +190,16 @@ test("intersection_rectangle_vs_rectangle", function(t) {
         r3 = Rectangle(1, 1, 2, 2),
         r4 = Rectangle(6, 6, 7, 7);
 
-    t.deepEqual(Intersection.rectangle_rectangle(r1, r2),
-        { success: true, reason: Intersection.COLLIDE, points: [], lines: [] },
+    t.deepEqual(Intersection.rectangle_rectangle(r1, r2, true, true),
+        {reason: Intersection.COLLIDE, points: [[5,1], [1,5]]},
         "intersection_rectangle_vs_rectangle collide");
 
     t.deepEqual(Intersection.rectangle_rectangle(r1, r3),
-        { success: false, reason: Intersection.INSIDE },
+        {reason: Intersection.INSIDE },
         "intersection_rectangle_vs_rectangle inside");
 
     t.deepEqual(Intersection.rectangle_rectangle(r1, r4),
-        { success: false, reason: Intersection.OUTSIDE },
+        {reason: Intersection.OUTSIDE },
         "intersection_rectangle_vs_rectangle outside");
 
     t.end();
@@ -203,15 +213,15 @@ test("intersection_segment2_vs_vec2", function(t) {
         v3 = new Vec2(1,5);
 
     t.deepEqual(Math.intersection_segment2_vs_vec2(s1, v1),
-        { success: true, reason: 'collide', points: [ { x: 1, y: 1 } ] },
+        {reason: 'collide', points: [ { x: 1, y: 1 } ] },
         "intersection_segment2_vs_vec2 collide");
 
     t.deepEqual(Math.intersection_segment2_vs_vec2(s1, v2),
-        { success: false, reason: 'outside', distance: 1.4142135623730951 },
+        {reason: 'outside', distance: 1.4142135623730951 },
         "intersection_segment2_vs_vec2 outside");
 
     t.deepEqual(Math.intersection_segment2_vs_vec2(s1, v3),
-        { success: false, reason: 'outside', distance: 2.8284271247461903 },
+        {reason: 'outside', distance: 2.8284271247461903 },
         "intersection_segment2_vs_vec2 outside");
 
     t.end();
@@ -225,15 +235,15 @@ test("intersection_segment2_vs_vec2", function(t) {
         s4 = new Segment2(0,1, 5,6);
 
     t.deepEqual(Math.intersection_segment2_vs_segment2(s1, s2),
-        { success: true, reason: 'coincident', points: [], segments: [{x1:0, y1:0, x2: 5, y2: 5}] },
+        {reason: 'coincident', points: [], segments: [{x1:0, y1:0, x2: 5, y2: 5}] },
         "intersection_segment2_vs_vec2 collide");
 
     t.deepEqual(Math.intersection_segment2_vs_segment2(s1, s3),
-        { success: true, reason: 'collide', points: [{x: 0.6666666666666666, y: 0.6666666666666666}] },
+        {reason: 'collide', points: [{x: 0.6666666666666666, y: 0.6666666666666666}] },
         "intersection_segment2_vs_vec2 outside");
 
     t.deepEqual(Math.intersection_segment2_vs_segment2(s1, s4),
-        { success: false, reason: 'parallel'},
+        {reason: 'parallel'},
         "intersection_segment2_vs_vec2 parallel");
 
     t.end();
