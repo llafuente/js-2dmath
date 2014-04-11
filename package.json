@@ -1,6 +1,6 @@
 {
   "name": "js-2dmath",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Fast 2d geometry math: Vector2, Rectangle, Circle, Matrix2x3 (2D transformation), Circle, BoundingBox, Line2, Segment2, Intersections, Distances, Transitions (animation/tween), Random numbers, Noise",
   "main": "./index.js",
   "keywords": [
@@ -48,5 +48,39 @@
   },
   "devDependencies": {
     "tap": "~0.4.4"
-  }
+  },
+  "jshintConfig": {
+      "white": true,
+      "curly": true,
+      "eqeqeq": true,
+      "indent": 4,
+      "asi": false,
+      "boss": false,
+      "browser": true,
+      "devel": true,
+      "maxdepth": 4,
+      "maxstatements": 25,
+      "maxcomplexity": 6,
+      "eqnull": true,
+      "es5": true,
+      "evil": false,
+      "immed": false,
+      "jquery": true,
+      "latedef": false,
+      "laxcomma": true,
+      "laxbreak": true,
+      "newcap": true,
+      "node": true,
+      "noempty": true,
+      "nonew": true,
+      "predef": [
+        "log"
+      ],
+      "quotmark": "double",
+      "smarttabs": false,
+      "strict": false,
+      "trailing": true,
+      "undef": true,
+      "unused": true
+    }
 }
