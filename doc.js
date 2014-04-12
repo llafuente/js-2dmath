@@ -54,7 +54,6 @@ var methods,
             filename: "lib/segment2.js",
             valid_arguments:{
                 out: "Segment2",
-
                 seg2: "Segment2",
 
                 x1: "Number",
@@ -64,6 +63,7 @@ var methods,
                 y2: "Number",
                 y3: "Number",
 
+                out_vec2: "Segment2",
                 vec2: "Vec2",
             }
         },
@@ -103,7 +103,7 @@ var methods,
                 vec2: "Vec2",
                 vec2_offset: "Vec2",
                 vec2_scale: "Vec2",
-                alignament: "Number (BB2.TOPLEFT, BB2.TOPMIDDLE, BB2.TOPRIGHT, BB2.CENTERLEFT, BB2.CENTER, BB2.CENTERRIGHT, BB2.BOTTOMLEFT, BB2.BOTTOM, BB2.BOTTOMRIGH)"
+                alignament: "Number"
             }
         },
         Circle: {
@@ -137,7 +137,8 @@ var methods,
             filename: "lib/polygon.js",
             valid_arguments:{
                 out: "Polygon",
-                poly:  "Polygon"
+                poly:  "Polygon",
+                out_vec2: "Segment2"
             }
         },
 
@@ -146,6 +147,9 @@ var methods,
             valid_arguments:{
                 out: "Beizer",
                 curve: "Beizer",
+                
+                out_vec2: "Segment2",
+
                 t: "Number",
                 step: "Number",
                 cp0x: "Number",
@@ -208,7 +212,7 @@ for (cls in files) {
                     console.log(node);
                     throw new Error(files[cls].filename + ":" + arg + " is an invalid argument name, not in whitelist");
                 }
-                args.push("*" + arg + "*:" + valid_arguments[arg]);
+                args.push("*" + arg + "*: " + valid_arguments[arg]);
             }
 
             methods[node.id.name] = {
