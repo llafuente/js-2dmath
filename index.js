@@ -12,7 +12,14 @@ module.exports = {
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),
     Xorshift: require("./lib/xorshift.js"),
-    Noise: require("./lib/noise.js")
+    Noise: require("./lib/noise.js"),
+    Draw: require("./lib/draw.js"),
+    globalize: function(object) {
+        var i;
+        for (i in this) {
+            object[i] = this[i];
+        }
+    }
 };
 
 

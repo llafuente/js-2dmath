@@ -13,7 +13,14 @@ module.exports = {
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),
     Xorshift: require("./lib/xorshift.js"),
-    Noise: require("./lib/noise.js")
+    Noise: require("./lib/noise.js"),
+    Draw: require("./lib/draw.js"),
+    globalize: function(object) {
+        var i;
+        for (i in this) {
+            object[i] = this[i];
+        }
+    }
 };
 
 
@@ -58,7 +65,7 @@ for (i in module.exports) {
     console.log();
 }
 */
-},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/intersection.js":7,"./lib/line2.js":8,"./lib/math.js":9,"./lib/matrix2d.js":10,"./lib/noise.js":11,"./lib/rectangle.js":12,"./lib/segment2.js":13,"./lib/transitions.js":14,"./lib/vec2.js":15,"./lib/xorshift.js":16}],"js-2dmath":[function(require,module,exports){
+},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/draw.js":7,"./lib/intersection.js":8,"./lib/line2.js":9,"./lib/math.js":10,"./lib/matrix2d.js":11,"./lib/noise.js":12,"./lib/rectangle.js":13,"./lib/segment2.js":14,"./lib/transitions.js":15,"./lib/vec2.js":16,"./lib/xorshift.js":17}],"js-2dmath":[function(require,module,exports){
 module.exports=require('Focm2+');
 },{}],3:[function(require,module,exports){
 var sqrt = Math.sqrt,
@@ -71,19 +78,19 @@ var sqrt = Math.sqrt,
     t3 = 0;
 
 /**
- * @return {Beizer}
+ * @returns {Beizer}
  */
 function cubic(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y, cp3x, cp3y) {
     return [[cp0x, cp0y], [cp1x, cp1y], [cp2x, cp2y], [cp3x, cp3y]];
 }
 /**
- * @return {Beizer}
+ * @returns {Beizer}
  */
 function quadric(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
     return [[cp0x, cp0y], [cp1x, cp1y], [cp2x, cp2y]];
 }
 /**
- * @return {Vec2}
+ * @returns {Vec2}
  */
 function get(out_vec2, curve, t) {
     if (curve.length === 4) {
@@ -122,7 +129,7 @@ function get(out_vec2, curve, t) {
  * Calculate the curve length by incrementally solving the curve every substep=CAAT.Curve.k. This value defaults
  * to .05 so at least 20 iterations will be performed.
  * @todo some kind of cache maybe it's needed!
- * @returns {Number} the approximate curve length.
+ * @returnss {Number} the approximate curve length.
  */
 function length(curve, step) {
     step = step || 0.05;
@@ -158,9 +165,7 @@ var Beizer = {
 };
 
 
-if ("undefined" !== typeof module) {
-    module.exports = Beizer;
-}
+module.exports = Beizer;
 },{}],4:[function(require,module,exports){
 var min = Math.min,
     max = Math.max,
@@ -477,778 +482,863 @@ var Circle = {
 };
 
 
-if ("undefined" !== typeof module) {
-    module.exports = Circle;
+module.exports = Circle;
+},{"./vec2.js":16}],6:[function(require,module,exports){
+var browser = "undefined" === typeof module,
+    sqrt = Math.sqrt,
+    abs = Math.abs,
+    min = Math.min,
+    Rectangle = browser ? window.Rectangle : require("./rectangle.js"),
+    x = 0,
+    y = 0;
+
+function fourPoints(x1, y1, x2, y2) {
+    x = x1 - x2;
+    y = y1 - y2;
+
+    return sqrt(x * x + y * y);
 }
-},{"./vec2.js":15}],6:[function(require,module,exports){
-var exp;
-(exp = function () {
-    "use strict";
 
-    var browser = "undefined" === typeof module,
-        sqrt = Math.sqrt,
-        abs = Math.abs,
-        min = Math.min,
-        Rectangle = browser ? window.Rectangle : require("./rectangle.js"),
-        x = 0,
-        y = 0,
-        Distance;
+function sqrFourPoints(x1, y1, x2, y2) {
+    x = x1 - x2;
+    y = y1 - y2;
 
-    Distance = {};
-
-    Distance.fourPoints = function (x1, y1, x2, y2) {
-        x = x1 - x2;
-        y = y1 - y2;
-
-        return sqrt(x * x + y * y);
-    };
-
-    Distance.sqrFourPoints = function (x1, y1, x2, y2) {
-        x = x1 - x2;
-        y = y1 - y2;
-
-        return x * x + y * y;
-    };
-
-    Distance.fourPointsSq = Distance.sqrFourPoints;
-
-    Distance.line2_vec2 = function (line, point) {
-        var __x1 = line[0][0],
-            __y1 = line[0][1],
-            __x2 = line[0][0] + line[1],
-            __y2 = line[0][1] + line[1],
-            __px = point[0],
-            __py = point[1],
-            r_numerator = (__x1 - __x2) * (__px - __x2) + (__y1 - __y2) * (__py - __y2),
-            r_denomenator = (__px - __x2) * (__px - __x2) + (__py - __y2) * (__py - __y2),
-            r = r_denomenator === 0 ? 0 : (r_numerator / r_denomenator),
-            distanceLine,
-            px,
-            py,
-            s;
-
-
-        if ((r >= 0) && (r <= 1)) {
-            return 0;
-        }
-
-        //
-        px = __x2 + r * (__px - __x2);
-        py = __y2 + r * (__py - __y2);
-        //
-        s = ((__y2 - __y1) * (__px - __x2) - (__x2 - __x1) * (__py - __y2)) / r_denomenator;
-        distanceLine = abs(s) * sqrt(r_denomenator);
-
-        return distanceLine;
-    };
-
-    Distance.segment2_vec2 = function (segment, v2) {
-        var A = v2[0] - segment[0],
-            B = v2[1] - segment[1],
-            C = segment[2] - segment[0],
-            D = segment[3] - segment[1],
-            dot = A * C + B * D,
-            len_sq = C * C + D * D,
-            param = dot / len_sq,
-            xx,
-            yy;
-
-        if (param < 0) {
-            xx = segment[0];
-            yy = segment[1];
-        } else if (param > 1) {
-            xx = segment[2];
-            yy = segment[3];
-        } else {
-            xx = segment[0] + param * C;
-            yy = segment[1] + param * D;
-        }
-
-        return Distance.fourPoints(v2[0], v2[1], xx, yy);
-    };
-
-    Distance.rectangle_vec2 = function (rect, vec2) {
-        Rectangle.normalize(rect, rect);
-
-        /*
-        @TODO: Optimize, i cant find the right combination
-        var hcat = vec2.x < rect.v1.x ? 0 : ( vec2.x > rect.v2.x ? 2 : 1 );
-        var vcat = vec2.y > rect.v1.y ? 0 : ( vec2.y < rect.v2.y ? 2 : 1 );
-
-        if(hcat == 0 && vcat == 0) return distance_vec2_vs_vec2(rect.v1, vec2);
-        if(hcat == 2 && vcat == 2) return distance_vec2_vs_vec2(rect.v2, vec2);
-
-        if(hcat == 0 && vcat == 2) return distance_vec2_vs_vec2(new Vec2(rect.v2.x, rect.v1.y), vec2);
-        if(hcat == 2 && vcat == 0) return distance_vec2_vs_vec2(new Vec2(rect.v1.x, rect.v2.y), vec2);
-
-        if(hcat == 0 && vcat == 1) return distance_segment2_vs_vec2(new Vec2(rect.v1.x, rect.v1.y), new Vec2(rect.v1.x, rect.v2.y));
-        if(hcat == 1 && vcat == 0) return distance_segment2_vs_vec2(new Vec2(rect.v1.x, rect.v1.y), new Vec2(rect.v2.x, rect.v1.y));
-
-        if(hcat == 2 && vcat == 1) return distance_segment2_vs_vec2(new Vec2(rect.v2.x, rect.v1.y), new Vec2(rect.v2.x, rect.v2.y));
-        if(hcat == 1 && vcat == 2) return distance_segment2_vs_vec2(new Vec2(rect.v1.x, rect.v2.y), new Vec2(rect.v2.x, rect.v2.y));
-        */
-
-        var s1 = [rect[0][0], rect[0][1], rect[0][0], rect[1][1]],
-            s2 = [rect[0][0], rect[0][1], rect[1][0], rect[0][1]],
-
-            s3 = [rect[0][0], rect[1][1], rect[1][0], rect[1][1]],
-            s4 = [rect[1][0], rect[0][1], rect[1][0], rect[1][1]];
-
-        return min(
-            Distance.segment2_vec2(s1, vec2),
-            Distance.segment2_vec2(s2, vec2),
-            Distance.segment2_vec2(s3, vec2),
-            Distance.segment2_vec2(s4, vec2)
-        );
-    };
-
-    return Distance;
-
-}());
-
-
-if ("undefined" === typeof module) {
-    window.Distance = exp;
-} else {
-    module.exports = exp;
+    return x * x + y * y;
 }
-},{"./rectangle.js":12}],7:[function(require,module,exports){
-var exp;
-(exp = function () {
-    "use strict";
+
+function line2_vec2(line2, vec2) {
+    var __x1 = line2[0][0],
+        __y1 = line2[0][1],
+        __x2 = line2[0][0] + line2[1],
+        __y2 = line2[0][1] + line2[1],
+        __px = vec2[0],
+        __py = vec2[1],
+        r_numerator = (__x1 - __x2) * (__px - __x2) + (__y1 - __y2) * (__py - __y2),
+        r_denomenator = (__px - __x2) * (__px - __x2) + (__py - __y2) * (__py - __y2),
+        r = r_denomenator === 0 ? 0 : (r_numerator / r_denomenator),
+        distanceLine,
+        px,
+        py,
+        s;
 
 
-    var browser = "undefined" === typeof module,
-        Rectangle = browser ? window.Rectangle : require("./rectangle.js"),
-        Distance = browser ? window.Distance : require("./distance.js"),
-        Segment2 = browser ? window.Segment2 : require("./segment2.js"),
-        segment2$inside = Segment2.$.inside,
-        BB2 = browser ? window.BB2 : require("./boundingbox2.js"),
-        Vec2 = browser ? window.Vec2 : require("./vec2.js"),
-        abs = Math.abs,
-        sqrt = Math.sqrt,
-        max = Math.max,
-        min = Math.min,
-        EPS = Math.EPS,
-        Intersection,
-        aux_vec2 = [0, 0],
-
-        //cache
-        OUTSIDE = 1, // no collision
-        PARALLEL = 2, // no collision
-        INSIDE = 4, // no collision
-        COLLIDE = 8, // collision
-        COINCIDENT = 16,  // collision
-        TANGENT = 32, // collision
-
-        rectangle_rectangle,
-        rectangle_vec2,
-        circle_segment,
-        circle_rectangle;
-
-    function near(value, cvalue) {
-        return value > cvalue - EPS && value < cvalue + EPS;
+    if ((r >= 0) && (r <= 1)) {
+        return 0;
     }
 
-
-    Intersection = {
-        OUTSIDE: OUTSIDE,
-        PARALLEL: PARALLEL,
-        COLLIDE: COLLIDE,
-        INSIDE: INSIDE,
-        COINCIDENT: COINCIDENT,
-        TANGENT: TANGENT,
-        $: {}
-    };
-
     //
-    // helpers
+    px = __x2 + r * (__px - __x2);
+    py = __y2 + r * (__py - __y2);
     //
+    s = ((__y2 - __y1) * (__px - __x2) - (__x2 - __x1) * (__py - __y2)) / r_denomenator;
+    distanceLine = abs(s) * sqrt(r_denomenator);
 
-    // x1 < x3
-    // TODO segment collision, maybe using segment-segment collision, this could slow down things!
-    // TODO distance
-    rectangle_rectangle = Intersection.$.rectangle_rectangle = function (x1, y1, x2, y2, x3, y3, x4, y4, collision, distance) {
-        var points,
-            x_inside,
-            y_inside;
+    return distanceLine;
+}
 
-        if (x2 < x3 || y1 > y4 || y2 < y3) {
-            return {reason : OUTSIDE};
-        }
+function segment2_vec2(seg2, vec2) {
+    var A = vec2[0] - seg2[0],
+        B = vec2[1] - seg2[1],
+        C = seg2[2] - seg2[0],
+        D = seg2[3] - seg2[1],
+        dot = A * C + B * D,
+        len_sq = C * C + D * D,
+        param = dot / len_sq,
+        xx,
+        yy;
 
-        x_inside = x1 < x3 && x2 > x4;
-        y_inside = y1 < y3 && y2 > y4;
+    if (param < 0) {
+        xx = seg2[0];
+        yy = seg2[1];
+    } else if (param > 1) {
+        xx = seg2[2];
+        yy = seg2[3];
+    } else {
+        xx = seg2[0] + param * C;
+        yy = seg2[1] + param * D;
+    }
 
-        if (x_inside && y_inside) {
-            return {reason : INSIDE};
-        }
+    return fourPoints(vec2[0], vec2[1], xx, yy);
+}
 
+function rectangle_vec2(rect, vec2) {
+    Rectangle.normalize(rect, rect);
+
+    /*
+    @TODO: Optimize, i cant find the right combination
+    var hcat = vec2.x < rect.v1.x ? 0 : ( vec2.x > rect.v2.x ? 2 : 1 );
+    var vcat = vec2.y > rect.v1.y ? 0 : ( vec2.y < rect.v2.y ? 2 : 1 );
+
+    if(hcat == 0 && vcat == 0) return distance_vec2_vs_vec2(rect.v1, vec2);
+    if(hcat == 2 && vcat == 2) return distance_vec2_vs_vec2(rect.v2, vec2);
+
+    if(hcat == 0 && vcat == 2) return distance_vec2_vs_vec2(new Vec2(rect.v2.x, rect.v1.y), vec2);
+    if(hcat == 2 && vcat == 0) return distance_vec2_vs_vec2(new Vec2(rect.v1.x, rect.v2.y), vec2);
+
+    if(hcat == 0 && vcat == 1) return distance_segment2_vs_vec2(new Vec2(rect.v1.x, rect.v1.y), new Vec2(rect.v1.x, rect.v2.y));
+    if(hcat == 1 && vcat == 0) return distance_segment2_vs_vec2(new Vec2(rect.v1.x, rect.v1.y), new Vec2(rect.v2.x, rect.v1.y));
+
+    if(hcat == 2 && vcat == 1) return distance_segment2_vs_vec2(new Vec2(rect.v2.x, rect.v1.y), new Vec2(rect.v2.x, rect.v2.y));
+    if(hcat == 1 && vcat == 2) return distance_segment2_vs_vec2(new Vec2(rect.v1.x, rect.v2.y), new Vec2(rect.v2.x, rect.v2.y));
+    */
+
+    var s1 = [rect[0][0], rect[0][1], rect[0][0], rect[1][1]],
+        s2 = [rect[0][0], rect[0][1], rect[1][0], rect[0][1]],
+
+        s3 = [rect[0][0], rect[1][1], rect[1][0], rect[1][1]],
+        s4 = [rect[1][0], rect[0][1], rect[1][0], rect[1][1]];
+
+    return min(
+        segment2_vec2(s1, vec2),
+        segment2_vec2(s2, vec2),
+        segment2_vec2(s3, vec2),
+        segment2_vec2(s4, vec2)
+    );
+}
+
+/**
+ * @class Distance
+ */
+var Distance = {
+    fourPoints: fourPoints,
+    sqrFourPoints: sqrFourPoints,
+    line2_vec2: line2_vec2,
+    segment2_vec2: segment2_vec2,
+    rectangle_vec2: rectangle_vec2,
+
+    //alias
+    fourPointsSq: sqrFourPoints
+};
+
+
+module.exports = Distance;
+},{"./rectangle.js":13}],7:[function(require,module,exports){
+function rectangle(context2d, rect, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.strokeRect(rect[0][0], rect[0][1], rect[1][0] - rect[0][0], rect[1][1] - rect[0][1]);
+}
+
+function circle(context2d, circle, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.beginPath();
+    context2d.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
+    context2d.stroke();
+}
+
+function vec2(context2d, vec2, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.beginPath();
+    context2d.moveTo(vec2[0] + 2, vec2[1] + 2);
+    context2d.lineTo(vec2[0] - 2, vec2[1] - 2);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.moveTo(vec2[0] - 2, vec2[1] + 2);
+    context2d.lineTo(vec2[0] + 2, vec2[1] - 2);
+    context2d.stroke();
+}
+
+function segment2(context2d, seg2, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.beginPath();
+    context2d.moveTo(seg2[0], seg2[1]);
+    context2d.lineTo(seg2[2], seg2[3]);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.arc(seg2[0], seg2[1], 1, 0, 2 * Math.PI, false);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.arc(seg2[2], seg2[3], 1, 0, 2 * Math.PI, false);
+    context2d.stroke();
+
+}
+
+function bb2(context2d, bb2, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.strokeRect(bb2[0], bb2[1], bb2[2] - bb2[0], bb2[3] - bb2[1]);
+}
+
+function text(context2d, text, vec2, font) {
+    font = font || "12pt Consolas";
+    context2d.font = font;
+
+    context2d.fillText(text, vec2[0], vec2[1]);
+}
+
+
+var Draw = {
+    vec2: vec2,
+    rectangle: rectangle,
+    circle: circle,
+    segment2: segment2,
+    bb2: bb2,
+
+    text: text
+};
+
+module.exports = Draw;
+},{}],8:[function(require,module,exports){
+var browser = "undefined" === typeof module,
+    Rectangle = browser ? window.Rectangle : require("./rectangle.js"),
+    Distance = browser ? window.Distance : require("./distance.js"),
+    Segment2 = browser ? window.Segment2 : require("./segment2.js"),
+    segment2$inside = Segment2.$.inside,
+    BB2 = browser ? window.BB2 : require("./boundingbox2.js"),
+    Vec2 = browser ? window.Vec2 : require("./vec2.js"),
+    abs = Math.abs,
+    sqrt = Math.sqrt,
+    max = Math.max,
+    min = Math.min,
+    EPS = Math.EPS,
+    aux_vec2 = [0, 0],
+
+    //cache
+    OUTSIDE = 1, // no collision
+    PARALLEL = 2, // no collision
+    INSIDE = 4, // no collision
+    COLLIDE = 8, // collision
+    COINCIDENT = 16,  // collision
+    TANGENT = 32; // collision
+
+function near(num, num2) {
+    return num > num2 - EPS && num < num2 + EPS;
+}
+
+//
+// helpers
+//
+
+// x1 < x3
+// TODO segment collision, maybe using segment-segment collision, this could slow down things!
+// TODO distance
+function $rectangle_rectangle(x1, y1, x2, y2, x3, y3, x4, y4, collision, distance) {
+    var points,
+        x_inside,
+        y_inside;
+
+    if (x2 < x3 || y1 > y4 || y2 < y3) {
+        return {reason : OUTSIDE};
+    }
+
+    x_inside = x1 < x3 && x2 > x4;
+    y_inside = y1 < y3 && y2 > y4;
+
+    if (x_inside && y_inside) {
+        return {reason : INSIDE};
+    }
+
+    if (collision === false) {
+        return {reason: COLLIDE};
+    }
+
+    // complex cases, 4 point collision
+    if (y1 > y3 && (x_inside || y_inside)) {
+        points = [
+            [max(x1, x3), max(y1, y3)],
+            [min(x2, x4), min(y2, y4)],
+            [min(x2, x4), max(y1, y3)],
+            [max(x1, x3), min(y2, y4)]
+        ];
+    } else {
+        //base case
+        points = [
+            [min(x2, x4), max(y1, y3)],
+            [max(x1, x3), min(y2, y4)]
+        ];
+    }
+
+    return {reason: COLLIDE, points : points};
+}
+
+function $rectangle_vec2(x1, y1, x2, y2, x3, y3, collision, distance) {
+    if (x1 > x3 || x2 < x3 || y1 > y3 || y2 < y3) {
+        return {reason: OUTSIDE};
+        // TODO distance: distance ? Distance.rectangle_vec2(rectangle, vec2) : null
+    }
+
+    //if (bb[0] <= v[0] && bb[2] >= v[0] && bb[1] <= v[1] && bb[3] >= v[1]);
+    if (x1 < x3 && x2 > x3 && y1 < y3 && y2 > y3) {
+        return {reason: INSIDE};
+        // TODO distance: distance ? Distance.rectangle_vec2(rectangle, vec2) : null
+    }
+
+    return {reason: COLLIDE, points : [[x3, y3]]};
+}
+
+function $circle_segment2(cx, cy, r, x1, y1, x2, y2, collision, distance) {
+
+    var cx1 = x1 - cx,
+        cy1 = y1 - cy,
+        cx2 = x2 - cx,
+        cy2 = y2 - cy,
+
+        dx = cx2 - cx1,
+        dy = cy2 - cy1,
+        a = dx * dx + dy * dy,
+        b = 2 * ((dx * cx1) + (dy * cy1)),
+        c = (cx1 * cx1) + (cy1 * cy1) - (r * r),
+        delta = b * b - (4 * a * c),
+        u,
+        u1,
+        u2,
+        deltasqrt,
+        p,
+        points;
+
+    if (delta < 0) {
+        // No intersection
+        return {reason: OUTSIDE};
+    }
+
+    if (delta === 0) {
+        // One intersection
         if (collision === false) {
-            return {reason: COLLIDE};
+            return {reason: TANGENT};
         }
 
-        // complex cases, 4 point collision
-        if (y1 > y3 && (x_inside || y_inside)) {
-            points = [
-                [max(x1, x3), max(y1, y3)],
-                [min(x2, x4), min(y2, y4)],
-                [min(x2, x4), max(y1, y3)],
-                [max(x1, x3), min(y2, y4)]
-            ];
-        } else {
-            //base case
-            points = [
-                [min(x2, x4), max(y1, y3)],
-                [max(x1, x3), min(y2, y4)]
-            ];
+        u = -b / (2 * a);
+
+        p = [x1 + (u * dx), y1 + (u * dy)];
+
+        if (segment2$inside(x1, y1, x2, y2, p[0], p[1])) {
+            return {reason: TANGENT, points: [p]};
         }
 
-        return {reason: COLLIDE, points : points};
+        return {reason: OUTSIDE};
+
+
+        /* Use LineP1 instead of LocalP1 because we want our answer in global
+           space, not the circle's local space */
     }
 
-    rectangle_vec2 = Intersection.$.rectangle_vec2 = function (x1, y1, x2, y2, x3, y3, collision, distance) {
-        if (x1 > x3 || x2 < x3 || y1 > y3 || y2 < y3) {
-            return {reason: OUTSIDE};
-            // TODO distance: distance ? Distance.rectangle_vec2(rectangle, vec2) : null
+    // NOTE do not test collision === false, here, there is no performance gain here.
+    if (delta > 0) {
+        // Two intersections
+        deltasqrt = sqrt(delta);
+
+        u1 = (-b + deltasqrt) / (2 * a);
+        u2 = (-b - deltasqrt) / (2 * a);
+
+        points = [];
+
+        p = [x1 + (u1 * dx), y1 + (u1 * dy)];
+
+        if (segment2$inside(x1, y1, x2, y2, p[0], p[1])) {
+            points.push(p);
         }
 
-        //if (bb[0] <= v[0] && bb[2] >= v[0] && bb[1] <= v[1] && bb[3] >= v[1]);
-        if (x1 < x3 && x2 > x3 && y1 < y3 && y2 > y3) {
-            return {reason: INSIDE};
-            // TODO distance: distance ? Distance.rectangle_vec2(rectangle, vec2) : null
+        p = [x1 + (u2 * dx), y1 + (u2 * dy)];
+
+        if (segment2$inside(x1, y1, x2, y2, p[0], p[1])) {
+            points.push(p);
         }
 
-        return {reason: COLLIDE, points : [[x3, y3]]};
-    }
-
-    circle_segment = Intersection.$.circle_segment = function (cx, cy, r, x1, y1, x2, y2, collision, distance) {
-
-        var cx1 = x1 - cx,
-            cy1 = y1 - cy,
-            cx2 = x2 - cx,
-            cy2 = y2 - cy,
-
-            dx = cx2 - cx1,
-            dy = cy2 - cy1,
-            a = dx * dx + dy * dy,
-            b = 2 * ((dx * cx1) + (dy * cy1)),
-            c = (cx1 * cx1) + (cy1 * cy1) - (r * r),
-            delta = b * b - (4 * a * c),
-            u,
-            u1,
-            u2,
-            deltasqrt,
-            p,
-            points;
-
-        if (delta < 0) {
-            // No intersection
-            return {reason: OUTSIDE};
-        }
-
-        if (delta === 0) {
-            // One intersection
-            if (collision === false) {
-                return {reason: TANGENT};
-            }
-
-            u = -b / (2 * a);
-
-            p = [x1 + (u * dx), y1 + (u * dy)];
-
-            if (segment2$inside(x1, y1, x2, y2, p[0], p[1])) {
-                return {reason: TANGENT, points: [p]};
-            }
-
-            return {reason: OUTSIDE};
-
-
-            /* Use LineP1 instead of LocalP1 because we want our answer in global
-               space, not the circle's local space */
-        }
-
-        // NOTE do not test collision === false, here, there is no performance gain here.
-        if (delta > 0) {
-            // Two intersections
-            deltasqrt = sqrt(delta);
-
-            u1 = (-b + deltasqrt) / (2 * a);
-            u2 = (-b - deltasqrt) / (2 * a);
-
-            points = [];
-
-            p = [x1 + (u1 * dx), y1 + (u1 * dy)];
-
-            if (segment2$inside(x1, y1, x2, y2, p[0], p[1])) {
-                points.push(p);
-            }
-
-            p = [x1 + (u2 * dx), y1 + (u2 * dy)];
-
-            if (segment2$inside(x1, y1, x2, y2, p[0], p[1])) {
-                points.push(p);
-            }
-
-            if (points.length) {
-                return {reason: TANGENT, points: points};
-            }
-
-            return {reason: OUTSIDE};
-        }
-
-    }
-
-    circle_rectangle = Intersection.$.circle_rectangle = function (c1, c2, r, x1, y1, x2, y2, collision, distance) {
-        var points = [],
-            r2,
-            collide = false;
-
-        // TODO inside test
-
-        r2 = circle_segment(c1, c2, r, x1, y1, x2, y1, collision, distance);
-
-        if (r2.reason >= COLLIDE) {
-            collide = true;
-            if (collision === true) {
-                points.push(r2.points[0]);
-                if (r2.points.length === 2) {
-                    points.push(r2.points[1]);
-                }
-            }
-        }
-
-        r2 = circle_segment(c1, c2, r, x1, y1, x1, y2, collision, distance);
-
-        if (r2.reason >= COLLIDE) {
-            collide = true;
-            if (collision === true) {
-                points.push(r2.points[0]);
-                if (r2.points.length === 2) {
-                    points.push(r2.points[1]);
-                }
-            }
-        }
-
-        r2 = circle_segment(c1, c2, r, x1, y2, x2, y2, collision, distance);
-
-        if (r2.reason >= COLLIDE) {
-            collide = true;
-            if (collision === true) {
-                points.push(r2.points[0]);
-                if (r2.points.length === 2) {
-                    points.push(r2.points[1]);
-                }
-            }
-        }
-
-        r2 = circle_segment(c1, c2, r, x2, y1, x2, y2, collision, distance);
-
-        if (r2.reason >= COLLIDE) {
-            collide = true;
-            if (collision === true) {
-                points.push(r2.points[0]);
-                if (r2.points.length === 2) {
-                    points.push(r2.points[1]);
-                }
-            }
-        }
-
-        if (collide) {
-            if (points === false) {
-                return {reason: COLLIDE};
-            }
-
-            return {reason: COLLIDE, points: points};
+        if (points.length) {
+            return {reason: TANGENT, points: points};
         }
 
         return {reason: OUTSIDE};
     }
 
-    Intersection.bb2_bb2 = function (bb1, bb2, collision, distance) {
-        BB2.normalize(bb1, bb1);
-        BB2.normalize(bb2, bb2);
+}
 
-        // x1 should be further left!
-        if (bb2[0] < bb1[0]) {
-            return rectangle_rectangle(
-                bb2[0], bb2[1], bb2[2], bb2[3],
-                bb1[0], bb1[1], bb1[2], bb1[3],
-                collision === true,
-                distance === true
-            );
+function $circle_rectangle(cx, cy, r, x1, y1, x2, y2, collision, distance) {
+    var points = [],
+        r2,
+        collide = false;
+
+    // TODO inside test
+
+    r2 = $circle_segment2(cx, cy, r, x1, y1, x2, y1, collision, distance);
+
+    if (r2.reason >= COLLIDE) {
+        collide = true;
+        if (collision === true) {
+            points.push(r2.points[0]);
+            if (r2.points.length === 2) {
+                points.push(r2.points[1]);
+            }
         }
-
-        return rectangle_rectangle(
-            bb1[0], bb1[1], bb1[2], bb1[3],
-            bb2[0], bb2[1], bb2[2], bb2[3],
-            collision === true,
-            distance === true
-        );
-    };
-
-    Intersection.bb2_vec2 = function (bb, vec2, collision, distance) {
-        return rectangle_vec2(bb[0], bb[1], bb[2], bb[3], vec2[0], vec2[1], collision === true, distance === true);
-    };
-    Intersection.vec2_bb2 = function(vec2, bb, collision, distance) {
-        return rectangle_vec2(bb[0], bb[1], bb[2], bb[3], vec2[0], vec2[1], collision === true, distance === true);
     }
 
-    /**
-     * TODO segments of collision
-     */
-    Intersection.rectangle_rectangle = function (rect1, rect2, collision, distance) {
-        Rectangle.normalize(rect1, rect1);
-        Rectangle.normalize(rect2, rect2);
+    r2 = $circle_segment2(cx, cy, r, x1, y1, x1, y2, collision, distance);
 
-        // r1 should be further left!
-        if (rect2[0][0] < rect1[0][0]) {
-            return rectangle_rectangle(
-                rect2[0][0], rect2[0][1], rect2[1][0], rect2[1][1],
-                rect1[0][0], rect1[0][1], rect1[1][0], rect1[1][1],
-                collision === true,
-                distance === true
-            );
+    if (r2.reason >= COLLIDE) {
+        collide = true;
+        if (collision === true) {
+            points.push(r2.points[0]);
+            if (r2.points.length === 2) {
+                points.push(r2.points[1]);
+            }
         }
-
-        return rectangle_rectangle(
-            rect1[0][0], rect1[0][1], rect1[1][0], rect1[1][1],
-            rect2[0][0], rect2[0][1], rect2[1][0], rect2[1][1],
-            collision === true,
-            distance === true
-        );
-
-    };
-
-    /**
-     * TODO segments of collision
-     */
-    Intersection.bb2_rectangle = function (bb2, rectangle_2, collision, distance) {
-        var rect1,
-            rect2;
-
-        BB2.normalize(bb2, bb2);
-        Rectangle.normalize(rectangle_2, rectangle_2);
-
-        // r1 should be further left!
-        if (bb2[0] < rectangle_1[0][0]) {
-            return rectangle_rectangle(
-                rect2[0][0], rect2[0][1], rect2[1][0], rect2[1][1],
-                bb2[0], bb2[1], bb2[2], bb2[3],
-                collision === true,
-                distance === true
-            );
-        }
-
-        return rectangle_rectangle(
-            bb2[0], bb2[1], bb2[2], bb2[3],
-            rect2[0][0], rect2[0][1], rect2[1][0], rect2[1][1],
-            collision === true,
-            distance === true
-        );
-    };
-
-    Intersection.bb2_rectangle = function (rectangle_2, bb2, collision, distance) {
-        return Intersection.bb2_rectangle (bb2, rectangle_2, collision, distance);
     }
 
+    r2 = $circle_segment2(cx, cy, r, x1, y2, x2, y2, collision, distance);
 
-    /**
-     *
-     */
-    Intersection.rectangle_vec2 = function (rectangle, vec2, collision, distance) {
-        return rectangle_vec2(rectangle[0][0], rectangle[0][1], rectangle[1][0], rectangle[1][1], vec2[0], vec2[1], collision === true, distance === true);
-    };
-
-    Intersection.vec2_rectangle = function (vec2, rectangle, collision, distance) {
-        return rectangle_vec2(rectangle[0][0], rectangle[0][1], rectangle[1][0], rectangle[1][1], vec2[0], vec2[1], collision === true, distance === true);
+    if (r2.reason >= COLLIDE) {
+        collide = true;
+        if (collision === true) {
+            points.push(r2.points[0]);
+            if (r2.points.length === 2) {
+                points.push(r2.points[1]);
+            }
+        }
     }
 
-    /**
-     *
-     */
-    Intersection.circle_vec2 = function (circle, vec2, collision, distance) {
-        collision = collision === true;
-        distance = distance === true;
+    r2 = $circle_segment2(cx, cy, r, x2, y1, x2, y2, collision, distance);
 
-        var distance_to_center = Vec2.distance(circle[0], vec2);
-
-        if (near(distance_to_center, circle[1])) {
-            return {reason: COLLIDE, points: [vec2]};
+    if (r2.reason >= COLLIDE) {
+        collide = true;
+        if (collision === true) {
+            points.push(r2.points[0]);
+            if (r2.points.length === 2) {
+                points.push(r2.points[1]);
+            }
         }
-
-        if (distance_to_center < circle[1]) {
-            return {reason: INSIDE, distance: abs(distance_to_center - circle[1])};
-        }
-        return {reason: OUTSIDE, distance: abs(distance_to_center - circle[1])};
-    };
-    Intersection.vec2_circle = function(vec2, circle, collision, distance) {
-        Intersection.circle_vec2(circle, vec2, collision, distance);
     }
-    /**
-     *
-     */
-    Intersection.circle_circle = function (acircle, bcircle, collision, distance) {
-        collision = collision === true;
-        distance = distance === true;
 
-        var result,
-            c1 = acircle[0],
-            c2 = bcircle[0],
-            r1 = acircle[1],
-            r2 = bcircle[1],
-            r1sq = r1 * r1,
-            r2sq = r2 * r2,
-            // Determine minimum and maximum radius where circles can intersect
-            r_max = r1sq + r2sq + r1 * r2 * 2,
-            r_min = r1 - r2,
-            // Determine actual distance between circle circles
-            c_dist_sq = Vec2.distanceSq(c1, c2),
-            c_dist,
-            a,
-            h,
-            p,
-            b,
-            points,
-            z;
-
-        if (c_dist_sq > r_max * r_max) {
-            return {reason: OUTSIDE};
-        }
-
-        if (c_dist_sq < r_min * r_min) {
-            return {reason: INSIDE};
-        }
-
-        if (collision === false) {
+    if (collide) {
+        if (points === false) {
             return {reason: COLLIDE};
         }
 
-        points = [];
-
-        c_dist = sqrt(c_dist_sq);
-
-        a = (r1sq - r2sq + c_dist_sq) / (2 * c_dist);
-        z = r1sq - a * a;
-        h = sqrt(z > 0 ? z : -z);
-
-        Vec2.lerp(aux_vec2, c1, c2, a / c_dist);
-
-        b = h / c_dist;
-
-        points.push([aux_vec2[0] - b * (c2[1] - c1[1]), aux_vec2[1] + b * (c2[0] - c1[0])]);
-        points.push([aux_vec2[0] + b * (c2[1] - c1[1]), aux_vec2[1] - b * (c2[0] - c1[0])]);
-
         return {reason: COLLIDE, points: points};
-    };
+    }
 
-    Intersection.circle_bb2 = function (circle, bb, collision, distance) {
-        return circle_rectangle(circle[0][0], circle[0][1], circle[1],
-            bb[0], bb[1], bb[2], bb[3],
-            collision === true, distance === true);
-    };
+    return {reason: OUTSIDE};
+}
 
-    Intersection.bb2_circle = function (bb, circle, collision, distance) {
-        return circle_rectangle(circle[0][0], circle[0][1], circle[1],
-            bb[0], bb[1], bb[2], bb[3],
-            collision === true, distance === true);
-    };
+function bb2_bb2(bb2_1, bb2_2, collision, distance) {
+    BB2.normalize(bb2_1, bb2_1);
+    BB2.normalize(bb2_2, bb2_2);
 
-    Intersection.circle_rectangle = function (circle, rect, collision, distance) {
-        return circle_rectangle(circle[0][0], circle[0][1], circle[1],
-            rect[0][0], rect[0][1], rect[1][0], rect[1][1],
-            collision === true, distance === true);
-    };
-
-    Intersection.rectangle_circle = function (rect, circle, collision, distance) {
-        return circle_rectangle(circle[0][0], circle[0][1], circle[1],
-            rect[0][0], rect[0][1], rect[1][0], rect[1][1],
-            collision === true, distance === true);
-    };
-
-    Intersection.circle_segment2 = function (circle, segment2, collision, distance) {
-        return circle_segment(
-            circle[0][0], circle[0][1], circle[1],
-            segment2[0], segment2[1], segment2[2], segment2[3],
+    // x1 should be further left!
+    if (bb2_2[0] < bb2_1[0]) {
+        return $rectangle_rectangle(
+            bb2_2[0], bb2_2[1], bb2_2[2], bb2_2[3],
+            bb2_1[0], bb2_1[1], bb2_1[2], bb2_1[3],
             collision === true,
             distance === true
         );
-    };
+    }
 
-    Intersection.segment2_circle = function (segment2, circle, collision, distance) {
-        return circle_segment(
-            circle[0][0], circle[0][1], circle[1],
-            segment2[0], segment2[1], segment2[2], segment2[3],
+    return $rectangle_rectangle(
+        bb2_1[0], bb2_1[1], bb2_1[2], bb2_1[3],
+        bb2_2[0], bb2_2[1], bb2_2[2], bb2_2[3],
+        collision === true,
+        distance === true
+    );
+}
+
+function bb2_vec2(bb2, vec2, collision, distance) {
+    return $rectangle_vec2(bb2[0], bb2[1], bb2[2], bb2[3], vec2[0], vec2[1], collision === true, distance === true);
+}
+
+function vec2_bb2(vec2, bb2, collision, distance) {
+    return $rectangle_vec2(bb2[0], bb2[1], bb2[2], bb2[3], vec2[0], vec2[1], collision === true, distance === true);
+}
+
+/**
+ * TODO segments of collision
+ */
+function rectangle_rectangle(rect1, rect2, collision, distance) {
+    Rectangle.normalize(rect1, rect1);
+    Rectangle.normalize(rect2, rect2);
+
+    // r1 should be further left!
+    if (rect2[0][0] < rect1[0][0]) {
+        return $rectangle_rectangle(
+            rect2[0][0], rect2[0][1], rect2[1][0], rect2[1][1],
+            rect1[0][0], rect1[0][1], rect1[1][0], rect1[1][1],
             collision === true,
             distance === true
         );
-    };
+    }
 
-    Intersection.line2_line2 =  function (aline, bline, collision, distance) {
-        collision = collision === true;
-        distance = distance === true;
+    return $rectangle_rectangle(
+        rect1[0][0], rect1[0][1], rect1[1][0], rect1[1][1],
+        rect2[0][0], rect2[0][1], rect2[1][0], rect2[1][1],
+        collision === true,
+        distance === true
+    );
 
-        var a1 = [aline[0][0], aline[0][1]],
-            a2 = [0, 0], // XXX check! m,1 ??
-            b1 = [bline[0][0], bline[0][1]],
-            b2 = [0, 0],
-            ua_t,
-            ub_t,
-            u_b,
-            ua,
-            ub;
+}
 
-        Vec2.add(a2, a1, [aline[1], 1]);
-        Vec2.add(b2, b1, [bline[1], 1]);
+/**
+ * TODO segments of collision
+ */
+function bb2_rectangle(bb2, rect, collision, distance) {
+    BB2.normalize(bb2, bb2);
+    Rectangle.normalize(rect, rect);
 
-        ua_t = (b2[0] - b1[0]) * (a1[1] - b1[1]) - (b2[1] - b1[1]) * (a1[0] - b1[0]);
-        ub_t = (a2[0] - a1[0]) * (a1[1] - b1[1]) - (a2[1] - a1[1]) * (a1[0] - b1[0]);
-        u_b  = (b2[1] - b1[1]) * (a2[0] - a1[0]) - (b2[0] - b1[0]) * (a2[1] - a1[1]);
+    // r1 should be further left!
+    if (bb2[0] < rect[0][0]) {
+        return $rectangle_rectangle(
+            rect[0][0], rect[0][1], rect[1][0], rect[1][1],
+            bb2[0], bb2[1], bb2[2], bb2[3],
+            collision === true,
+            distance === true
+        );
+    }
 
-        if (u_b !== 0) {
-            ua = ua_t / u_b;
-            ub = ub_t / u_b;
+    return $rectangle_rectangle(
+        bb2[0], bb2[1], bb2[2], bb2[3],
+        rect[0][0], rect[0][1], rect[1][0], rect[1][1],
+        collision === true,
+        distance === true
+    );
+}
 
-            if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
-                if (collision === false) {
-                    return {reason: COLLIDE};
-                }
-                return {reason: COLLIDE, points: [[a1[0] + ua * (a2[0] - a1[0]), a1[1] + ua * (a2[1] - a1[1])]]};
-            }
-            return {reason: OUTSIDE};
-        }
-        if (ua_t === 0 || ub_t === 0) {
-            return {reason: COINCIDENT};
-        }
-        return {reason: PARALLEL};
-    };
+function rectangle_bb2(rect, bb2, collision, distance) {
+    return bb2_rectangle(bb2, rect, collision, distance);
+}
 
-    Intersection.segment2_segment2 = function (asegment, bsegment, collision, distance) {
-        collision = collision === true;
-        distance = distance === true;
 
-        var mua,
-            mub,
-            denom,
-            numera,
-            numerb,
-            points,
-            i,
-            max,
-            minp,
-            maxp,
-            dist;
+/**
+ *
+ */
+function rectangle_vec2(rect, vec2, collision, distance) {
+    return $rectangle_vec2(rect[0][0], rect[0][1], rect[1][0], rect[1][1], vec2[0], vec2[1], collision === true, distance === true);
+}
 
-        denom  = (bsegment[3] - bsegment[1]) * (asegment[2] - asegment[0]) - (bsegment[2] - bsegment[0]) * (asegment[3] - asegment[1]);
-        numera = (bsegment[2] - bsegment[0]) * (asegment[1] - bsegment[1]) - (bsegment[3] - bsegment[1]) * (asegment[0] - bsegment[0]);
-        numerb = (asegment[2] - asegment[0]) * (asegment[1] - bsegment[1]) - (asegment[3] - asegment[1]) * (asegment[0] - bsegment[0]);
+function vec2_rectangle(vec2, rect, collision, distance) {
+    return $rectangle_vec2(rect[0][0], rect[0][1], rect[1][0], rect[1][1], vec2[0], vec2[1], collision === true, distance === true);
+}
 
-        /* Are the line coincident? */
-        if (Math.abs(numera) < Math.EPS && Math.abs(numerb) < Math.EPS && Math.abs(denom) < Math.EPS) {
+/**
+ *
+ */
+function circle_vec2(circle, vec2, collision, distance) {
+    collision = collision === true;
+    distance = distance === true;
 
+    var distance_to_center = Vec2.distance(circle[0], vec2);
+
+    if (near(distance_to_center, circle[1])) {
+        return {reason: COLLIDE, points: [vec2]};
+    }
+
+    if (distance_to_center < circle[1]) {
+        return {reason: INSIDE, distance: abs(distance_to_center - circle[1])};
+    }
+    return {reason: OUTSIDE, distance: abs(distance_to_center - circle[1])};
+}
+
+function vec2_circle(vec2, circle, collision, distance) {
+    circle_vec2(circle, vec2, collision, distance);
+}
+/**
+ *
+ */
+function circle_circle(circle_1, circle_2, collision, distance) {
+    collision = collision === true;
+    distance = distance === true;
+
+    var c1 = circle_1[0],
+        c2 = circle_2[0],
+        r1 = circle_1[1],
+        r2 = circle_2[1],
+        r1sq = r1 * r1,
+        r2sq = r2 * r2,
+        // Determine minimum and maximum radius where circles can intersect
+        r_max = r1sq + r2sq + r1 * r2 * 2,
+        r_min = r1 - r2,
+        // Determine actual distance between circle circles
+        c_dist_sq = Vec2.distanceSq(c1, c2),
+        c_dist,
+        a,
+        h,
+        b,
+        points,
+        z;
+
+    if (c_dist_sq > r_max * r_max) {
+        return {reason: OUTSIDE};
+    }
+
+    if (c_dist_sq < r_min * r_min) {
+        return {reason: INSIDE};
+    }
+
+    if (collision === false) {
+        return {reason: COLLIDE};
+    }
+
+    points = [];
+
+    c_dist = sqrt(c_dist_sq);
+
+    a = (r1sq - r2sq + c_dist_sq) / (2 * c_dist);
+    z = r1sq - a * a;
+    h = sqrt(z > 0 ? z : -z);
+
+    Vec2.lerp(aux_vec2, c1, c2, a / c_dist);
+
+    b = h / c_dist;
+
+    points.push([aux_vec2[0] - b * (c2[1] - c1[1]), aux_vec2[1] + b * (c2[0] - c1[0])]);
+    points.push([aux_vec2[0] + b * (c2[1] - c1[1]), aux_vec2[1] - b * (c2[0] - c1[0])]);
+
+    return {reason: COLLIDE, points: points};
+}
+
+function circle_bb2(circle, bb2, collision, distance) {
+    return $circle_rectangle(circle[0][0], circle[0][1], circle[1],
+        bb2[0], bb2[1], bb2[2], bb2[3],
+        collision === true, distance === true);
+}
+
+function bb2_circle(bb2, circle, collision, distance) {
+    return $circle_rectangle(circle[0][0], circle[0][1], circle[1],
+        bb2[0], bb2[1], bb2[2], bb2[3],
+        collision === true, distance === true);
+}
+
+function circle_rectangle(circle, rect, collision, distance) {
+    return $circle_rectangle(circle[0][0], circle[0][1], circle[1],
+        rect[0][0], rect[0][1], rect[1][0], rect[1][1],
+        collision === true, distance === true);
+}
+
+function rectangle_circle(rect, circle, collision, distance) {
+    return $circle_rectangle(circle[0][0], circle[0][1], circle[1],
+        rect[0][0], rect[0][1], rect[1][0], rect[1][1],
+        collision === true, distance === true);
+}
+
+function circle_segment2(circle, seg2, collision, distance) {
+    return $circle_segment2(
+        circle[0][0], circle[0][1], circle[1],
+        seg2[0], seg2[1], seg2[2], seg2[3],
+        collision === true,
+        distance === true
+    );
+}
+
+function segment2_circle(seg2, circle, collision, distance) {
+    return $circle_segment2(
+        circle[0][0], circle[0][1], circle[1],
+        seg2[0], seg2[1], seg2[2], seg2[3],
+        collision === true,
+        distance === true
+    );
+}
+
+function line2_line2(line2_1, line2_2, collision, distance) {
+    collision = collision === true;
+    distance = distance === true;
+
+    var a1 = [line2_1[0][0], line2_1[0][1]],
+        a2 = [0, 0], // XXX check! m,1 ??
+        b1 = [line2_2[0][0], line2_2[0][1]],
+        b2 = [0, 0],
+        ua_t,
+        ub_t,
+        u_b,
+        ua,
+        ub;
+
+    Vec2.add(a2, a1, [line2_1[1], 1]);
+    Vec2.add(b2, b1, [line2_2[1], 1]);
+
+    ua_t = (b2[0] - b1[0]) * (a1[1] - b1[1]) - (b2[1] - b1[1]) * (a1[0] - b1[0]);
+    ub_t = (a2[0] - a1[0]) * (a1[1] - b1[1]) - (a2[1] - a1[1]) * (a1[0] - b1[0]);
+    u_b  = (b2[1] - b1[1]) * (a2[0] - a1[0]) - (b2[0] - b1[0]) * (a2[1] - a1[1]);
+
+    if (u_b !== 0) {
+        ua = ua_t / u_b;
+        ub = ub_t / u_b;
+
+        if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
             if (collision === false) {
-                return {
-                    reason : COLLIDE
-                };
+                return {reason: COLLIDE};
             }
+            return {reason: COLLIDE, points: [[a1[0] + ua * (a2[0] - a1[0]), a1[1] + ua * (a2[1] - a1[1])]]};
+        }
+        return {reason: OUTSIDE};
+    }
+    if (ua_t === 0 || ub_t === 0) {
+        return {reason: COINCIDENT};
+    }
+    return {reason: PARALLEL};
+}
 
-            // check if the intersections is a line!
-            points = [];
-            points.push(Intersection.segment2_vec2(bsegment, [asegment[0], asegment[1]]));
-            points.push(Intersection.segment2_vec2(bsegment, [asegment[2], asegment[3]]));
-            points.push(Intersection.segment2_vec2(asegment, [bsegment[0], bsegment[1]]));
-            points.push(Intersection.segment2_vec2(asegment, [bsegment[2], bsegment[3]]));
-            // now check those intersections, remove no intersections!
-            max = points.length;
-            minp = { distance: false, point: null};
-            maxp = { distance: false, point: null};
+function segment2_segment2(seg2_1, seg2_2, collision, distance) {
+    collision = collision === true;
+    distance = distance === true;
 
+    var mua,
+        mub,
+        denom,
+        numera,
+        numerb,
+        points,
+        i,
+        max,
+        minp,
+        maxp,
+        dist;
 
-            for (i = 0; i < max; ++i) {
-                if (points[i].reason <= COLLIDE) { // no collision
-                    points.splice(i, 1);
-                    --i;
-                    max = points.length;
-                } else {
+    denom  = (seg2_2[3] - seg2_2[1]) * (seg2_1[2] - seg2_1[0]) - (seg2_2[2] - seg2_2[0]) * (seg2_1[3] - seg2_1[1]);
+    numera = (seg2_2[2] - seg2_2[0]) * (seg2_1[1] - seg2_2[1]) - (seg2_2[3] - seg2_2[1]) * (seg2_1[0] - seg2_2[0]);
+    numerb = (seg2_1[2] - seg2_1[0]) * (seg2_1[1] - seg2_2[1]) - (seg2_1[3] - seg2_1[1]) * (seg2_1[0] - seg2_2[0]);
 
-                    dist = Vec2.lengthSq(points[i].points[0]);
+    /* Are the line coincident? */
+    if (Math.abs(numera) < Math.EPS && Math.abs(numerb) < Math.EPS && Math.abs(denom) < Math.EPS) {
 
-                    if (minp.distance === false || minp.distance > dist) {
-                        minp.distance = dist;
-                        minp.point = points[i].points[0];
-                    }
-
-                    if (maxp.distance === false || minp.distance < dist) {
-                        maxp.distance = dist;
-                        maxp.point = points[i].points[0];
-                    }
-                }
-            }
-
-            if (points.length > 1) {
-                //line intersection!
-                return {
-                    reason : COLLIDE,
-                    points: [],
-                    segments: [[minp.point[0], minp.point[1], maxp.point[0], maxp.point[1]]]
-                };
-            }
-
+        if (collision === false) {
             return {
-                reason : COINCIDENT
+                reason : COLLIDE
             };
         }
 
-        /* Are the line parallel */
-        if (Math.abs(denom) < Math.EPS) {
-            return {reason: PARALLEL};
+        // check if the intersections is a line!
+        points = [];
+        points.push(segment2_vec2(seg2_2, [seg2_1[0], seg2_1[1]]));
+        points.push(segment2_vec2(seg2_2, [seg2_1[2], seg2_1[3]]));
+        points.push(segment2_vec2(seg2_1, [seg2_2[0], seg2_2[1]]));
+        points.push(segment2_vec2(seg2_1, [seg2_2[2], seg2_2[3]]));
+        // now check those intersections, remove no intersections!
+        max = points.length;
+        minp = { distance: false, point: null};
+        maxp = { distance: false, point: null};
+
+
+        for (i = 0; i < max; ++i) {
+            if (points[i].reason <= COLLIDE) { // no collision
+                points.splice(i, 1);
+                --i;
+                max = points.length;
+            } else {
+
+                dist = Vec2.lengthSq(points[i].points[0]);
+
+                if (minp.distance === false || minp.distance > dist) {
+                    minp.distance = dist;
+                    minp.point = points[i].points[0];
+                }
+
+                if (maxp.distance === false || minp.distance < dist) {
+                    maxp.distance = dist;
+                    maxp.point = points[i].points[0];
+                }
+            }
         }
 
-        /* Is the intersection along the the segments */
-        mua = numera / denom;
-        mub = numerb / denom;
-        if (mua < 0 || mua > 1 || mub < 0 || mub > 1) {
-            return {reason: OUTSIDE};
-        }
-
-        if (collision === false) {
-            return {reason: COLLIDE};
-        }
-
-        return {reason: COLLIDE, points: [[asegment[0] + mua * (asegment[2] - asegment[0]), asegment[1] + mua * (asegment[3] - asegment[1])]]};
-    };
-
-    Intersection.segment2_vec2 = function (seg2, vec2) {
-        var dis = Distance.segment2_vec2(seg2, vec2);
-
-        if (dis === 0) {
+        if (points.length > 1) {
+            //line intersection!
             return {
                 reason : COLLIDE,
-                points: [vec2]
+                points: [],
+                segments: [[minp.point[0], minp.point[1], maxp.point[0], maxp.point[1]]]
             };
         }
 
         return {
-            reason : OUTSIDE,
-            distance: dis
+            reason : COINCIDENT
         };
-    };
-
-    Intersection.vec2_segment2 = function (vec2, seg2) {
-        return Intersection.segment2_vec2(seg2, vec2);
     }
 
+    /* Are the line parallel */
+    if (Math.abs(denom) < Math.EPS) {
+        return {reason: PARALLEL};
+    }
 
-    return Intersection;
-}());
+    /* Is the intersection along the the segments */
+    mua = numera / denom;
+    mub = numerb / denom;
+    if (mua < 0 || mua > 1 || mub < 0 || mub > 1) {
+        return {reason: OUTSIDE};
+    }
 
+    if (collision === false) {
+        return {reason: COLLIDE};
+    }
 
-if ("undefined" === typeof module) {
-    window.Intersection = exp;
-} else {
-    module.exports = exp;
+    return {reason: COLLIDE, points: [[seg2_1[0] + mua * (seg2_1[2] - seg2_1[0]), seg2_1[1] + mua * (seg2_1[3] - seg2_1[1])]]};
 }
-},{"./boundingbox2.js":4,"./distance.js":6,"./rectangle.js":12,"./segment2.js":13,"./vec2.js":15}],8:[function(require,module,exports){
+
+function segment2_vec2(seg2, vec2) {
+    var dis = Distance.segment2_vec2(seg2, vec2);
+
+    if (dis === 0) {
+        return {
+            reason : COLLIDE,
+            points: [vec2]
+        };
+    }
+
+    return {
+        reason : OUTSIDE,
+        distance: dis
+    };
+}
+
+function vec2_segment2(vec2, seg2) {
+    return segment2_vec2(seg2, vec2);
+}
+
+/**
+ * @class Intersection
+ */
+var Intersection = {
+    OUTSIDE: OUTSIDE,
+    PARALLEL: PARALLEL,
+    COLLIDE: COLLIDE,
+    INSIDE: INSIDE,
+    COINCIDENT: COINCIDENT,
+    TANGENT: TANGENT,
+
+    bb2_bb2: bb2_bb2,
+    bb2_vec2: bb2_vec2,
+    vec2_bb2: vec2_bb2,
+    rectangle_rectangle: rectangle_rectangle,
+    bb2_rectangle: bb2_rectangle,
+    rectangle_bb2: rectangle_bb2,
+    rectangle_vec2: rectangle_vec2,
+    vec2_rectangle: vec2_rectangle,
+    circle_vec2: circle_vec2,
+    vec2_circle: vec2_circle,
+    circle_circle: circle_circle,
+    circle_bb2: circle_bb2,
+    bb2_circle: bb2_circle,
+    circle_rectangle: circle_rectangle,
+    rectangle_circle: rectangle_circle,
+    circle_segment2: circle_segment2,
+    segment2_circle: segment2_circle,
+    line2_line2: line2_line2,
+    segment2_segment2: segment2_segment2,
+    segment2_vec2: segment2_vec2,
+    vec2_segment2: vec2_segment2,
+
+    $: {
+        rectangle_rectangle: $rectangle_rectangle,
+        rectangle_vec2: $rectangle_vec2,
+        circle_segment2: $circle_segment2,
+        circle_rectangle: $circle_rectangle
+    }
+};
+
+
+module.exports = Intersection;
+},{"./boundingbox2.js":4,"./distance.js":6,"./rectangle.js":13,"./segment2.js":14,"./vec2.js":16}],9:[function(require,module,exports){
 /**
  * @returns {Line2}
  */
@@ -1333,10 +1423,8 @@ var Line2 = {
 };
 
 
-if ("undefined" !== typeof module) {
-    module.exports = Line2;
-}
-},{}],9:[function(require,module,exports){
+module.exports = Line2;
+},{}],10:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -1409,7 +1497,7 @@ if ("undefined" !== typeof module) {
 
 
 }());
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // cache variables
 var DEG_TO_RAD = Math.DEG_TO_RAD,
     PI = Math.PI,
@@ -2176,10 +2264,8 @@ var Matrix2D =  {
     setScale: scalation,
 };
 
-if ("undefined" !== typeof module) {
-    module.exports = Matrix2D;
-}
-},{}],11:[function(require,module,exports){
+module.exports = Matrix2D;
+},{}],12:[function(require,module,exports){
 var exp;
 (exp = function () {
     "use strict";
@@ -2488,7 +2574,7 @@ if ("undefined" === typeof module) {
 } else {
     module.exports = exp;
 }
-},{"./xorshift.js":16,"object-enhancements":19}],12:[function(require,module,exports){
+},{"./xorshift.js":17,"object-enhancements":20}],13:[function(require,module,exports){
 var Vec2 = "undefined" === typeof exports ? window.Vec2 : require("./vec2.js"),
     vec2_distance = Vec2.distance,
     max = Math.max,
@@ -2626,10 +2712,8 @@ var Rectangle = {
 };
 
 
-if ("undefined" !== typeof module) {
-    module.exports = Rectangle;
-}
-},{"./vec2.js":15}],13:[function(require,module,exports){
+module.exports = Rectangle;
+},{"./vec2.js":16}],14:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     within = Vec2.$.within,
@@ -2773,10 +2857,8 @@ var Segment2 =  {
 };
 
 
-if ("undefined" !== typeof module) {
-    module.exports = Segment2;
-}
-},{"./vec2.js":15}],14:[function(require,module,exports){
+module.exports = Segment2;
+},{"./vec2.js":16}],15:[function(require,module,exports){
 var exp;
 (exp = function () {
     "use strict";
@@ -3152,7 +3234,7 @@ if ("undefined" === typeof module) {
 } else {
     module.exports = exp;
 }
-},{"array-enhancements":17}],15:[function(require,module,exports){
+},{"array-enhancements":18}],16:[function(require,module,exports){
 var aux_vec = [0, 0],
     __x = 0,
     __y = 0,
@@ -3873,12 +3955,8 @@ Vec2 = {
     }
 };
 
-
-// node
-if ("undefined" !== typeof module) {
-    module.exports = Vec2;
-}
-},{}],16:[function(require,module,exports){
+module.exports = Vec2;
+},{}],17:[function(require,module,exports){
 var exp;
 (exp = function () {
     "use strict";
@@ -3971,14 +4049,14 @@ if ("undefined" === typeof module) {
 } else {
     module.exports = exp;
 }
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function () {
     "use strict";
 
     require("./lib/arrays.js");
 
 }());
-},{"./lib/arrays.js":18}],18:[function(require,module,exports){
+},{"./lib/arrays.js":19}],19:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -4654,14 +4732,14 @@ if ("undefined" === typeof module) {
     }
 
 }());
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/objects.js");
 
 }());
-},{"./lib/objects.js":20}],20:[function(require,module,exports){
+},{"./lib/objects.js":21}],21:[function(require,module,exports){
 (function () {
     "use strict";
 

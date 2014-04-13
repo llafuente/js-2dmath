@@ -4,18 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>Untitled Document</title>
 
-<script src="../lib/math.js" type="text/javascript" ></script>
-<script src="../lib/vec2.js" type="text/javascript" ></script>
-<script src="../lib/line2.js" type="text/javascript" ></script>
-<script src="../lib/segment2.js" type="text/javascript" ></script>
-<script src="../lib/circle.js" type="text/javascript" ></script>
-<script src="../lib/rectangle.js" type="text/javascript" ></script>
-<script src="../lib/polygon.js" type="text/javascript" ></script>
-<script src="../lib/matrix2d.js" type="text/javascript" ></script>
-<script src="../lib/beizer.js" type="text/javascript" ></script>
-<script src="../lib/distance.js" type="text/javascript" ></script>
-<script src="../lib/intersection.js" type="text/javascript" ></script>
-<script src="../lib/boundingbox2.js" type="text/javascript" ></script>
+<script src="../js-2dmath-browser.js" type="text/javascript" ></script>
 
 
 </head>
@@ -27,60 +16,7 @@
 <script>
 var ctx = document.getElementById("canvas").getContext("2d");
 
-function draw_circle(circle, style) {
-    ctx.strokeStyle = style || "green";
-    ctx.beginPath();
-    ctx.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
-    ctx.stroke();
-}
-
-function draw_vec2(vec2, style, comment) {
-    ctx.strokeStyle = style || "green";
-    console.log("draw_vec2", vec2, style);
-
-    ctx.beginPath();
-    ctx.moveTo(vec2[0] + 2, vec2[1] + 2);
-    ctx.lineTo(vec2[0] - 2, vec2[1] - 2);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(vec2[0] - 2, vec2[1] + 2);
-    ctx.lineTo(vec2[0] + 2, vec2[1] - 2);
-    ctx.stroke();
-
-    ctx.font = "12pt Consolas";
-    ctx.fillText(comment, vec2[0] + 7, vec2[1] + 7);
-}
-
-function draw_segment2(segment2, style) {
-    ctx.strokeStyle = style || "green";
-
-    ctx.beginPath();
-    ctx.moveTo(segment2[0], segment2[1]);
-    ctx.lineTo(segment2[2], segment2[3]);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(segment2[0], segment2[1], 1, 0, 2 * Math.PI, false);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(segment2[2], segment2[3], 1, 0, 2 * Math.PI, false);
-    ctx.stroke();
-
-}
-
-function draw_rectangle(rect, style) {
-    ctx.strokeStyle = style || "green";
-
-    ctx.strokeRect(rect[0][0], rect[0][1], rect[1][0] - rect[0][0], rect[1][1] - rect[0][1]);
-}
-
-function draw_bb2(bb, style) {
-    ctx.strokeStyle = style || "green";
-
-    ctx.strokeRect(bb[0], bb[1], bb[2] - bb[0], bb[3] - bb[1]);
-}
+require("js-2dmath").globalize(window);
 
 ctx.strokeStyle = "grey";
 ctx.beginPath();
@@ -96,9 +32,6 @@ ctx.stroke();
 
 ctx.translate(640 * 0.5, 480 * 0.5);
 
-
-
-
 var s = Segment2.create(-50, -50, 50, 50),
     a = Vec2.create(40, 25),
     b = Vec2.create(100, 0),
@@ -106,9 +39,12 @@ var s = Segment2.create(-50, -50, 50, 50),
 
 Segment2.closestPoint(aux, s, a);
 
-draw_segment2(s, "red");
+Draw.segment2(ctx, s, "red");
 
-draw_vec2(a, "red", "point");
-draw_vec2(aux, "red", "closest");
+Draw.vec2(ctx, a, "red");
+Draw.text(ctx, "point", Vec2.add([], a, [0,-7]));
+
+Draw.vec2(ctx, aux, "red");
+Draw.text(ctx, "closest", Vec2.add([], aux, [-65,7]));
 
 </script>

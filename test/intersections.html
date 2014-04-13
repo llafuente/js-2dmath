@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
+<title>Untitled Document</title>
+
+<script src="../js-2dmath-browser.js" type="text/javascript" ></script>
+
+</head>
+<body>
+<canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
+</body>
+</html>
+
+<script>
+var ctx = document.getElementById("canvas").getContext("2d");
+
+require("js-2dmath").globalize(window);
+
+/*
+var c = Circle.create(50, 50, 20);
+var v2 = Vec2.create(50, 50);
+var s = Segment2.create(10, 50, 100, 50);
+//var s = Segment2.create(45, 50, 100, 50);
+
+Draw.circle(c);
+Draw.vec2(v2);
+Draw.segment2(s, "blue");
+
+var r = Intersection.circle_segment2(c, s);
+console.log(r);
+
+if (r.success && r.reason == 1) {
+    Draw.vec2(r.points[0], "red")
+    if (r.points[1]) {
+        Draw.vec2(r.points[1], "red")
+    }
+}
+
+var c2 = Circle.create(150, 150, 20);
+var rect = Rectangle.create(120, 120, 160, 160);
+console.log(rect);
+
+Draw.rectangle(rect, "purple")
+
+
+var bb = BB2.fromRectangle(rect);
+
+console.log("circle", c2);
+console.log("rect", rect);
+console.log("bb", bb);
+
+
+
+if (r.success && r.reason == 1) {
+    console.log("xxxx");
+    Draw.vec2(r.points[0], "red");
+    if (r.points[1]) {
+        console.log("xxxx");
+        Draw.vec2(r.points[1], "red")
+    }
+}
+
+console.log("circle_bb", r);
+
+var c3 = Circle.create(300, 300, 50);
+var s3 = Segment2.create(275, 275, 350, 275);
+Draw.circle(c3);
+Draw.segment2(s3, "blue");
+console.log(Intersection.circle_segment2(c3, s3));
+
+*/
+
+function draw_test(draw1, val1, draw2, val2, int_fn) {
+
+    var r = int_fn(val1, val2, true, true),
+        i;
+
+
+    console.log("result", r);
+    draw1(ctx, val1, "blue");
+
+    if (r.points && r.points.length) {
+        draw2(ctx, val2, "green");
+        for(i = 0; i < r.points.length; ++i) {
+            Draw.vec2(ctx, r.points[i], "red");
+        }
+    } else if (r.segments && r.segments.length) {
+        draw2(ctx, val2, "green");
+
+        for(i = 0; i < r.segments.length; ++i) {
+            Draw.segment2(ctx, r.segments[i], "red");
+        }
+
+    } else {
+        draw2(ctx, val2, "cyan");
+    }
+}
+
+draw_test(Draw.circle, Circle.create(35, 35, 20), Draw.bb2, BB2.create(10, 0, 50, 80), Intersection.circle_bb2);
+
+
+
+draw_test(Draw.circle, Circle.create(35, 100, 20), Draw.circle, Circle.create(35, 100, 30), Intersection.circle_circle);
+draw_test(Draw.circle, Circle.create(110, 100, 40), Draw.circle, Circle.create(110, 100, 20), Intersection.circle_circle);
+draw_test(Draw.circle, Circle.create(190, 100, 20), Draw.circle, Circle.create(200, 100, 20), Intersection.circle_circle);
+draw_test(Draw.circle, Circle.create(250, 100, 20), Draw.circle, Circle.create(250, 90, 20), Intersection.circle_circle);
+draw_test(Draw.circle, Circle.create(300, 80, 20), Draw.circle, Circle.create(300, 120, 20), Intersection.circle_circle);
+
+draw_test(Draw.circle, Circle.create(50, 200, 20), Draw.segment2, Segment2.create(10, 200, 80, 200), Intersection.circle_segment2);
+draw_test(Draw.circle, Circle.create(110, 200, 20), Draw.segment2, Segment2.create(110, 200, 140, 200), Intersection.circle_segment2);
+
+draw_test(Draw.circle, Circle.create(200, 200, 20), Draw.bb2, BB2.create(180, 180, 220, 220), Intersection.circle_bb2);
+draw_test(Draw.circle, Circle.create(250, 200, 20), Draw.bb2, BB2.create(230, 190, 270, 210), Intersection.circle_bb2);
+
+
+draw_test(Draw.rectangle, Rectangle.create(50, 300, 80, 330), Draw.rectangle, Rectangle.create(55, 305, 90, 340), Intersection.rectangle_rectangle);
+draw_test(Draw.rectangle, Rectangle.create(150, 300, 140, 320), Draw.rectangle, Rectangle.create(145, 295, 130, 310), Intersection.rectangle_rectangle);
+
+draw_test(Draw.rectangle, Rectangle.create(200, 300, 230, 330), Draw.rectangle, Rectangle.create(190, 310, 240, 320), Intersection.rectangle_rectangle);
+draw_test(Draw.rectangle, Rectangle.create(250, 300, 280, 330), Draw.rectangle, Rectangle.create(260, 290, 270, 340), Intersection.rectangle_rectangle);
+
+draw_test(Draw.segment2, Segment2.create(50, 425, 100, 425), Draw.segment2, Segment2.create(75, 400, 75, 450), Intersection.segment2_segment2);
+draw_test(Draw.segment2, Segment2.create(125, 425, 150, 425), Draw.segment2, Segment2.create(125, 400, 150, 450), Intersection.segment2_segment2);
+
+draw_test(Draw.segment2, Segment2.create(300, 425, 350, 425), Draw.segment2, Segment2.create(325, 425, 400, 425), Intersection.segment2_segment2);
+
+
+
+
+
+
+
+</script>
