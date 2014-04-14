@@ -9,6 +9,7 @@
 </head>
 <body>
 <canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
+<canvas id="canvas2" width="640" height="480" style="border: 1px solid red;"></canvas>
 </body>
 </html>
 
@@ -71,6 +72,16 @@ Vec2.interpolate(aux, b, a, 2)
 console.log(aux);
 Draw.vec2(ctx, aux, "red");
 Draw.text(ctx, "interpolate(b,a,2)", Vec2.add([], aux, [7,7]))
+
+
+var ctx = document.getElementById("canvas2").getContext("2d");
+aux = [50, 50];
+Draw.vec2(ctx, aux, "red");
+var angle = Vec2.angleTo([0, 0], aux) * Math.RAD_TO_DEG;
+console.log(Math.RAD_TO_DEG);
+console.log(Vec2.angleTo([100, 0], aux));
+console.log(angle);
+Draw.text(ctx, "angleTo=" + angle.toFixed(2), Vec2.add([], aux, [7,7]))
 
 
 </script>

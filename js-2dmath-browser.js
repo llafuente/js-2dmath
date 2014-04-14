@@ -1431,6 +1431,7 @@ module.exports = Line2;
     var clamp,
         sqrt = Math.sqrt,
         random = Math.random,
+        ceil = Math.ceil,
         floor = Math.floor;
 
     Math.QUATER_PI = 0.25 * Math.PI;
@@ -1493,6 +1494,19 @@ module.exports = Line2;
         min = min || 0;
 
         return floor(random() * (max - min + 1) + min);
+    };
+
+    Math.snap = function (value, snapSize) {
+        return Math.floor(value / snapSize) * snapSize;
+    };
+
+
+    Math.snapRound = function (value, snapSize) {
+        var steps = value / snapSize | 0,
+            remain = value - (steps * snapSize),
+            rounder = remain > (snapSize / 2) ? ceil : floor;
+
+        return rounder(value / snapSize) * snapSize;
     };
 
 
@@ -1674,7 +1688,7 @@ function rotation(out, m2d, radians) {
  * Translates given Matrix2D by the dimensions in the given vec2
  * @note This translation is affected by rotation/skew
  * @note increment position
- * @see    * gtranslate
+ * @see gTranslate
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2 amount to be translated
@@ -1709,7 +1723,7 @@ function translate(out, m2d, vec2) {
  * Translates given Matrix2D by the dimensions in the given vec2
  * @note This translation is NOT affected by rotation/skew
  * @note increment position
- * @see    * translate
+ * @see translate
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2 amount to be translated
@@ -1744,7 +1758,8 @@ function gTranslate(out, m2d, vec2) {
  * Set Matrix2D position
  * @note This translation is NOT affected by rotation/skew
  * @note set position
- * @see    * gtranslate @see    * translate
+ * @see gTranslate
+ * @see translate
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2 destiny position
@@ -1780,7 +1795,7 @@ function position(out, m2d, vec2) {
 
  * @note incremental scale
  * @note do not affect position
- * @see    * scalation
+ * @see scalation
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} v1 destiny position
@@ -1813,7 +1828,7 @@ function scale(out, m2d, vec2) {
 
  * @note set scale
  * @note do not affect position
- * @see    * scalation
+ * @see scale
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2 destiny position
@@ -1827,7 +1842,7 @@ function scalation(out, m2d, vec2) {
  * Increment the Matrix2D x-skew by given degrees
  *
  * @note increment skewX
- * @see    * scalation
+ * @see skewX
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Number} degrees Degrees to skew
@@ -1840,7 +1855,6 @@ function dSkewX(out, m2d, degrees) {
  * Increment the Matrix2D x-skew by given radians
  *
  * @note increment skewX
- * @see    * scalation
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Number} radians Radians to skew
@@ -1871,7 +1885,6 @@ function skewX(out, m2d, radians) {
  * Increment the Matrix2D y-skew by given degrees
  *
  * @note increment skewY
- * @see    * scalation
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Number} degrees Degrees to skew
@@ -1884,7 +1897,6 @@ function dSkewY(out, m2d, degrees) {
  * Increment the Matrix2D y-skew by given radians
  *
  * @note increment skewY
- * @see    * scalation
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Number} radians Radians to skew
@@ -1915,7 +1927,7 @@ function skewY(out, m2d, radians) {
  * Increment the Matrix2D skew y by given degrees in vec2_degrees
  *
  * @note increment skew
- * @see    * dSetSkew
+ * @see dSetSkew
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2_degrees Degrees to skew
@@ -1932,7 +1944,6 @@ function dSkew(out, m2d, vec2_degrees) {
  * Increment the Matrix2D skew y by given radians in vec2
  *
  * @note increment skew
- * @see    * scalation
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2 Radians to skew
@@ -1963,7 +1974,7 @@ function skew(out, m2d, vec2) {
  * Set the Matrix2D skew y by given degrees in vec2_degrees
  *
  * @note set skew
- * @see    * setSkew
+ * @see setSkew
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2_degrees Degrees to skew
@@ -1980,7 +1991,6 @@ function dSetSkew(out, m2d, vec2_degrees) {
  * Set the Matrix2D skew y by given radians in vec2
  *
  * @note set skew
- * @see    * skew
  * @param {Matrix2D} out destiny matrix
  * @param {Matrix2D} m2d source matrix
  * @param {Vec2} vec2 Radians to skew
@@ -2863,9 +2873,7 @@ var exp;
 (exp = function () {
     "use strict";
 
-    if ("undefined" !== typeof module) {
-        var array = require("array-enhancements");
-    }
+    var array = require("array-enhancements");
 
     var pow = Math.pow,
         sin = Math.sin,
@@ -3826,6 +3834,13 @@ function toAngle(v1) {
 }
 
 /**
+ * @returns {Number}
+ */
+function angleTo(v1, v2) {
+    return atan2(v2[1] - v1[1], v2[0] - v1[0]);
+}
+
+/**
  * Returns the distance between v1 and v2.
  * @returns {Number}
  */
@@ -3934,6 +3949,7 @@ Vec2 = {
     cross: cross,
     toAngle: toAngle,
     angle: toAngle,
+    angleTo: angleTo,
     distance: distance,
     length: length,
     sqrDistance: sqrDistance,
@@ -4053,7 +4069,7 @@ if ("undefined" === typeof module) {
 (function () {
     "use strict";
 
-    require("./lib/arrays.js");
+    module.exports = require("./lib/arrays.js");
 
 }());
 },{"./lib/arrays.js":19}],19:[function(require,module,exports){
@@ -4066,14 +4082,10 @@ if ("undefined" === typeof module) {
 *
 */
 
-    var defineProperty = Object.defineProperty || function (obj, name, prop) {
-            if (prop.get || prop.set) {
-                throw new Error("this is not supported in your js.engine");
-            }
-            obj[name] = prop.value;
-        },
-        slice = Array.prototype.slice,
-        hasOwnProperty = Object.hasOwnProperty;
+    var slice = Array.prototype.slice,
+        hasOwnProperty = Object.hasOwnProperty,
+        __clone,
+        __rfilter;
 
     /**
      * Create an array given any type of argument
@@ -4081,10 +4093,7 @@ if ("undefined" === typeof module) {
      * @param {Mixed} item
      * @returns {Array}
      */
-    Array.ize = function (item) {
-        var out,
-            i;
-
+    module.exports.ize = function (item) {
         if (item === null || item === undefined) {
             return [];
         }
@@ -4102,15 +4111,15 @@ if ("undefined" === typeof module) {
         return [ item ];
     };
 
-    Array.from = Array.ize;
+    module.exports.from = Array.ize;
 
     /**
-     * Append any given number of arrays into a new one that will be returned
-     * TODO support any type of arguments
+     * Append any given number of arrays into a new one
+     * @todo support any type of arguments
      *
-     * @returns {Array}
+     * @returns Array
     */
-    Array.add = function () {
+    module.exports.add = function () {
         var i,
             j,
             ret = [],
@@ -4126,17 +4135,19 @@ if ("undefined" === typeof module) {
         return ret;
     };
     /**
-     * Clone an dense array
+     * Clone (could be recursive) a dense array
+     * Note: only loop arrays not objects
      *
-     * @param {Array} ar
-     * @returns {Array}
+     * @param Array ar
+     * @param Boolean deep
+     * @returns Array
     */
-    Array.clone = function (ar, deep) {
+    module.exports.clone = __clone = function (ar, deep) {
         var i = ar.length,
             clone = new Array(i);
         while (i--) {
             if (deep && ar[i] instanceof Array) {
-                clone[i] = Array.clone(ar[i], true);
+                clone[i] = __clone(ar[i], true);
             } else {
                 clone[i] = ar[i];
             }
@@ -4151,7 +4162,7 @@ if ("undefined" === typeof module) {
      * @param {int} index The index position the element has to be inserted
      * @return {Boolean} true if o is successfully inserted
      */
-    Array.insertAt = function (ar, o, index) {
+    module.exports.insertAt = function (ar, o, index) {
         if (index > -1 && index <= ar.length) {
             ar.splice(index, 0, o);
             return true;
@@ -4159,22 +4170,22 @@ if ("undefined" === typeof module) {
         return false;
     };
     /**
-     * Get a random value, the array must be condensed
+     * Get a random value, the array must be dense
      *
      * @param {Array} arr
      * @returns {Mixed}
      */
-    Array.random = function (arr) {
+    module.exports.random = function (arr) {
         var l = Math.floor(Math.random() * arr.length);
         return arr[l];
     };
     /**
-     * Remove duplicates from an array
+     * Create a new array removing duplicated values
      *
      * @param {Array} arr
      * @returns {Array}
      */
-    Array.unique = function (arr) {
+    module.exports.unique = function (arr) {
         var ret = [],
             i;
 
@@ -4193,13 +4204,9 @@ if ("undefined" === typeof module) {
      * @param {Array} arr
      * @returns {Array}
      */
-    Array.sortObject = function (arr, key) {
-        var ret = [],
-            slist = [],
-            i;
-
+    module.exports.sortObject = function (arr, key) {
         arr.sort(function (a, b) {
-            if ("string" === (typeof a)) {
+            if ("string" === (typeof a[key])) {
                 return a.value.toLowerCase().localeCompare(b.value.toLowerCase());
             }
             return a[key] - b[key];
@@ -4214,15 +4221,15 @@ if ("undefined" === typeof module) {
      * @param {Array} arr
      * @returns {Array}
      */
-    Array.shuffle = function (arr) {
+    module.exports.shuffle = function (arr) {
         var currentIndex = arr.length,
             temporaryValue,
             randomIndex;
 
-        // While there remain elements to shuffle...
+        // While there remain elements to shuffle..
         while (0 !== currentIndex) {
 
-            // Pick a remaining element...
+            // Pick a remaining element..
             randomIndex = Math.floor(Math.random() * currentIndex);
             currentIndex -= 1;
 
@@ -4242,7 +4249,7 @@ if ("undefined" === typeof module) {
      * @param {Function} fun
      * @returns {Array}
      */
-    Array.rfilter = function (arr, fun /*, thisp */) {
+    module.exports.rfilter = __rfilter = function (arr, fun /*, thisp */) {
         if (arr === null) {
             throw new TypeError();
         }
@@ -4255,7 +4262,7 @@ if ("undefined" === typeof module) {
             val,
             r;
 
-        if ('function' !== typeof fun) {
+        if ("function" !== typeof fun) {
             throw new TypeError();
         }
 
@@ -4274,7 +4281,7 @@ if ("undefined" === typeof module) {
         return res;
     };
 
-    Array.chunk = function (arr, size, preserve_keys) {
+    module.exports.chunk = function (arr, size, preserve_keys) {
         preserve_keys = preserve_keys || false;
 
         var i = 0,
@@ -4315,7 +4322,7 @@ if ("undefined" === typeof module) {
      * returns the values from a single column of the array-of-objects/arrays, identified by the column_key.
      * Optionally, you may provide an index_key to index the values in the returned array by the values from the index_key column in the input array.
      */
-    Array.column = function (arr, field) {
+    module.exports.column = function (arr, field) {
         return Array.rfilter(arr, function (x) { return x ? x[field] : undefined; });
     };
     /**
@@ -4324,7 +4331,7 @@ if ("undefined" === typeof module) {
      * @param {Array} dst
      * @returns {Array}
      */
-    Array.combine = function (dst) {
+    module.exports.combine = function (dst) {
         var i,
             j,
             ar;
@@ -4337,16 +4344,18 @@ if ("undefined" === typeof module) {
             }
         }
     };
-
-    Array.count_values = function(arr, lower_case) {
-        lower_case = lower_case || false;
+    /**
+     * Counts all the values of an array
+     */
+    module.exports.countValues = function (arr, ci) {
+        ci = ci || false;
         var i,
             counter = {},
             val;
 
         for (i = 0; i < arr.length; ++i) {
             val = arr[i];
-            if (lower_case && "string" === typeof val) {
+            if (ci && "string" === typeof val) {
                 val = val.toLowerCase();
             }
 
@@ -4358,11 +4367,11 @@ if ("undefined" === typeof module) {
         }
 
         return counter;
-    }
+    };
     /**
-     * Returns a copy of the array padded to size specified by size with value value. If size is positive then the array is padded on the right, if it's negative then on the left. If the absolute value of size is less than or equal to the length of the array then no padding takes place
+     * Returns a copy of the array padded to size specified by size with value value. If size is positive then the array is padded on the right, if it"s negative then on the left. If the absolute value of size is less than or equal to the length of the array then no padding takes place
      */
-    Array.pad = function(arr, size, value) {
+    module.exports.pad = function (arr, size, value) {
         if (Math.abs(size) <= arr.length) {
             return arr;
         }
@@ -4370,30 +4379,30 @@ if ("undefined" === typeof module) {
             i,
             len;
 
-        if (size > 0 ) {
-            for(i = 0;  i < size; ++i) {
+        if (size > 0) {
+            for (i = 0;  i < size; ++i) {
                 out[i] = i < arr.length ? arr[i] : value;
             }
         } else {
             size = Math.abs(size);
             len = size - arr.length;
-            for(i = 0;  i < size; ++i) {
+            for (i = 0;  i < size; ++i) {
                 out[i] = i < len ? value : arr[i - len];
             }
         }
 
         return out;
-    }
+    };
     /**
      * Calculate the product of values in an array
      */
-    Array.product = function (arr) {
+    module.exports.product = function (arr) {
         var sum = 1,
             len = arr.length,
             i;
 
         for (i = 0; i < len; i++) {
-            sum *= parseFloat(arr[i]); // be sure it's a number...
+            sum *= parseFloat(arr[i]); // be sure it"s a number..
         }
 
         return sum;
@@ -4401,40 +4410,44 @@ if ("undefined" === typeof module) {
     /**
      * Picks one or more random entries out of an array, and returns the key (or keys) of the random entries.
      */
-    Array.rand = function(arr, len) {
-        var len = len || 1,
-            out = [];
+    module.exports.rand = function (arr, len) {
+        var out = [],
+            i;
+        len = len || 1;
 
         for (i = 0; i < len; ++i) {
             out.push(Math.floor(Math.random() * arr.length));
         }
 
         return out;
-    }
+    };
 
-    Array.dense = function(arr) {
+    module.exports.dense = function (arr) {
         var out = [];
 
-        arr.forEach(function(val) {
+        arr.forEach(function (val) {
             out.push(val);
         });
 
         return out;
-    }
+    };
 
-    Array.sum = function (arr) {
+    module.exports.sum = function (arr) {
         var sum = 0,
             len = arr.length,
             i;
 
         for (i = 0; i < len; i++) {
-            sum += parseFloat(arr[i]); // be sure it's a number...
+            sum += parseFloat(arr[i]); // be sure it"s a number..
         }
 
         return sum;
     };
 
-    Array.fill = function (start, count, value) {
+    /**
+     * Fill an array with values
+     */
+    module.exports.fill = function (start, count, value) {
         var arr = [],
             len = start + count,
             i;
@@ -4445,16 +4458,18 @@ if ("undefined" === typeof module) {
 
         return arr;
     };
-
-    Array.column = function (arr, field) {
-        return Array.rfilter(arr, function (x) { return x[field]; });
+    /**
+     * Return the values from a single column in the input array
+     */
+    module.exports.column = function (arr, field) {
+        return __rfilter(arr, function (x) { return x[field]; });
     };
 
     /**
      * returns an object with the same values keys given a property of the object
      * @throws if the field is undefined!
      */
-    Array.kmap = function (arr, field) {
+    module.exports.kmap = function (arr, field) {
         var ret = {};
 
         arr.forEach(function (v) {
@@ -4467,270 +4482,135 @@ if ("undefined" === typeof module) {
         });
 
         return ret;
-    }
+    };
 
 
-    // from mozilla
-    if (!Array.prototype.reduce) {
-        /**
-         * Applies iteratively the callback function to the elements of the array, so as to reduce the array to a single value.
-         */
-        Array.prototype.reduce = function reduce(accumulator) {
-            var i, l = this.length, curr;
+    module.exports.oFilter = function (arr, obj) {
+        if (!arr) return [];
 
-            if (typeof accumulator !== "function") { // ES5 : "If IsCallable(callbackfn) is false, throw a TypeError exception."
-                throw new TypeError("First argument is not callable");
-            }
+        var res = [],
+            i,
+            f,
+            j,
+            max = arr.length;
 
-            if ((l === 0 || l === null) && (arguments.length <= 1)) {// == on purpose to test 0 and false.
-                throw new TypeError("Array length is 0 and no second argument");
-            }
-
-            if (arguments.length <= 1) {
-                curr = this[0]; // Increase i to start searching the secondly defined element in the array
-                i = 1; // start accumulating at the second element
-            } else {
-                curr = arguments[1];
-            }
-
-            for (i = i || 0; i < l; ++i) {
-                if (i in this) {
-                    curr = accumulator.call(undefined, curr, this[i], i, this);
-                }
-            }
-
-            return curr;
-        };
-    }
-
-    // from mozilla
-    if (!Array.prototype.filter) {
-        /**
-        * Iterates over each value in the array passing them to the callback function. If the callback function returns true, the current value from array is returned into the result array.
-        */
-        Array.prototype.filter = function (fun /*, thisp */) {
-            if (this === null) {
-                throw new TypeError();
-            }
-
-            var t = Object(this),
-                len = t.length >>> 0,
-                res,
-                thisp,
-                i,
-                val;
-
-            if ('function' !== typeof fun) {
-                throw new TypeError();
-            }
-
-            res = [];
-            thisp = arguments[1];
-            for (i = 0; i < len; i++) {
-                if (i in t) {
-                    val = t[i]; // in case fun mutates this
-                    if (fun.call(thisp, val, i, t)) {
-                        res.push(val);
+        for (i = 0; i < max; ++i) {
+            if (arr[i]) {
+                f = true;
+                for (j in obj) {
+                    if (arr[i][j] !== obj[j]) {
+                        f = false;
                     }
                 }
-            }
-
-            return res;
-        };
-    }
-
-    // from mozilla
-    if ('function' !== typeof Array.prototype.reduceRight) {
-        Array.prototype.reduceRight = function (callback, opt_initialValue) {
-            if (null === this || 'undefined' === typeof this) {
-                // At the moment all modern browsers, that support strict mode, have
-                // native implementation of Array.prototype.reduceRight. For instance,
-                // IE8 does not support strict mode, so this check is actually useless.
-                throw new TypeError('Array.prototype.reduceRight called on null or undefined');
-            }
-
-            if ('function' !== typeof callback) {
-                throw new TypeError(callback + ' is not a function');
-            }
-
-            var length = this.length >>> 0,
-                index,
-                value,
-                isValueSet = false;
-
-            if (1 < arguments.length) {
-                value = opt_initialValue;
-                isValueSet = true;
-            }
-            for (index = length - 1; -1 < index; --index) {
-                if (this.hasOwnProperty(index)) {
-                    if (isValueSet) {
-                        value = callback(value, this[index], index, this);
-                    } else {
-                        value = this[index];
-                        isValueSet = true;
-                    }
+                if (f) {
+                    res.push(arr[i]);
                 }
             }
-            if (!isValueSet) {
-                throw new TypeError('Reduce of empty array with no initial value');
-            }
-            return value;
-        };
-    }
+        }
 
-    // from mozilla
-    if (!Array.prototype.some) {
-        Array.prototype.some = function (fun /*, thisp */) {
-            if (this === null) {
-                throw new TypeError();
-            }
-            if (typeof fun !== "function") {
-                throw new TypeError();
-            }
+        return res;
+    };
 
-            var t = Object(this),
-                len = t.length >>> 0,
-                thisp = arguments[1],
-                i;
+    /**
+     * Returns the key of the object contained in the array that has the same value in given key.
+     * @throws if the field is undefined!
+     */
+    module.exports.search = function (arr, key, value) {
+        if (!arr || !arr.length) {
+            return -1;
+        }
 
-            for (i = 0; i < len; i++) {
-                if (i in t && fun.call(thisp, t[i], i, t)) {
-                    return true;
+        var i,
+            max = arr.length;
+
+        for (i = 0; i < max; ++i) {
+            if (arr[i] && arr[i][key] == value) {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
+
+    module.exports.mapAsync = function (arr, callback, donecallback, thisArg) {
+        if (!arr || !arr.length) {
+            return donecallback();
+        }
+
+        var i,
+            max = arr.length,
+            done_count = 0,
+            ret = [],
+            done = function(value, key) {
+                if (ret.length === 0 && key) {
+                    ret = {};
                 }
-            }
 
-            return false;
-        };
-    }
+                // no first
+                key = key || done_count;
+                ret[key] = value;
 
-    // from mozilla
-    if (!Array.prototype.every) {
-        Array.prototype.every = function (fun /*, thisp */) {
-            var t,
-                len,
-                i,
-                thisp;
 
-            if (this === null) {
-                throw new TypeError();
-            }
-
-            t = Object(this);
-            len = t.length >>> 0;
-            if (typeof fun !== 'function') {
-                throw new TypeError();
-            }
-
-            thisp = arguments[1];
-            for (i = 0; i < len; i++) {
-                if (i in t && !fun.call(thisp, t[i], i, t)) {
-                    return false;
+                if (++done_count === max) {
+                    donecallback(ret);
                 }
-            }
+            };
 
-            return true;
-        };
-    }
-
-    // from mozilla
-    if (!Array.prototype.forEach) {
-        Array.prototype.forEach = function (fn, scope) {
-            var i,
-                len;
-
-            for (i = 0, len = this.length; i < len; ++i) {
-                if (i in this) {
-                    fn.call(scope, this[i], i, this);
-                }
-            }
-        };
-    }
-
-    // from mozilla
-    // Production steps of ECMA-262, Edition 5, 15.4.4.19
-    // Reference: http://es5.github.com/#x15.4.4.19
-    if (!Array.prototype.map) {
-        Array.prototype.map = function (callback, thisArg) {
-            var T,
-                A,
-                k,
-                O,
-                len,
-                kValue,
-                mappedValue;
-
-            if (this == null) {
-                throw new TypeError(" this is null or not defined");
-            }
-
-            // 1. Let O be the result of calling ToObject passing the |this| value as the argument.
-            O = Object(this);
-
-            // 2. Let lenValue be the result of calling the Get internal method of O with the argument "length".
-            // 3. Let len be ToUint32(lenValue).
-            len = O.length >>> 0;
-
-            // 4. If IsCallable(callback) is false, throw a TypeError exception.
-            // See: http://es5.github.com/#x9.11
-            if (typeof callback !== "function") {
-                throw new TypeError(callback + " is not a function");
-            }
-
-            // 5. If thisArg was supplied, let T be thisArg; else let T be undefined.
+        for (i = 0; i < max; ++i) {
             if (thisArg) {
-                T = thisArg;
+                callback.call(thisArg, arr[i], i, done);
+            } else {
+                callback(arr[i], i, done);
             }
 
-            // 6. Let A be a new array created as if by the expression new Array(len) where Array is
-            // the standard built-in constructor with that name and len is the value of len.
-            A = new Array(len);
+        }
+    };
 
-            // 7. Let k be 0
-            k = 0;
+    module.exports.mapSerial = function (arr, callback, donecallback, thisArg) {
+        if (!arr || !arr.length) {
+            return donecallback();
+        }
 
-            // 8. Repeat, while k < len
-            while (k < len) {
-                // a. Let Pk be ToString(k).
-                //   This is implicit for LHS operands of the in operator
-                // b. Let kPresent be the result of calling the HasProperty internal method of O with argument Pk.
-                //   This step can be combined with c
-                // c. If kPresent is true, then
-                if (k in O) {
-
-                    // i. Let kValue be the result of calling the Get internal method of O with argument Pk.
-                    kValue = O[k];
-
-                    // ii. Let mappedValue be the result of calling the Call internal method of callback
-                    // with T as the this value and argument list containing kValue, k, and O.
-                    mappedValue = callback.call(T, kValue, k, O);
-
-                    // iii. Call the DefineOwnProperty internal method of A with arguments
-                    // Pk, Property Descriptor {Value: mappedValue, : true, Enumerable: true, Configurable: true},
-                    // and false.
-
-                    // In browsers that support Object.defineProperty, use the following:
-                    // Object.defineProperty(A, Pk, { value: mappedValue, writable: true, enumerable: true, configurable: true });
-
-                    // For best browser support, use the following:
-                    A[k] = mappedValue;
+        var i = 0,
+            max = arr.length,
+            ret = [],
+            next = function(value, key) {
+                // change ret to object if first call has key
+                if (i === 1 && key) {
+                    ret = {};
                 }
-                // d. Increase k by 1.
-                k++;
-            }
 
-            // 9. return A
-            return A;
-        };
-    }
 
-    // from mozilla
-    if(!Array.isArray) {
-        Array.isArray = function (vArg) {
-            return Object.prototype.toString.call(vArg) === "[object Array]";
-        };
-    }
+                // no first
+                if (i !== 0) {
+                    key = key || i;
+                    ret[key] = value;
+                }
 
+                var ci = i,
+                    ct = arr[i];
+
+                if (++i > max) {
+                    return donecallback(ret);
+                }
+
+                if (thisArg) {
+                    callback.call(thisArg, ct, ci, next, end);
+                } else {
+                    callback(ct, ci, next, end);
+                }
+
+            },
+            end = function(value, key) {
+                key = key || i;
+                ret[key] = value;
+
+                donecallback(ret);
+            };
+
+        next();
+    };
 }());
 },{}],20:[function(require,module,exports){
 (function () {
