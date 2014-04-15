@@ -2,26 +2,59 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
-<title>Untitled Document</title>
+<title>js-2dmath: Transitions</title>
 
 <script src="../js-2dmath-browser.js" type="text/javascript" ></script>
 
 </head>
 <body>
-<canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
+<h1>js-2dmath: Transitions</h1>
+<canvas id="canvas" width="1000" height="2400" style="border: 1px solid red;"></canvas>
 </body>
 </html>
 
 <script>
 var ctx = document.getElementById("canvas").getContext("2d");
+ctx.font = "12pt Consolas";
 
 require("js-2dmath").globalize(window);
 
 
-var t;
+
+var t,
+    c = 0, // do not show linear :)
+    sx,
+    sy;
+
 for (t in Transitions) {
+    if (
+        t === "create" ||
+        t === "LINK_CHAIN" ||
+        t === "LINK_STOP" ||
+        t === "LINK_IGNORE" ||
+        t === "LINK_CANCEL" ||
+        t === "animate" ||
+        t === "tween"
+    ) {
+        continue;
+    }
+
+    ctx.save();
     console.log(t);
-    for (i = 0.05; i < 1; i+= 0.05)
+    ctx.beginPath();
+    sx = (c % 4) * 200;
+    sy = Math.floor(c / 4) * 200;
+
+    ctx.fillText(t, sx + 18, sy + 18);
+
+    ctx.moveTo(sx + 25, sy + 25);
+    for (i = 0; i <= 1.05; i+= 0.05) {
+        ctx.lineTo((sx + 25) + i * 150, (sy + 25) + Transitions[t](i) * 150);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    ++c;
 }
 
 

@@ -1,5 +1,6 @@
 
-var falafel = require('falafel'),
+var falafel = require("falafel"),
+    object = require("object-enhancements"),
     fs = require("fs");
 
 var methods,
@@ -8,7 +9,7 @@ var methods,
     files = {
         Vec2: {
             filename: "./lib/vec2.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Vec2",
 
                 x: "Number",
@@ -35,7 +36,7 @@ var methods,
         },
         Line2: {
             filename: "./lib/line2.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Line2",
 
                 x: "Number",
@@ -52,7 +53,7 @@ var methods,
         },
         Segment2: {
             filename: "./lib/segment2.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Segment2",
                 seg2: "Segment2",
 
@@ -69,7 +70,7 @@ var methods,
         },
         Rectangle: {
             filename: "./lib/rectangle.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Rectangle",
                 rect: "Rectangle",
                 rect2: "Rectangle",
@@ -88,7 +89,7 @@ var methods,
         },
         BB2: {
             filename: "./lib/boundingbox2.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "BB2",
                 bb2: "BB2",
                 bb2_1: "BB2",
@@ -108,7 +109,7 @@ var methods,
         },
         Circle: {
             filename: "./lib/circle.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Circle",
                 circle: "Circle",
                 circle_2: "Circle",
@@ -120,7 +121,7 @@ var methods,
         },
         Matrix2D: {
             filename: "./lib/matrix2d.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Matrix2D",
                 m2d:  "Matrix2D",
                 m2d_2:  "Matrix2D",
@@ -129,13 +130,14 @@ var methods,
                 vec2_degrees: "Vec2 (Degrees)",
                 degrees: "Number (Degrees)",
                 radians: "Number (Radians)",
+                factor: "Number",
                 x: "Number",
                 y: "Number",
             }
         },
         Polygon: {
             filename: "./lib/polygon.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Polygon",
                 poly:  "Polygon",
                 out_vec2: "Segment2"
@@ -144,10 +146,10 @@ var methods,
 
         Beizer: {
             filename: "./lib/beizer.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Beizer",
                 curve: "Beizer",
-                
+
                 out_vec2: "Segment2",
 
                 t: "Number",
@@ -165,7 +167,7 @@ var methods,
 
         Triangle: {
             filename: "./lib/triangle.js",
-            valid_arguments:{
+            valid_arguments: {
                 out: "Triangle",
                 tri: "Triangle",
 
@@ -184,7 +186,7 @@ var methods,
         },
         Intersection: {
             filename: "./lib/intersection.js",
-            valid_arguments:{
+            valid_arguments: {
                 num: "Number",
                 num2: "Number",
                 collision: "Boolean",
@@ -226,7 +228,7 @@ var methods,
         },
         Distance: {
             filename: "./lib/distance.js",
-            valid_arguments:{
+            valid_arguments: {
                 x1: "Number",
                 x2: "Number",
                 x3: "Number",
@@ -248,15 +250,69 @@ var methods,
                 rect: "Rectangle",
             }
         },
+        Transitions: {
+            filename: "./lib/transitions.js",
+            valid_arguments: {
+                pos: "Number",
+                x: "Number",
+                name: "String",
+                transition: "Function",
+                obj: "Object",
+                prop: "String",
+                values: "Mixed",
+                ioptions: "Object",
+                params: "Object",
+                options: "Object"
+            }
+        },
     },
     src,
-    module;
+    mod_required;
 
-var cls_list = [];
+
+function is_fn(node) {
+    var args = [],
+        arg,
+        i,
+        max;
+
+    if (node.type === "FunctionDeclaration" && node.id && node.id.name) {
+        if (node.id.name[0] === "_") {
+            //internal skip!
+            return;
+        }
+
+        // define a new function!
+
+
+        for (i = 0, max = node.params.length; i < max; ++i) {
+            arg = node.params[i].name;
+            if (!valid_arguments[arg]) {
+                console.log(node);
+                throw new Error(files[cls].filename + ":" + arg + " is an invalid argument name, not in whitelist");
+            }
+            args.push("*" + arg + "*: " + valid_arguments[arg]);
+        }
+
+        methods[node.id.name] = {
+            arguments: args,
+            comments: [],
+            returns: null,
+            loc: node.loc
+        };
+    }
+}
+
+
+var cls_list = [],
+    cls,
+    i;
+
 for (cls in files) {
     cls_list.push("[" + cls + "](#" + cls + ")");
 
 }
+
 console.log(cls_list.join(", "));
 console.log("");
 console.log("");
@@ -264,49 +320,30 @@ console.log("");
 for (cls in files) {
 
     methods = {};
-    src = fs.readFileSync(files[cls].filename, 'utf-8');
+    src = fs.readFileSync(files[cls].filename, "utf-8");
 
-    module = require(files[cls].filename);
+    mod_required = require(files[cls].filename);
 
     // test
-    //src = fs.readFileSync("doc-test.js", 'utf-8');
+    //src = fs.readFileSync("doc-test.js", "utf-8");
 
     valid_arguments = files[cls].valid_arguments;
 
     falafel(src, {comment: true, loc: true}, function (node) {
         //console.log(node);
 
-        if (node.type == 'FunctionDeclaration' && node.id && node.id.name) {
-            // define a new function!
-            var args = [],
-                i,
-                max;
+        var fname;
 
-            for (i = 0, max = node.params.length; i < max; ++i) {
-                arg = node.params[i].name;
-                if (!valid_arguments[arg]) {
-                    console.log(node);
-                    throw new Error(files[cls].filename + ":" + arg + " is an invalid argument name, not in whitelist");
-                }
-                args.push("*" + arg + "*: " + valid_arguments[arg]);
-            }
-
-            methods[node.id.name] = {
-                arguments: args,
-                comments: [],
-                returns: null,
-                loc: node.loc
-            };
-        }
+        is_fn(node);
 
         // comment at first level!
-        if (node.type == 'Block' && node.parent.type == "Program") {
+        if (node.type === "Block" && node.parent.type === "Program") {
             // search nearest
             var fn,
                 min_diff = 9999;
 
-            node.parent.body.every(function(subnode) {
-                if (subnode.type == "FunctionDeclaration") {
+            node.parent.body.every(function (subnode) {
+                if (subnode.type === "FunctionDeclaration") {
                     var diff = subnode.loc.start.line - node.loc.end.line;
 
                     if (diff > 0 && diff < min_diff) {
@@ -324,19 +361,48 @@ for (cls in files) {
                 methods[fname].comments = node.value.split("\n");
             }
         }
-
     });
-    var args;
+
+
+    // DEFINES
+    for (i in mod_required) {
+        if ("function" === typeof mod_required[i] && !methods[i]) {
+            // check if it"s an alias
+            if (methods[mod_required[i].name]) {
+                //alias!
+                methods[i] = object.clone(methods[mod_required[i].name]);
+                methods[i].comments = ["@see " + mod_required[i].name];
+            } else {
+                // this is for complex cases - generated code
+                try {
+                    falafel(mod_required[i], {comment: true, loc: true}, function (node) {
+                        //console.log(node);
+
+                        is_fn(node);
+                    });
+                } catch(e) {
+                    methods[i] = {
+                        arguments: [],
+                        comments: [],
+                        returns: null,
+                        loc: null
+                    };
+                }
+            }
+        }
+    }
+
+
     console.log("");
     console.log("");
     console.log("<a name=\"" + cls + "\"></a>");
     console.log("## " + cls);
 
     // DEFINES
-    for (i in module) {
-        if ("function" !== typeof module[i]) {
-            if ("object" !== typeof module[i]) {
-                console.log("* **" + i + "** = " + module[i]);
+    for (i in mod_required) {
+        if ("function" !== typeof mod_required[i]) {
+            if ("object" !== typeof mod_required[i]) {
+                console.log("* **" + i + "** = " + mod_required[i]);
             }
         }
     }
@@ -345,23 +411,25 @@ for (cls in files) {
         if (methods[i].comments.length) {
             comments = [];
 
-            methods[i].comments.forEach(function(c) {
+            methods[i].comments.forEach(function (c) {
+                var line;
+
                 if (c.indexOf("@returns") !== -1) {
                     c = c.substring(c.indexOf("{"));
                     c = c.substring(1, c.indexOf("}"));
                     methods[i].returns = c;
                 } else if (c.indexOf("@see") !== -1) {
-                    var line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
+                    line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
                     line = line.substring(5);
                     if (line.indexOf("http") === 0) {
-                        comments.push("  **link**: [" + line + "](" + line +")");
+                        comments.push("  **link**: [" + line + "](" + line + ")");
                     } else {
-                        comments.push("  **see**: [" + line + "](#" + cls + "-" + line +")");
+                        comments.push("  **see**: [" + line + "](#" + cls + "-" + line + ")");
                     }
                 } else if (c.indexOf("@param") !== -1) {
                     //ignore
                 } else {
-                    var line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
+                    line = c.trim().replace(/^\*(\s{0,1})/, "").replace(/^\*$/, "");
                     if (line.length) {
                         comments.push("  " + line);
                     }
@@ -370,7 +438,6 @@ for (cls in files) {
 
             methods[i].comments = comments.join("\n\n");
         }
-
 
         console.log("");
         console.log("<a name=\"" + cls + "-" + i + "\"></a>");

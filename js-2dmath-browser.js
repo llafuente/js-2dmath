@@ -78,6 +78,11 @@ var sqrt = Math.sqrt,
     t3 = 0;
 
 /**
+ * cp0 - start point
+ * cp1 - start control point
+ * cp2 - end control point
+ * cp3 - end
+ *
  * @returns {Beizer}
  */
 function cubic(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y, cp3x, cp3y) {
@@ -427,6 +432,13 @@ function create(x, y, radius) {
 /**
  * @returns {Circle}
  */
+function fromVec2(vec2, radius) {
+    return [[vec2[0], vec2[1]], radius];
+}
+
+/**
+ * @returns {Circle}
+ */
 function clone(circle) {
     return [[circle[0][0], circle[0][1]], circle[1]];
 }
@@ -473,6 +485,7 @@ function area(circle) {
  */
 var Circle = {
     create: create,
+    fromVec2: fromVec2,
     clone: clone,
     copy: copy,
     translate: translate,
@@ -682,6 +695,10 @@ function text(context2d, text, vec2, font) {
     context2d.fillText(text, vec2[0], vec2[1]);
 }
 
+function applyMatrix2D(context2d, m2d) {
+    context2d.setTransform(m2d[0], m2d[1], m2d[2], m2d[3], m2d[4], m2d[5]);
+}
+
 
 var Draw = {
     vec2: vec2,
@@ -689,6 +706,8 @@ var Draw = {
     circle: circle,
     segment2: segment2,
     bb2: bb2,
+
+    applyMatrix2D: applyMatrix2D,
 
     text: text
 };
@@ -1432,16 +1451,37 @@ module.exports = Line2;
         sqrt = Math.sqrt,
         random = Math.random,
         ceil = Math.ceil,
-        floor = Math.floor;
+        floor = Math.floor,
+        PI,
+        QUATER_PI,
+        HALF_PI,
+        TWO_PI,
+        TWO_HALF_PI,
+        NPI,
+        NQUATER_PI,
+        NHALF_PI,
+        NTWO_PI,
+        NTWO_HALF_PI;
 
-    Math.QUATER_PI = 0.25 * Math.PI;
-    Math.HALF_PI = 0.5 * Math.PI;
-    Math.TWO_PI = 2 * Math.PI;
-    Math.TWO_HALF_PI = (2 * Math.PI) + Math.HALF_PI;
-    Math.EPS = 10e-3;
+    PI = Math.PI;
+    QUATER_PI = Math.QUATER_PI = 0.25 * Math.PI;
+    HALF_PI = Math.HALF_PI = 0.5 * Math.PI;
+    TWO_PI = Math.TWO_PI = 2 * Math.PI;
+    TWO_HALF_PI = Math.TWO_HALF_PI = (2 * Math.PI) + Math.HALF_PI;
+    NPI = Math.NPI = -Math.PI;
+    NQUATER_PI = Math.NQUATER_PI = 0.25 * Math.NPI;
+    NHALF_PI = Math.NHALF_PI = 0.5 * Math.NPI;
+    NTWO_PI = Math.NTWO_PI = 2 * Math.NPI;
+    NTWO_HALF_PI = Math.NTWO_HALF_PI = (2 * Math.NPI) + Math.HALF_PI;
+
     Math.INV_PI = 1 / Math.PI;
+
     Math.RAD_TO_DEG = 180 / Math.PI;
     Math.DEG_TO_RAD = Math.PI / 180;
+
+    // this could be useful to tweak in your app, depends on your world resolution
+    Math.EPS = 10e-3;
+
 
     Math.cross = function (x1, y1, x2, y2) {
         return x1 * y2 - y1 * x2;
@@ -1496,10 +1536,10 @@ module.exports = Line2;
         return floor(random() * (max - min + 1) + min);
     };
 
+
     Math.snap = function (value, snapSize) {
         return Math.floor(value / snapSize) * snapSize;
     };
-
 
     Math.snapRound = function (value, snapSize) {
         var steps = value / snapSize | 0,
@@ -1509,6 +1549,23 @@ module.exports = Line2;
         return rounder(value / snapSize) * snapSize;
     };
 
+    Math.normalizeRadians = function (angle) {
+        if( angle > NPI && angle < PI) {
+            return angle;
+        }
+
+        angle = angle % (TWO_PI);
+        if( angle < NPI )
+            angle += TWO_PI;
+        else if( angle > PI )
+            angle -= TWO_PI;
+        return angle;
+
+    };
+
+    Math.deltaRotation = function (angle, target) {
+      return normalizeRotation(angle - target);
+    }
 
 }());
 },{}],11:[function(require,module,exports){
@@ -1537,7 +1594,7 @@ var DEG_TO_RAD = Math.DEG_TO_RAD,
 
 /**
  * Creates a new identity 2x3 matrix
- * @returns {Matrix2D} 
+ * @returns {Matrix2D}
  */
 function create() {
     return [1, 0, 0, 1, 0, 0, [1, 1, 0, 0, 0], false];
@@ -1546,9 +1603,10 @@ function create() {
 /**
  * Creates a new matrix given 4 points(a Rectangle)
  *
+ * @todo
+ * @see http://jsfiddle.net/dFrHS/1/
  * @returns {Matrix2D} a new 2x3 matrix
  */
-/// @TODO http://jsfiddle.net/dFrHS/1/
 function fromPoints() {
 }
 
@@ -2136,15 +2194,21 @@ function reflect(out, m2d) {
     return rotate(out, m2d, PI);
 }
 
-/// @TODO this a transformation matrix, what inverse means for us, mirror ?
+/**
+ * @TODO this a transformation matrix, what inverse means for us, mirror ?
+ */
 function inverse(out, m2d) {
 }
 
-/// @TODO needed ?
+/**
+ * @TODO needed ?
+ */
 function transpose(out, m2d) {
 }
 
-/// @TODO review
+/**
+ * @TODO review & test
+ */
 function determinant(out, m2d) {
     var fCofactor00 = m2d[1][1] * m2d[2][2] - m2d[1][2] * m2d[2][1],
         fCofactor10 = m2d[1][2] * m2d[2][0] - m2d[1][0] * m2d[2][2],
@@ -2220,6 +2284,36 @@ function scalingMatrix(x, y) {
 }
 
 
+/**
+ * Interpolate two matrixes by given factor.
+ * Used in conjunction with Transitions and you will have nice transformations :)
+ *
+ * @param {Number} sx
+ * @param {Number} sy
+ */
+function interpolate(out, m2d, m2d_2, factor) {
+    out[0] = m2d[0] + ((m2d_2[0] - m2d[0]) * factor);
+    out[1] = m2d[1] + ((m2d_2[1] - m2d[1]) * factor);
+    out[2] = m2d[2] + ((m2d_2[2] - m2d[2]) * factor);
+    out[3] = m2d[3] + ((m2d_2[3] - m2d[3]) * factor);
+    out[4] = m2d[4] + ((m2d_2[4] - m2d[4]) * factor);
+    out[5] = m2d[5] + ((m2d_2[5] - m2d[5]) * factor);
+
+    var o = out[6],
+        i1 = m2d[6],
+        i2 = m2d_2[6];
+
+    o[0] = i1[0] + ((i2[0] - i1[0]) * factor);
+    o[1] = i1[1] + ((i2[1] - i1[1]) * factor);
+    o[2] = i1[2] + ((i2[2] - i1[2]) * factor);
+    o[3] = i1[3] + ((i2[3] - i1[3]) * factor);
+    o[4] = i1[4] + ((i2[4] - i1[4]) * factor);
+
+    out[7] = m2d[7];
+
+    return out;
+}
+
 
 /**
  * Transformation matrix used for 2D(column-major), AKA matrix2X3
@@ -2227,7 +2321,7 @@ function scalingMatrix(x, y) {
  * [1, 0, 0, 1, 0, 0, [1, 1, 0, 0, 0], false]
  * 0-6 data 2x3 matrix is here
  * 6 cached data, cached data to support setRotation, setScale, setSkew and other functions
- * 7 is modified, user must ser this boolean to false after recalculations
+ * 7 is modified, user must set this boolean to false after recalculations
  */
 var Matrix2D =  {
     create: create,
@@ -2266,6 +2360,7 @@ var Matrix2D =  {
     dSkewYMatrix: dSkewYMatrix,
     skewYMatrix: skewYMatrix,
     scalingMatrix: scalingMatrix,
+    interpolate: interpolate,
 
     // alias
     dSetRotation: dRotation,
@@ -2869,379 +2964,396 @@ var Segment2 =  {
 
 module.exports = Segment2;
 },{"./vec2.js":16}],15:[function(require,module,exports){
-var exp;
-(exp = function () {
-    "use strict";
+var array = require("array-enhancements"),
+    pow = Math.pow,
+    sin = Math.sin,
+    acos = Math.acos,
+    cos = Math.cos,
+    PI = Math.PI,
+    t = {
+    },
+    k,
+    Transitions = {},
+    CHAIN = 1,
+    STOP = 2,
+    IGNORE = 3,
+    CANCEL = 4;
 
-    var array = require("array-enhancements");
 
-    var pow = Math.pow,
-        sin = Math.sin,
-        acos = Math.acos,
-        cos = Math.cos,
-        PI = Math.PI,
-        t = {
-            Pow: function (p, x) {
-                return pow(p, (x && x[0]) || 6);
-            },
-            Expo: function (p) {
-                return pow(2, 8 * (p - 1));
-            },
-            Circ: function (p) {
-                return 1 - sin(acos(p));
-            },
-            Sine: function (p) {
-                return 1 - cos(p * PI / 2);
-            },
-            Back: function (p, x) {
-                x = (x && x[0]) || 1.618;
-                return pow(p, 2) * ((x + 1) * p - x);
-            },
-            Bounce: function (p) {
-                var value, a, b;
-                for (a = 0, b = 1; true; a += b, b /= 2) {
-                    if (p >= (7 - 4 * a) / 11) {
-                        value = b * b - pow((11 - 6 * a - 11 * p) / 4, 2);
-                        break;
-                    }
-                }
-                return value;
-            },
-            Elastic: function (p, x) {
-                return pow(2, 10 * --p) * cos(20 * p * PI * ((x && x[0]) || 1) / 3);
-            }
-        },
-        k,
-        Transitions = {},
-        CHAIN = 1,
-        STOP = 2,
-        IGNORE = 3,
-        CANCEL = 4;
+function Pow(pos, x) {
+    return pow(pos, (x && x[0]) || 6);
+}
 
-    Transitions.linear = function (zero) {
-        return zero;
-    };
+function Expo(pos) {
+    return pow(2, 8 * (pos - 1));
+}
 
-    Transitions.create = function (name, transition) {
+function Circ(pos) {
+    return 1 - sin(acos(pos));
+}
 
-        Transitions[name] = function (pos) {
-            return transition(pos);
-        };
+function Sine(pos) {
+    return 1 - cos(pos * PI / 2);
+}
 
-        Transitions[name + "In"] = Transitions[name];
+function Back(pos, x) {
+    x = (x && x[0]) || 1.618;
+    return pow(pos, 2) * ((x + 1) * pos - x);
+}
 
-        Transitions[name + "Out"] = function (pos) {
-            return 1 - transition(1 - pos);
-        };
-
-        Transitions[name + "InOut"] = function (pos) {
-            return (pos <= 0.5 ? transition(2 * pos) : (2 - transition(2 * (1 - pos)))) / 2;
-        };
-
-    };
-
-    for (k in t) {
-        Transitions.create(k, t[k]);
+function Bounce(pos) {
+    var value, a, b;
+    for (a = 0, b = 1; true; a += b, b /= 2) {
+        if (pos >= (7 - 4 * a) / 11) {
+            value = b * b - pow((11 - 6 * a - 11 * pos) / 4, 2);
+            break;
+        }
     }
+    return value;
+}
 
-    ['Quad', 'Cubic', 'Quart', 'Quint'].forEach(function (transition, i) {
-        Transitions.create(transition, function (p) {
-            return pow(p, i + 2);
-        });
+function Elastic(pos, x) {
+    return pow(2, 10 * --pos) * cos(20 * pos * PI * ((x && x[0]) || 1) / 3);
+}
+
+
+
+/**
+ * Just return what you sent
+ */
+function linear(pos) {
+    return pos;
+}
+
+/**
+ * Wrap your transaction with In/Out/InOut modifiers.
+ */
+function create(name, transition) {
+
+    //Transitions[name] = function (pos) {
+    //    return transition(pos);
+    //};
+    //Transitions[name + "In"] = Transitions[name];
+
+    Transitions[name] = transition;
+    Transitions[name + "In"] = transition;
+
+    Transitions[name + "Out"] = function (pos) {
+        return 1 - transition(1 - pos);
+    };
+
+    Transitions[name + "InOut"] = function (pos) {
+        return (pos <= 0.5 ? transition(2 * pos) : (2 - transition(2 * (1 - pos)))) / 2;
+    };
+}
+
+t = {
+    Pow: Pow,
+    Expo: Expo,
+    Circ: Circ,
+    Sine: Sine,
+    Back: Back,
+    Bounce: Bounce,
+    Elastic: Elastic
+};
+
+for (k in t) {
+    create(k, t[k]);
+}
+
+["Quad", "Cubic", "Quart", "Quint"].forEach(function (transition, i) {
+    create(transition, function (p) {
+        return pow(p, i + 2);
     });
+});
 
-    // tween function
+// tween function
 
-    function def_render(obj, prop, value) {
-        obj[prop] = value;
+function _def_render(obj, prop, value) {
+    obj[prop] = value;
+}
+
+function _def_parser(obj, prop) {
+    return parseFloat(obj[prop], 10);
+}
+
+function _def_factor(k0, k1, rfactor) {
+    return ((k1 - k0) * rfactor) + k0;
+}
+
+Transitions.LINK_CHAIN  = CHAIN;
+Transitions.LINK_STOP   = STOP;
+Transitions.LINK_IGNORE = IGNORE;
+Transitions.LINK_CANCEL = CANCEL;
+
+function _normalize(obj, input) {
+    //get all props
+
+    var keys = Object.keys(input).sort(function (a, b) { return parseFloat(a) - parseFloat(b); }),
+        i,
+        j,
+        prop,
+        key,
+        fkey,
+        prop_list = [],
+        props = {},
+        last;
+
+    for (i = 0; i < keys.length; ++i) {
+        prop_list = array.add(prop_list, Object.keys(input[keys[i]]));
     }
+    prop_list = array.unique(prop_list);
 
-    function def_parser(obj, prop) {
-        return parseFloat(obj[prop]);
-    }
-
-    function def_factor(k0, k1, rfactor) {
-        return ((k1 - k0) * rfactor) + k0;
-    }
-
-    Transitions.LINK = {};
-    Transitions.LINK.CHAIN  = CHAIN;
-    Transitions.LINK.STOP   = STOP;
-    Transitions.LINK.IGNORE = IGNORE;
-    Transitions.LINK.CANCEL = CANCEL;
-
-    function normalize(obj, input) {
-        //get all props
-
-        var keys = Object.keys(input).sort(function (a, b) { return parseFloat(a) - parseFloat(b); }),
-            kk,
-            i,
-            j,
-            prop,
-            key,
-            fkey,
-            prop_list = [],
-            props = {},
-            last;
+    for (j = 0; j < prop_list.length; ++j) {
+        prop = prop_list[j];
+        props[prop] = {};
 
         for (i = 0; i < keys.length; ++i) {
-            prop_list = array.add(prop_list, Object.keys(input[keys[i]]));
-        }
-        prop_list = array.unique(prop_list);
+            key = keys[i];
 
-        for (j = 0; j < prop_list.length; ++j) {
-            prop = prop_list[j];
-            props[prop] = {};
+            fkey = parseFloat(keys[i]);
 
-            for (i = 0; i < keys.length; ++i) {
-                key = keys[i];
-
-                fkey = parseFloat(keys[i]);
-
-                // first of the sorted list and is not 0%
-                // set current value
-                if (i === 0 && key !== "0%") {
-                    props[prop][0] = obj[prop];
-                }
-
-                if (input[key][prop] !== undefined) {
-                    props[prop][fkey] = last = input[key][prop];
-                }
+            // first of the sorted list and is not 0%
+            // set current value
+            if (i === 0 && key !== "0%") {
+                props[prop][0] = obj[prop];
             }
 
-            // check that has 100% if not set the last known value
-            if (props[prop]["100"] === undefined) {
-                props[prop][100] = last;
+            if (input[key][prop] !== undefined) {
+                props[prop][fkey] = last = input[key][prop];
             }
-
         }
 
-        return props;
+        // check that has 100% if not set the last known value
+        if (props[prop]["100"] === undefined) {
+            props[prop][100] = last;
+        }
+
     }
 
-    /**
-     * Animate object properties.
-     *
-     * @param {Object} obj must be writable or at least have defined $__tween
-     * @param {String} prop property name to animate
-     * @param {Object} values keys are numbers from 0 to 100, values could be anything
-     * @param {Object} options defined as
-     *   * mandatory
-     *     time: <number> in ms
-     *   * optional
-     *     transition: Transition.XXX, or a valid compatible function Default: linear
-     *     link: Transisition.LINK.XXX Default: CHAIN
-     *     render: function(obj, property, new_value) {}
-     *     parser: function(obj, property) { return <value>; }
-     *     tickEvent: <string> event name Default: "tick"
-     *     endEvent: <string> event name Default: "animation:end"
-     *     startEvent: <string> event name Default: "animation:star"
-     *     chainEvent: <string> event name Default: "animation:chain"
-     *
-     */
-    Transitions.animate = function (obj, prop, values, ioptions) {
-        // lazy init
-        obj.$__tween = obj.$__tween || {};
+    return props;
+}
 
-        //console.log("options", JSON.stringify(options), JSON.stringify(values));
-        // <debug>
-        if ("function" !== typeof obj.on) {
-            throw new Error("obj must be an event-emitter");
+/**
+ * Animate object properties.
+ *
+ * *obj* must be writable or at least have defined $__tween
+ * *prop* property name to animate
+ * *values* keys are numbers from 0 to 100, values could be anything
+ * *ioptions*
+ * **mandatory**
+ *   * **time**: <number> in ms
+ *
+ * **optional**
+ *   * **transition** Transition.XXX, or a valid compatible function Default: linear
+ *   * **link** Transition.LINK_XXX Default: CHAIN
+ *   * **render** function(obj, property, new_value) {}
+ *   * **parser** function(obj, property) { return <value>; }
+ *   * **tickEvent** <string> event name Default: "tick"
+ *   * **endEvent** <string> event name Default: "animation:end"
+ *   * **startEvent** <string> event name Default: "animation:star"
+ *   * **chainEvent** <string> event name Default: "animation:chain"
+ *
+ */
+function animate(obj, prop, values, ioptions) {
+    // lazy init
+    obj.$__tween = obj.$__tween || {};
+
+    //console.log("options", JSON.stringify(options), JSON.stringify(values));
+    // <debug>
+    if ("function" !== typeof obj.on) {
+        throw new Error("obj must be an event-emitter");
+    }
+    if ("function" !== typeof obj.removeListener) {
+        throw new Error("obj must be an event-emitter");
+    }
+    if ("number" !== typeof ioptions.time) {
+        throw new Error("options.time is mandatory");
+    }
+    // </debug>
+
+        //soft clone and defaults
+    var options = {
+            render: ioptions.render || _def_render,
+            parser: ioptions.parser || _def_parser,
+            applyFactor: ioptions.applyFactor || _def_factor,
+            transition: ioptions.transition || Transitions.linear,
+            link: ioptions.link || CHAIN,
+            tickEvent: ioptions.tickEvent || "tick",
+            endEvent: ioptions.endEvent || "animation:end",
+            startEvent: ioptions.startEvent || "animation:start", // first emit
+            chainEvent: ioptions.chainEvent || "animation:chain",
+            time: ioptions.time,
+            start: Date.now(),
+            current: 0
+        },
+        chain_fn,
+        kvalues = Object.keys(values),
+        fvalues = kvalues.map(function (val) { return parseFloat(val) * 0.01; }),
+        update_fn;
+
+    //console.log("options", JSON.stringify(options), JSON.stringify(values));
+
+    update_fn = function (delta) {
+        //console.log(prop, "tween @", delta, options, values);
+        if (!delta) {
+            throw new Error("trace");
         }
-        if ("function" !== typeof obj.removeListener) {
-            throw new Error("obj must be an event-emitter");
+        options.current += delta;
+
+
+
+        var factor = options.current / options.time,
+            tr_factor,
+            i,
+            found = false,
+            max = kvalues.length,
+            k0,
+            k1,
+            rfactor;
+
+        //clamp
+        if (factor > 1) { // end
+            factor = 1;
+            tr_factor = 1;
+        } else {
+            tr_factor = options.transition(factor);
         }
-        if ("number" !== typeof ioptions.time) {
-            throw new Error("options.time is mandatory");
-        }
-        // </debug>
 
-            //soft clone and defaults
-        var options = {
-                render: ioptions.render || def_render,
-                parser: ioptions.parser || def_parser,
-                applyFactor: ioptions.applyFactor || def_factor,
-                transition: ioptions.transition || Transitions.linear,
-                link: ioptions.link || CHAIN,
-                tickEvent: ioptions.tickEvent || "tick",
-                endEvent: ioptions.endEvent || "animation:end",
-                startEvent: ioptions.startEvent || "animation:start", // first emit
-                chainEvent: ioptions.chainEvent || "animation:chain",
-                time: ioptions.time,
-                start: Date.now(),
-                current: 0
-            },
-            chain_fn,
-            kvalues = Object.keys(values),
-            fvalues = kvalues.map(function (val) { return parseFloat(val) * 0.01; }),
-            update_fn;
+        for (i = 0; i < max && !found; ++i) {
+            k0 = fvalues[i];
+            if (k0 <= tr_factor) {
+                if (i === max - 1) {
+                    // last element
+                    found = true;
+                    k0 = fvalues[i - 1];
+                    k1 = fvalues[i];
+                } else {
+                    k1 = fvalues[i + 1];
 
-        //console.log("options", JSON.stringify(options), JSON.stringify(values));
-
-        update_fn = function (delta) {
-            //console.log(prop, "tween @", delta, options, values);
-            if (!delta) {
-                throw new Error("trace");
-            }
-            options.current += delta;
-
-
-
-            var factor = options.current / options.time,
-                tr_factor,
-                i,
-                found = false,
-                max = kvalues.length,
-                k0,
-                k1,
-                rfactor;
-
-            //clamp
-            if (factor > 1) { // end
-                factor = 1;
-                tr_factor = 1;
-            } else {
-                tr_factor = options.transition(factor);
-            }
-
-            for (i = 0; i < max && !found; ++i) {
-                k0 = fvalues[i];
-                if (k0 <= tr_factor) {
-                    if (i === max - 1) {
-                        // last element
+                    if (k1 > tr_factor) {
                         found = true;
-                        k0 = fvalues[i - 1];
-                        k1 = fvalues[i];
-                    } else {
-                        k1 = fvalues[i + 1];
-
-                        if (k1 > tr_factor) {
-                            found = true;
-                        }
                     }
+                }
 
 
-                    if (found === true) {
-                        //console.log(prop, "ko", k0, "k1", k1);
-                        //console.log(prop, tr_factor);
+                if (found === true) {
+                    //console.log(prop, "ko", k0, "k1", k1);
+                    //console.log(prop, tr_factor);
 
-                        if (tr_factor === 1) {
-                            options.render(obj, prop, values["100"]);
+                    if (tr_factor === 1) {
+                        options.render(obj, prop, values["100"]);
 
-                            // this is the end, my only friend, the end...
-                            obj.removeListener(options.tickEvent, obj.$__tween[prop]);
-                            delete obj.$__tween[prop];
-                            obj.emit(options.endEvent, options);
-                        } else {
-                            rfactor = (tr_factor - k0) / (k1 - k0);
-                            //console.log(prop, i, rfactor);
+                        // this is the end, my only friend, the end...
+                        obj.removeListener(options.tickEvent, obj.$__tween[prop]);
+                        delete obj.$__tween[prop];
+                        obj.emit(options.endEvent, options);
+                    } else {
+                        rfactor = (tr_factor - k0) / (k1 - k0);
+                        //console.log(prop, i, rfactor);
 
-                            //console.log(prop, rfactor, "k0", values[k0], "k1", values[k1]);
+                        //console.log(prop, rfactor, "k0", values[k0], "k1", values[k1]);
 
-                            options.render(obj, prop,
-                                options.applyFactor(values[kvalues[i]], values[kvalues[i + 1]], rfactor)
-                                );
-                        }
+                        options.render(obj, prop,
+                            options.applyFactor(values[kvalues[i]], values[kvalues[i + 1]], rfactor)
+                            );
                     }
                 }
             }
-        };
+        }
+    };
 
-        if (obj.$__tween[prop]) {
-            // link will told us what to do!
-            switch (options.link) {
-            case IGNORE:
-                return IGNORE;
-            case CHAIN:
+    if (obj.$__tween[prop]) {
+        // link will told us what to do!
+        switch (options.link) {
+        case IGNORE:
+            return IGNORE;
+        case CHAIN:
 
-                chain_fn = function () {
-                    if (!obj.$__tween[prop]) {
-                        obj.$__tween[prop] = update_fn;
-                        obj.on(options.tickEvent, obj.$__tween[prop]);
-                        obj.removeListener(options.endEvent, chain_fn);
-                    }
-                };
+            chain_fn = function () {
+                if (!obj.$__tween[prop]) {
+                    obj.$__tween[prop] = update_fn;
+                    obj.on(options.tickEvent, obj.$__tween[prop]);
+                    obj.removeListener(options.endEvent, chain_fn);
+                }
+            };
 
-                obj.on(options.endEvent, chain_fn);
-                obj.emit(options.chainEvent, options);
+            obj.on(options.endEvent, chain_fn);
+            obj.emit(options.chainEvent, options);
 
-                return CHAIN;
-            case STOP:
-                obj.removeListener(options.tickEvent, obj.$__tween[prop]);
-                delete obj.$__tween[prop];
+            return CHAIN;
+        case STOP:
+            obj.removeListener(options.tickEvent, obj.$__tween[prop]);
+            delete obj.$__tween[prop];
 
-                return STOP;
-            case CANCEL:
-                obj.removeListener(options.tickEvent, obj.$__tween[prop]);
-                delete obj.$__tween[prop];
-                // and attach!
+            return STOP;
+        case CANCEL:
+            obj.removeListener(options.tickEvent, obj.$__tween[prop]);
+            delete obj.$__tween[prop];
+            // and attach!
 
-                obj.$__tween[prop] = update_fn;
-                obj.on(options.tickEvent, obj.$__tween[prop]);
-                break;
-            }
-        } else {
             obj.$__tween[prop] = update_fn;
             obj.on(options.tickEvent, obj.$__tween[prop]);
+            break;
         }
+    } else {
+        obj.$__tween[prop] = update_fn;
+        obj.on(options.tickEvent, obj.$__tween[prop]);
+    }
 
 
 
-        return true;
-    };
-
-    /**
-     *
-     */
-    Transitions.tween = function (obj, params, options) {
-        // <debug>
-        if (!params.hasOwnProperty("100%")) {
-            throw new Error("100% params must exists");
-        }
-
-        if ("function" !== typeof obj.on) {
-            throw new Error("obj must be an event-emitter");
-        }
-        if ("function" !== typeof obj.removeListener) {
-            throw new Error("obj must be an event-emitter");
-        }
-        if ("number" !== typeof options.time) {
-            throw new Error("options.time is mandatory");
-        }
-        // </debug>
-
-        options = options || {};
-        // set defaults
-        options.render = options.render || def_render;
-        options.parser = options.parser || def_parser;
-        options.transition = options.transition || Transitions.linear;
-        options.link = options.link || CHAIN;
-        options.tick = options.tick || "tick";
-
-        // set config
-        obj.$__tween = obj.$__tween || {};
-
-        var plist = normalize(obj, params),
-            i;
-
-        // animate each property
-        for (i in plist) {
-            Transitions.animate(obj, i, plist[i], options);
-        }
-
-    };
-
-
-    return Transitions;
-
-}());
-
-
-if ("undefined" === typeof module) {
-    window.Transitions = exp;
-} else {
-    module.exports = exp;
+    return true;
 }
+
+/**
+ *
+ */
+function tween(obj, params, options) {
+    // <debug>
+    if (!params.hasOwnProperty("100%")) {
+        throw new Error("100% params must exists");
+    }
+
+    if ("function" !== typeof obj.on) {
+        throw new Error("obj must be an event-emitter");
+    }
+    if ("function" !== typeof obj.removeListener) {
+        throw new Error("obj must be an event-emitter");
+    }
+    if ("number" !== typeof options.time) {
+        throw new Error("options.time is mandatory");
+    }
+    // </debug>
+
+    options = options || {};
+    // set defaults
+    options.render = options.render || _def_render;
+    options.parser = options.parser || _def_parser;
+    options.transition = options.transition || Transitions.linear;
+    options.link = options.link || CHAIN;
+    options.tick = options.tick || "tick";
+
+    // set config
+    obj.$__tween = obj.$__tween || {};
+
+    var plist = _normalize(obj, params),
+        i;
+
+    // animate each property
+    for (i in plist) {
+        Transitions.animate(obj, i, plist[i], options);
+    }
+
+}
+
+
+Transitions.tween = tween;
+Transitions.animate = animate;
+Transitions.linear = linear;
+Transitions.create = create;
+
+module.exports = Transitions;
 },{"array-enhancements":18}],16:[function(require,module,exports){
 var aux_vec = [0, 0],
     __x = 0,

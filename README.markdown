@@ -10,7 +10,8 @@ So the objective is "**Be fast**"
 
 * API completeness
 * Testing
-* did I miss anything useful? 
+* did I miss anything useful?
+
 
 ## Performance? HOW?/TIPS
 
