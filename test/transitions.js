@@ -150,19 +150,19 @@ test("Transitions chain", function (t) {
         "100%" : {
             "x": 200
         }
-    }, {time: 1000, link: Transitions.LINK.CHAIN});
+    }, {time: 1000, link: Transitions.LINK_CHAIN});
 
     Transitions.tween(v, {
         "100%" : {
             "x": 300
         }
-    }, {time: 1000, link: Transitions.LINK.CHAIN});
+    }, {time: 1000, link: Transitions.LINK_CHAIN});
 
     Transitions.tween(v, {
         "100%" : {
             "x": 400
         }
-    }, {time: 1000, link: Transitions.LINK.CHAIN});
+    }, {time: 1000, link: Transitions.LINK_CHAIN});
 
     // x 100-50-75
     // y 100-100-100
@@ -197,7 +197,7 @@ test("Transitions cancel", function (t) {
         "100%" : {
             "x": 200
         }
-    }, {time: 1000, link: Transitions.LINK.CANCEL});
+    }, {time: 1000, link: Transitions.LINK_CANCEL});
 
 
     // x 100-50-75
@@ -224,7 +224,7 @@ test("Transitions ignore", function (t) {
         "100%" : {
             "x": 200
         }
-    }, {time: 1000, link: Transitions.LINK.IGNORE});
+    }, {time: 1000, link: Transitions.LINK_IGNORE});
 
 
     // x 100-50-75
@@ -251,7 +251,7 @@ test("Transitions stop", function (t) {
         "100%" : {
             "x": 200
         }
-    }, {time: 1000, link: Transitions.LINK.STOP});
+    }, {time: 1000, link: Transitions.LINK_STOP});
 
 
     // x 100-50-75

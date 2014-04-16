@@ -6,6 +6,18 @@ var falafel = require("falafel"),
 var methods,
     valid_arguments,
     comments,
+    common = {
+        m2d:  "Matrix2D",
+        circle: "Circle",
+        line2: "Line2",
+        vec2: "Vec2",
+        out_vec2: "Vec2",
+        seg2: "Segment2",
+        rect: "Rectangle",
+        tri: "Triangle",
+        curve: "Beizer",
+        bb2: "BB2",
+    },
     files = {
         Vec2: {
             filename: "./lib/vec2.js",
@@ -38,7 +50,9 @@ var methods,
             filename: "./lib/line2.js",
             valid_arguments: {
                 out: "Line2",
+                l2: "Line2",
 
+                offset: "Number",
                 x: "Number",
                 y: "Number",
                 m: "Number",
@@ -48,7 +62,7 @@ var methods,
                 y2: "Number",
                 seg2: "Segment2",
                 v1: "Vec2",
-                l1: "Line2",
+                v2: "Vec2",
             }
         },
         Segment2: {
@@ -63,9 +77,6 @@ var methods,
                 y1: "Number",
                 y2: "Number",
                 y3: "Number",
-
-                out_vec2: "Segment2",
-                vec2: "Vec2",
             }
         },
         Rectangle: {
@@ -75,9 +86,6 @@ var methods,
                 rect: "Rectangle",
                 rect2: "Rectangle",
                 force: "Boolean",
-
-                out_vec2: "Vec2",
-                vec2: "Vec2",
 
                 x1: "Number",
                 x2: "Number",
@@ -98,10 +106,7 @@ var methods,
                 b: "Number",
                 r: "Number",
                 t: "Number",
-                circle: "Circle",
-                rect: "Rectangle",
-                out_vec2: "Vec2",
-                vec2: "Vec2",
+
                 vec2_offset: "Vec2",
                 vec2_scale: "Vec2",
                 alignament: "Number"
@@ -111,22 +116,20 @@ var methods,
             filename: "./lib/circle.js",
             valid_arguments: {
                 out: "Circle",
-                circle: "Circle",
                 circle_2: "Circle",
                 x: "Number",
                 y: "Number",
                 radius: "Number",
-                vec2: "Vec2",
+                inside: "Boolean",
+                circumcenter: "Boolean",
             }
         },
         Matrix2D: {
             filename: "./lib/matrix2d.js",
             valid_arguments: {
                 out: "Matrix2D",
-                m2d:  "Matrix2D",
                 m2d_2:  "Matrix2D",
-                out_vec2: "Vec2",
-                vec2: "Vec2",
+
                 vec2_degrees: "Vec2 (Degrees)",
                 degrees: "Number (Degrees)",
                 radians: "Number (Radians)",
@@ -140,7 +143,6 @@ var methods,
             valid_arguments: {
                 out: "Polygon",
                 poly:  "Polygon",
-                out_vec2: "Segment2"
             }
         },
 
@@ -148,9 +150,6 @@ var methods,
             filename: "./lib/beizer.js",
             valid_arguments: {
                 out: "Beizer",
-                curve: "Beizer",
-
-                out_vec2: "Segment2",
 
                 t: "Number",
                 step: "Number",
@@ -169,10 +168,6 @@ var methods,
             filename: "./lib/triangle.js",
             valid_arguments: {
                 out: "Triangle",
-                tri: "Triangle",
-
-                out_vec2: "Vec2",
-                vec2: "Vec2",
 
                 x1: "Number",
                 x2: "Number",
@@ -205,23 +200,18 @@ var methods,
                 cy: "Number",
                 r: "Number",
 
-                line2: "Line2",
                 line2_1: "Line2",
                 line2_2: "Line2",
 
-                seg2: "Segment2",
                 seg2_1: "Segment2",
                 seg2_2: "Segment2",
 
-                vec2: "Vec2",
-                circle: "Circle",
                 circle_1: "Circle",
                 circle_2: "Circle",
 
-                bb2: "BB2",
                 bb2_1: "BB2",
                 bb2_2: "BB2",
-                rect: "Rectangle",
+
                 rect1: "Rectangle",
                 rect2: "Rectangle",
             }
@@ -239,12 +229,7 @@ var methods,
                 y4: "Number",
 
 
-                line2: "Line2",
 
-                seg2: "Segment2",
-
-                vec2: "Vec2",
-                circle: "Circle",
 
                 bb2: "BB2",
                 rect: "Rectangle",
@@ -263,6 +248,18 @@ var methods,
                 ioptions: "Object",
                 params: "Object",
                 options: "Object"
+            }
+        },
+        Xorshift: {
+            filename: "./lib/xorshift.js",
+            valid_arguments: {
+                seeds: "[, Number...]"
+            }
+        },
+        Noise: {
+            filename: "./lib/noise.js",
+            valid_arguments: {
+                seed: "Number"
             }
         },
     },
@@ -327,7 +324,7 @@ for (cls in files) {
     // test
     //src = fs.readFileSync("doc-test.js", "utf-8");
 
-    valid_arguments = files[cls].valid_arguments;
+    valid_arguments = object.merge(common, files[cls].valid_arguments);
 
     falafel(src, {comment: true, loc: true}, function (node) {
         //console.log(node);
@@ -426,6 +423,10 @@ for (cls in files) {
                     } else {
                         comments.push("  **see**: [" + line + "](#" + cls + "-" + line + ")");
                     }
+                } else if (c.indexOf("@source") !== -1) {
+                    line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
+                    line = line.substring(8);
+                    comments.push("  **source**: [" + line + "](" + line + ")");
                 } else if (c.indexOf("@param") !== -1) {
                     //ignore
                 } else {

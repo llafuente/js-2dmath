@@ -8,6 +8,7 @@ module.exports = {
     Rectangle: require("./lib/rectangle.js"),
     BB2: require("./lib/boundingbox2.js"),
     Circle: require("./lib/circle.js"),
+    Triangle: require("./lib/triangle.js"),
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
     Intersection: require("./lib/intersection.js"),
@@ -65,7 +66,7 @@ for (i in module.exports) {
     console.log();
 }
 */
-},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/draw.js":7,"./lib/intersection.js":8,"./lib/line2.js":9,"./lib/math.js":10,"./lib/matrix2d.js":11,"./lib/noise.js":12,"./lib/rectangle.js":13,"./lib/segment2.js":14,"./lib/transitions.js":15,"./lib/vec2.js":16,"./lib/xorshift.js":17}],"js-2dmath":[function(require,module,exports){
+},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/draw.js":7,"./lib/intersection.js":8,"./lib/line2.js":9,"./lib/math.js":10,"./lib/matrix2d.js":11,"./lib/noise.js":12,"./lib/rectangle.js":13,"./lib/segment2.js":14,"./lib/transitions.js":15,"./lib/triangle.js":16,"./lib/vec2.js":17,"./lib/xorshift.js":18}],"js-2dmath":[function(require,module,exports){
 module.exports=require('Focm2+');
 },{}],3:[function(require,module,exports){
 var sqrt = Math.sqrt,
@@ -419,10 +420,28 @@ if ("undefined" !== typeof module) {
 }
 },{}],5:[function(require,module,exports){
 var browser = "undefined" === typeof module,
-    Vec2 = browser ? window.Vec2 : require("./vec2.js"),
+    Vec2 = require("./vec2.js"),
+    vec2_distance = Vec2.distance,
+    vec2_distance_sq = Vec2.distanceSq,
+    vec2_midpoint = Vec2.midPoint,
+
+    Rectangle = require("./rectangle.js"),
+    rectangle_center = Rectangle.center,
+
+    Triangle = require("./triangle.js"),
+    triangle_circumcenter = Triangle.circumcenter,
+    triangle_center = Triangle.center,
+    triangle_abmidpoint = Triangle.abMidPoint,
+    triangle_bcmidpoint = Triangle.bcMidPoint,
+    triangle_camidpoint = Triangle.caMidPoint,
+
     max = Math.max,
     TWOPI = Math.TWOPI,
-    PI = Math.PI;
+    PI = Math.PI,
+    sqrt = Math.sqrt,
+    aux_vec2 = [0, 0],
+    aux_num,
+    aux_num2;
 /**
  * @returns {Circle}
  */
@@ -434,6 +453,91 @@ function create(x, y, radius) {
  */
 function fromVec2(vec2, radius) {
     return [[vec2[0], vec2[1]], radius];
+}
+/**
+ * Create a Circle with seg2 as diameter
+ * @returns {Circle}
+ */
+function fromSegment2(seg2) {
+    var out = [[0, 0], 0];
+
+    out[0][0] = (seg2[0] + seg2[2]) * 0.5;
+    out[0][1] = (seg2[1] + seg2[3]) * 0.5;
+
+    //subtract
+    aux_num = out[0][0] - seg2[0];
+    aux_num2 = out[0][1] - seg2[1];
+    //sqrLength
+    out[1] = sqrt(aux_num * aux_num + aux_num2 * aux_num2);
+
+    return out;
+}
+/**
+ * @returns {Circle}
+ */
+function fromRectangle(rect, inside) {
+    var out = [[0, 0], 0];
+    rectangle_center(out[0], rect);
+
+    if (inside) {
+        aux_vec2[0] = rect[0][0] + (rect[1][0] - rect[0][0]) * 0.5;
+        aux_vec2[1] = rect[0][1];
+
+        out[1] = vec2_distance(out[0], aux_vec2);
+    } else {
+        out[1] = vec2_distance(out[0], rect[0]);
+    }
+
+    return out;
+}
+/**
+ * @todo review inside cases
+ * @returns {Circle}
+ */
+function fromTriangle(tri, inside, circumcenter) {
+    var out = [[0, 0], 0];
+
+    if (circumcenter && !inside) {
+        triangle_circumcenter(out[0], tri);
+
+        // use distance^2 for comparison
+        out[1] = vec2_distance_sq(out[0], tri[0]);
+        aux_num = vec2_distance_sq(out[0], tri[1]);
+        if (aux_num > out[1]) {
+            out[1] = aux_num;
+        }
+        out[1] = vec2_distance_sq(out[0], tri[2]);
+        if (aux_num > out[1]) {
+            out[1] = aux_num;
+        }
+        // and now return the good one :)
+        out[1] = sqrt(out[1]);
+
+        return out;
+    }
+
+    triangle_center(out[0], tri);
+
+    // use distance^2 for comparison
+    triangle_abmidpoint(aux_vec2, tri);
+    out[1] = vec2_distance_sq(out[0], aux_vec2);
+
+    triangle_bcmidpoint(aux_vec2, tri);
+    aux_num = vec2_distance_sq(out[0], aux_vec2);
+    if (aux_num < out[1]) {
+        out[1] = aux_num;
+    }
+
+    triangle_camidpoint(aux_vec2, tri);
+    aux_num = vec2_distance_sq(out[0], aux_vec2);
+    if (aux_num < out[1]) {
+        out[1] = aux_num;
+    }
+
+    // and now return the good one :)
+    out[1] = sqrt(out[1]);
+
+    return out;
 }
 
 /**
@@ -486,6 +590,9 @@ function area(circle) {
 var Circle = {
     create: create,
     fromVec2: fromVec2,
+    fromSegment2: fromSegment2,
+    fromRectangle: fromRectangle,
+    fromTriangle: fromTriangle,
     clone: clone,
     copy: copy,
     translate: translate,
@@ -496,7 +603,7 @@ var Circle = {
 
 
 module.exports = Circle;
-},{"./vec2.js":16}],6:[function(require,module,exports){
+},{"./rectangle.js":13,"./triangle.js":16,"./vec2.js":17}],6:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     sqrt = Math.sqrt,
     abs = Math.abs,
@@ -642,6 +749,20 @@ function circle(context2d, circle, style) {
     context2d.beginPath();
     context2d.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
     context2d.stroke();
+
+    context2d.beginPath();
+    context2d.arc(circle[0][0], circle[0][1], 1, 0, 2 * Math.PI, false);
+    context2d.stroke();
+}
+
+function line2(context2d, line2, style) {
+
+    context2d.beginPath();
+    var m = line2[1] * 50;
+    context2d.moveTo(line2[0][0] + m, line2[0][1] + m);
+    context2d.lineTo(line2[0][0] - m, line2[0][1] - m);
+    context2d.stroke();
+
 }
 
 function vec2(context2d, vec2, style) {
@@ -680,6 +801,19 @@ function segment2(context2d, seg2, style) {
 
 }
 
+function triangle(context2d, tri, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.beginPath();
+    context2d.lineTo(tri[1][0], tri[1][1]);
+    context2d.lineTo(tri[2][0], tri[2][1]);
+    context2d.lineTo(tri[0][0], tri[0][1]);
+    context2d.lineTo(tri[1][0], tri[1][1]);
+    context2d.stroke();
+}
+
 function bb2(context2d, bb2, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
@@ -704,6 +838,8 @@ var Draw = {
     vec2: vec2,
     rectangle: rectangle,
     circle: circle,
+    line2: line2,
+    triangle: triangle,
     segment2: segment2,
     bb2: bb2,
 
@@ -1357,7 +1493,12 @@ var Intersection = {
 
 
 module.exports = Intersection;
-},{"./boundingbox2.js":4,"./distance.js":6,"./rectangle.js":13,"./segment2.js":14,"./vec2.js":16}],9:[function(require,module,exports){
+},{"./boundingbox2.js":4,"./distance.js":6,"./rectangle.js":13,"./segment2.js":14,"./vec2.js":17}],9:[function(require,module,exports){
+var dx,
+    dy,
+    r,
+    sqrt = Math.sqrt;
+
 /**
  * @returns {Line2}
  */
@@ -1367,7 +1508,19 @@ function create(x, y, m) {
 /**
  * @returns {Line2}
  */
-function fromPoints(x1, y1, x2, y2) {
+function zero() {
+    return [[0, 0], 0];
+}
+/**
+ * @returns {Line2}
+ */
+function fromVec2(v1, v2) {
+    return [[v1[0], v1[1]], (v1[0] - v2[0]) / (v1[0] - v2[1])];
+}
+/**
+ * @returns {Line2}
+ */
+function from2Points(x1, y1, x2, y2) {
     return [[x1, y1], (x1 - x2) / (y1 - y2)];
 }
 /**
@@ -1379,62 +1532,67 @@ function fromSegment2(seg2) {
 /**
  * @returns {Line2}
  */
-function copy(out, l1) {
-    out[0][0] = l1[0][0];
-    out[0][1] = l1[0][1];
-    out[1] = l1[1];
+function copy(out, line2) {
+    out[0][0] = line2[0][0];
+    out[0][1] = line2[0][1];
+    out[1] = line2[1];
 
     return out;
 }
 /**
  * @returns {Line2}
  */
-function clone(l1) {
-    return [[l1[0][0], l1[0][1]], l1[1]];
+function clone(line2) {
+    return [[line2[0][0], line2[0][1]], line2[1]];
 }
 /**
  * @returns {Line2}
  */
-function add(out, l1, v1) {
-    out[0][0] = l1[0][0] + v1[0];
-    out[0][1] = l1[0][1] + v1[1];
-    out[1] = l1[1];
+function add(out, line2, v1) {
+    out[0][0] = line2[0][0] + v1[0];
+    out[0][1] = line2[0][1] + v1[1];
+    out[1] = line2[1];
 
     return out;
 }
 /**
  * @returns {Line2}
  */
-function subtract(out, l1, v1) {
-    out[0][0] = l1[0][0] - v1[0];
-    out[0][1] = l1[0][1] - v1[1];
-    out[1] = l1[1];
+function subtract(out, line2, v1) {
+    out[0][0] = line2[0][0] - v1[0];
+    out[0][1] = line2[0][1] - v1[1];
+    out[1] = line2[1];
 
     return out;
 }
+
 /**
  * @returns {Line2}
  */
-function parallel(out, l1) {
-    out[0][0] = l1[0][0];
-    out[0][1] = l1[0][1];
-    out[1] = 1 / l1[1];
+function offset(out, line2, offset) {
+    out[0][0] = line2[0][0] + offset;
+    out[0][1] = line2[0][1];
+    out[1] = line2[1];
 
     return out;
 }
+
+
 
 /**
  * @class Line2
  */
 var Line2 = {
     create: create,
-    fromPoints: fromPoints,
+    zero: zero,
+    fromVec2: fromVec2,
+    from2Points: from2Points,
     fromSegment2: fromSegment2,
     copy: copy,
     clone: clone,
     add: add,
     subtract: subtract,
-    parallel: parallel,
+    offset: offset,
 
     // alias
     translate: add,
@@ -2371,315 +2529,309 @@ var Matrix2D =  {
 
 module.exports = Matrix2D;
 },{}],12:[function(require,module,exports){
-var exp;
-(exp = function () {
-    "use strict";
-
-    var browser = "undefined" === typeof module,
-        object = require("object-enhancements"),
-        Xorshift = browser ? window.Xorshift : require("./xorshift.js"),
-        GRAD3 = [
-            [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
-            [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
-            [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
-        ],
-
-        GRAD4 = [
-            [0, 1, 1, 1],  [0, 1, 1, -1],  [0, 1, -1, 1],  [0, 1, -1, -1],
-            [0, -1, 1, 1], [0, -1, 1, -1], [0, -1, -1, 1], [0, -1, -1, -1],
-            [1, 0, 1, 1],  [1, 0, 1, -1],  [1, 0, -1, 1],  [1, 0, -1, -1],
-            [-1, 0, 1, 1], [-1, 0, 1, -1], [-1, 0, -1, 1], [-1, 0, -1, -1],
-            [1, 1, 0, 1],  [1, 1, 0, -1],  [1, -1, 0, 1],  [1, -1, 0, -1],
-            [-1, 1, 0, 1], [-1, 1, 0, -1], [-1, -1, 0, 1], [-1, -1, 0, -1],
-            [1, 1, 1, 0],  [1, 1, -1, 0],  [1, -1, 1, 0],  [1, -1, -1, 0],
-            [-1, 1, 1, 0], [-1, 1, -1, 0], [-1, -1, 1, 0], [-1, -1, -1, 0]
-        ],
-
-        SIMPLEX = [
-            [0, 1, 2, 3], [0, 1, 3, 2], [0, 0, 0, 0], [0, 2, 3, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 2, 3, 0],
-            [0, 2, 1, 3], [0, 0, 0, 0], [0, 3, 1, 2], [0, 3, 2, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 3, 2, 0],
-            [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-            [1, 2, 0, 3], [0, 0, 0, 0], [1, 3, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [2, 3, 0, 1], [2, 3, 1, 0],
-            [1, 0, 2, 3], [1, 0, 3, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [2, 0, 3, 1], [0, 0, 0, 0], [2, 1, 3, 0],
-            [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-            [2, 0, 1, 3], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [3, 0, 1, 2], [3, 0, 2, 1], [0, 0, 0, 0], [3, 1, 2, 0],
-            [2, 1, 0, 3], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [3, 1, 0, 2], [0, 0, 0, 0], [3, 2, 0, 1], [3, 2, 1, 0]
-        ],
-        sqrt = Math.sqrt,
-        floor = Math.floor,
-        random = Math.random,
-        sqrt_of_3 = sqrt(3),
-
-        Noise = {};
-
-    // from: http://jsdo.it/akm2/fhMC/js
-    // don't know the author, if you are contact me.
-    // I just lint the code (a little)... and adapt it to the lib philosophy (that means remove 3d noises)
-    // TODO optimize, there is performance gain everywhere!
-
-
-    // Common helpers
-
-    function dot2d(g, x, y) {
-        return g[0] * x + g[1] * y;
-    }
-
-    function dot3d(g, x, y, z) {
-        return g[0] * x + g[1] * y + g[2] * z;
-    }
-
-    // Simplex helper
-
-    function dot4d(g, x, y, z, w) {
-        return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
-    }
-
-    // Classic helpers
-
-    function mix(a, b, t) {
-        return (1 - t) * a + t * b;
-    }
-
-    function fade(t) {
-        return t * t * t * (t * (t * 6 - 15) + 10);
-    }
-
-
-
-    /**
-     * @see http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
-     *
-     * Tiling Example (heavy...)
-     *
-     * var perlinNoise = new PerlinNoise();
-     *
-     * function tilingNoise2d(x, y, w, h) {
-     *     return (perlinNoise.noise(x, y) * (w - x) * (h - y) +
-     *         perlinNoise.noise(x - w, y) * x * (h - y) +
-     *         perlinNoise.noise(x - w, y - h) * x * y +
-     *         perlinNoise.noise(x, y - h) * (w - x) * y) / (w * h);
-     */
-
-
-    /**
-     * ClassicNoise
-     */
-    function ClassicNoise(seed) {
-        this.seed(seed);
-    }
-
-    ClassicNoise.prototype = {
-        _octaves: 4,
-        _fallout: 0.5,
-
-        seed: function (seed) {
-            var random = Xorshift.create(seed || new Date().getTime()).random,
-                i,
-                p = [],
-                perm = [];
-
-            for (i = 0; i < 256; i++) {
-                p[i] = floor(random() * 256);
-            }
-
-            for (i = 0; i < 512; i++) {
-                perm[i] = p[i & 255];
-            }
-
-            this._perm = perm;
-        },
-
-        octaves: function (octaves) {
-            if (!arguments.length) {
-                return this._octaves;
-            }
-            return this._octaves = octaves;
-        },
-
-        fallout: function (fallout) {
-            if (!arguments.length) {
-                return this._fallout;
-            }
-            return this._fallout = fallout;
-        },
-
-        noise: function (x, y) {
-            var result = 0,
-                noise,
-                f = 1,
-                oct = this._octaves,
-                amp = 0.5,
-                fallout = this._fallout,
-                i;
-
-            for (i = 0; i < oct; ++i) {
-                result += (1 + this.noise2d(x * f, y * f)) * amp * 0.5;
-                amp *= fallout;
-                f *= 2;
-            }
-
-            return result;
-        },
-
-        noise2d: function (x, y) {
-            var X = floor(x),
-                Y = floor(y),
-                perm = this._perm;
-
-            x = x - X;
-            y = y - Y;
-
-            X = X & 255;
-            Y = Y & 255;
-
-
-            var gi00 = perm[X + perm[Y]] % 12,
-                gi01 = perm[X + perm[Y + 1]] % 12,
-                gi10 = perm[X + 1 + perm[Y]] % 12,
-                gi11 = perm[X + 1 + perm[Y + 1]] % 12,
-
-                n00 = dot2d(GRAD3[gi00], x, y),
-                n10 = dot2d(GRAD3[gi10], x - 1, y),
-                n01 = dot2d(GRAD3[gi01], x, y - 1),
-                n11 = dot2d(GRAD3[gi11], x - 1, y - 1),
-
-                u = fade(x),
-                v = fade(y),
-
-                nx0 = mix(n00, n10, u),
-                nx1 = mix(n01, n11, u),
-
-                nxy = mix(nx0, nx1, v);
-
-            return nxy;
-        }
-    };
-
-
-    /**
-     * SimplexNoise
-     *
-     * @super ClassicNoise
-     */
-    function SimplexNoise(seed) {
-        this.seed(seed);
-    }
-
-    SimplexNoise.prototype = object.extend({}, ClassicNoise.prototype, {
-        noise: function (x, y, z, w) {
-            var result = 0,
-                noise,
-                f = 1,
-                oct = this._octaves,
-                amp = 0.5,
-                fallout = this._fallout,
-                i;
-
-            for (i = 0; i < oct; ++i) {
-                result += (1 + this.noise2d(x * f, y * f)) * amp * 0.5;
-                amp *= fallout;
-                f *= 2;
-            }
-
-            return result;
-        },
-
-        noise2d: function (x, y) {
-            var n0,
-                n1,
-                n2,
-
-                F2 = 0.5 * (sqrt_of_3 - 1),
-                s = (x + y) * F2,
-                i = floor(x + s),
-                j = floor(y + s),
-
-                G2 = (3 - sqrt_of_3) / 6,
-                t = (i + j) * G2,
-                X0 = i - t,
-                Y0 = j - t,
-                x0 = x - X0,
-                y0 = y - Y0,
-
-                i1,
-                j1,
-
-                perm = this._perm;
-
-            if (x0 > y0) {
-                i1 = 1;
-                j1 = 0;
-            } else {
-                i1 = 0;
-                j1 = 1;
-            }
-
-            var x1 = x0 - i1 + G2,
-                y1 = y0 - j1 + G2,
-
-                x2 = x0 - 1 + 2 * G2,
-                y2 = y0 - 1 + 2 * G2,
-
-                ii = i & 255,
-                jj = j & 255,
-
-                gi0 = perm[ii + perm[jj]] % 12,
-                gi1 = perm[ii + i1 + perm[jj + j1]] % 12,
-                gi2 = perm[ii + 1 + perm[jj + 1]] % 12,
-
-                t0 = 0.5 - x0 * x0 - y0 * y0;
-
-            if (t0 < 0) {
-                n0 = 0;
-            } else {
-                t0 *= t0;
-                n0 = t0 * t0 * dot2d(GRAD3[gi0], x0, y0);
-            }
-
-            var t1 = 0.5 - x1 * x1 - y1 * y1;
-            if (t1 < 0) {
-                n1 = 0;
-            } else {
-                t1 *= t1;
-                n1 = t1 * t1 * dot2d(GRAD3[gi1], x1, y1);
-            }
-
-            var t2 = 0.5 - x2 * x2 - y2 * y2;
-            if (t2 < 0) {
-                n2 = 0;
-            } else {
-                t2 *= t2;
-                n2 = t2 * t2 * dot2d(GRAD3[gi2], x2, y2);
-            }
-
-            return 70 * (n0 + n1 + n2);
-        }
-    });
-
-    Noise.GRAD3 = GRAD3;
-    Noise.GRAD4 = GRAD4;
-    Noise.SIMPLEX = SIMPLEX;
-
-    Noise.createClassic = function (seed) {
-        return new ClassicNoise(seed);
-    };
-
-    Noise.createSimpleX = function (seed) {
-        return new SimplexNoise(seed);
-    };
-
-
-    return Noise;
-
-}());
-
-
-if ("undefined" === typeof module) {
-    window.Noise = exp;
-} else {
-    module.exports = exp;
+var object = require("object-enhancements"),
+    Xorshift = require("./xorshift.js"),
+    GRAD3 = [
+        [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+        [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+        [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
+    ],
+
+    GRAD4 = [
+        [0, 1, 1, 1],  [0, 1, 1, -1],  [0, 1, -1, 1],  [0, 1, -1, -1],
+        [0, -1, 1, 1], [0, -1, 1, -1], [0, -1, -1, 1], [0, -1, -1, -1],
+        [1, 0, 1, 1],  [1, 0, 1, -1],  [1, 0, -1, 1],  [1, 0, -1, -1],
+        [-1, 0, 1, 1], [-1, 0, 1, -1], [-1, 0, -1, 1], [-1, 0, -1, -1],
+        [1, 1, 0, 1],  [1, 1, 0, -1],  [1, -1, 0, 1],  [1, -1, 0, -1],
+        [-1, 1, 0, 1], [-1, 1, 0, -1], [-1, -1, 0, 1], [-1, -1, 0, -1],
+        [1, 1, 1, 0],  [1, 1, -1, 0],  [1, -1, 1, 0],  [1, -1, -1, 0],
+        [-1, 1, 1, 0], [-1, 1, -1, 0], [-1, -1, 1, 0], [-1, -1, -1, 0]
+    ],
+
+    SIMPLEX = [
+        [0, 1, 2, 3], [0, 1, 3, 2], [0, 0, 0, 0], [0, 2, 3, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 2, 3, 0],
+        [0, 2, 1, 3], [0, 0, 0, 0], [0, 3, 1, 2], [0, 3, 2, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 3, 2, 0],
+        [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
+        [1, 2, 0, 3], [0, 0, 0, 0], [1, 3, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [2, 3, 0, 1], [2, 3, 1, 0],
+        [1, 0, 2, 3], [1, 0, 3, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [2, 0, 3, 1], [0, 0, 0, 0], [2, 1, 3, 0],
+        [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
+        [2, 0, 1, 3], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [3, 0, 1, 2], [3, 0, 2, 1], [0, 0, 0, 0], [3, 1, 2, 0],
+        [2, 1, 0, 3], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [3, 1, 0, 2], [0, 0, 0, 0], [3, 2, 0, 1], [3, 2, 1, 0]
+    ],
+    sqrt = Math.sqrt,
+    floor = Math.floor,
+    random = Math.random,
+    sqrt_of_3 = sqrt(3),
+
+    Noise = {};
+
+// from: http://jsdo.it/akm2/fhMC/js
+// don't know the author, if you are contact me.
+// I just lint the code (a little)... and adapt it to the lib philosophy (that means remove 3d noises)
+
+//@TODO optimize, there is performance gain everywhere!
+
+
+// Common helpers
+
+function _dot2d(g, x, y) {
+    return g[0] * x + g[1] * y;
 }
-},{"./xorshift.js":17,"object-enhancements":20}],13:[function(require,module,exports){
+
+function _dot3d(g, x, y, z) {
+    return g[0] * x + g[1] * y + g[2] * z;
+}
+
+// Simplex helper
+
+function _dot4d(g, x, y, z, w) {
+    return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
+}
+
+// Classic helpers
+
+function _mix(a, b, t) {
+    return (1 - t) * a + t * b;
+}
+
+function _fade(t) {
+    return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+
+
+/**
+ * @see http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+ *
+ * Tiling Example (heavy...)
+ *
+ * var perlinNoise = new PerlinNoise();
+ *
+ * function tilingNoise2d(x, y, w, h) {
+ *     return (perlinNoise.noise(x, y) * (w - x) * (h - y) +
+ *         perlinNoise.noise(x - w, y) * x * (h - y) +
+ *         perlinNoise.noise(x - w, y - h) * x * y +
+ *         perlinNoise.noise(x, y - h) * (w - x) * y) / (w * h);
+ */
+
+
+/**
+ * @class ClassicNoise
+ */
+function ClassicNoise(seed) {
+    this.seed(seed);
+}
+
+ClassicNoise.prototype = {
+    _octaves: 4,
+    _fallout: 0.5,
+
+    seed: function (seed) {
+        var random = Xorshift.create(seed || new Date().getTime()).random,
+            i,
+            p = [],
+            perm = [];
+
+        for (i = 0; i < 256; i++) {
+            p[i] = floor(random() * 256);
+        }
+
+        for (i = 0; i < 512; i++) {
+            perm[i] = p[i & 255];
+        }
+
+        this._perm = perm;
+    },
+
+    octaves: function (octaves) {
+        if (!arguments.length) {
+            return this._octaves;
+        }
+        return this._octaves = octaves;
+    },
+
+    fallout: function (fallout) {
+        if (!arguments.length) {
+            return this._fallout;
+        }
+        return this._fallout = fallout;
+    },
+
+    noise: function (x, y) {
+        var result = 0,
+            noise,
+            f = 1,
+            oct = this._octaves,
+            amp = 0.5,
+            fallout = this._fallout,
+            i;
+
+        for (i = 0; i < oct; ++i) {
+            result += (1 + this.noise2d(x * f, y * f)) * amp * 0.5;
+            amp *= fallout;
+            f *= 2;
+        }
+
+        return result;
+    },
+
+    noise2d: function (x, y) {
+        var X = floor(x),
+            Y = floor(y),
+            perm = this._perm;
+
+        x = x - X;
+        y = y - Y;
+
+        X = X & 255;
+        Y = Y & 255;
+
+
+        var gi00 = perm[X + perm[Y]] % 12,
+            gi01 = perm[X + perm[Y + 1]] % 12,
+            gi10 = perm[X + 1 + perm[Y]] % 12,
+            gi11 = perm[X + 1 + perm[Y + 1]] % 12,
+
+            n00 = _dot2d(GRAD3[gi00], x, y),
+            n10 = _dot2d(GRAD3[gi10], x - 1, y),
+            n01 = _dot2d(GRAD3[gi01], x, y - 1),
+            n11 = _dot2d(GRAD3[gi11], x - 1, y - 1),
+
+            u = _fade(x),
+            v = _fade(y),
+
+            nx0 = _mix(n00, n10, u),
+            nx1 = _mix(n01, n11, u),
+
+            nxy = _mix(nx0, nx1, v);
+
+        return nxy;
+    }
+};
+
+
+/**
+ * SimplexNoise
+ *
+ * @super ClassicNoise
+ */
+function SimplexNoise(seed) {
+    this.seed(seed);
+}
+
+SimplexNoise.prototype = object.extend({}, ClassicNoise.prototype, {
+    noise: function (x, y, z, w) {
+        var result = 0,
+            noise,
+            f = 1,
+            oct = this._octaves,
+            amp = 0.5,
+            fallout = this._fallout,
+            i;
+
+        for (i = 0; i < oct; ++i) {
+            result += (1 + this.noise2d(x * f, y * f)) * amp * 0.5;
+            amp *= fallout;
+            f *= 2;
+        }
+
+        return result;
+    },
+
+    noise2d: function (x, y) {
+        var n0,
+            n1,
+            n2,
+
+            F2 = 0.5 * (sqrt_of_3 - 1),
+            s = (x + y) * F2,
+            i = floor(x + s),
+            j = floor(y + s),
+
+            G2 = (3 - sqrt_of_3) / 6,
+            t = (i + j) * G2,
+            X0 = i - t,
+            Y0 = j - t,
+            x0 = x - X0,
+            y0 = y - Y0,
+
+            i1,
+            j1,
+
+            perm = this._perm;
+
+        if (x0 > y0) {
+            i1 = 1;
+            j1 = 0;
+        } else {
+            i1 = 0;
+            j1 = 1;
+        }
+
+        var x1 = x0 - i1 + G2,
+            y1 = y0 - j1 + G2,
+
+            x2 = x0 - 1 + 2 * G2,
+            y2 = y0 - 1 + 2 * G2,
+
+            ii = i & 255,
+            jj = j & 255,
+
+            gi0 = perm[ii + perm[jj]] % 12,
+            gi1 = perm[ii + i1 + perm[jj + j1]] % 12,
+            gi2 = perm[ii + 1 + perm[jj + 1]] % 12,
+
+            t0 = 0.5 - x0 * x0 - y0 * y0;
+
+        if (t0 < 0) {
+            n0 = 0;
+        } else {
+            t0 *= t0;
+            n0 = t0 * t0 * _dot2d(GRAD3[gi0], x0, y0);
+        }
+
+        var t1 = 0.5 - x1 * x1 - y1 * y1;
+        if (t1 < 0) {
+            n1 = 0;
+        } else {
+            t1 *= t1;
+            n1 = t1 * t1 * _dot2d(GRAD3[gi1], x1, y1);
+        }
+
+        var t2 = 0.5 - x2 * x2 - y2 * y2;
+        if (t2 < 0) {
+            n2 = 0;
+        } else {
+            t2 *= t2;
+            n2 = t2 * t2 * _dot2d(GRAD3[gi2], x2, y2);
+        }
+
+        return 70 * (n0 + n1 + n2);
+    }
+});
+
+function createClassic(seed) {
+    return new ClassicNoise(seed);
+}
+
+function createSimpleX(seed) {
+    return new SimplexNoise(seed);
+}
+
+Noise = {
+    GRAD3: GRAD3,
+    GRAD4: GRAD4,
+    SIMPLEX: SIMPLEX,
+
+    ClassicNoise: ClassicNoise,
+    SimplexNoise: SimplexNoise,
+
+    createClassic: createClassic,
+    createSimpleX: createSimpleX
+};
+
+module.exports = Noise;
+},{"./xorshift.js":18,"object-enhancements":21}],13:[function(require,module,exports){
 var Vec2 = "undefined" === typeof exports ? window.Vec2 : require("./vec2.js"),
     vec2_distance = Vec2.distance,
     max = Math.max,
@@ -2818,7 +2970,7 @@ var Rectangle = {
 
 
 module.exports = Rectangle;
-},{"./vec2.js":16}],14:[function(require,module,exports){
+},{"./vec2.js":17}],14:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     within = Vec2.$.within,
@@ -2963,7 +3115,11 @@ var Segment2 =  {
 
 
 module.exports = Segment2;
-},{"./vec2.js":16}],15:[function(require,module,exports){
+},{"./vec2.js":17}],15:[function(require,module,exports){
+//
+// @TODO expand all function, do not generate with loops
+//
+
 var array = require("array-enhancements"),
     pow = Math.pow,
     sin = Math.sin,
@@ -3036,6 +3192,7 @@ function create(name, transition) {
     //Transitions[name + "In"] = Transitions[name];
 
     Transitions[name] = transition;
+
     Transitions[name + "In"] = transition;
 
     Transitions[name + "Out"] = function (pos) {
@@ -3354,7 +3511,169 @@ Transitions.linear = linear;
 Transitions.create = create;
 
 module.exports = Transitions;
-},{"array-enhancements":18}],16:[function(require,module,exports){
+},{"array-enhancements":19}],16:[function(require,module,exports){
+var Vec2 = require("./vec2.js"),
+    vec2_midpoint = Vec2.midPoint,
+    vec2_pow = Vec2.pow,
+    DIV3 = 1 / 3,
+    ah = [0, 0],
+    bh = [0, 0],
+    ch = [0, 0],
+    dab = [0, 0],
+    dbc = [0, 0],
+    dca = [0, 0],
+    det = 0,
+    a = 0,
+    b = 0,
+    c = 0;
+/**
+ * @returns {Triangle}
+ */
+function create(x1, y1, x2, y2, x3, y3) {
+    var out = [[x1, y1], [x2, y2], [x3, y3], false];
+
+    //normalize(out, out);
+    return out;
+}
+/**
+ * @returns {Triangle}
+ */
+function abMidPoint(out_vec2, tri) {
+    return vec2_midpoint(out_vec2, tri[0], tri[1]);
+}
+/**
+ * @returns {Triangle}
+ */
+function bcMidPoint(out_vec2, tri) {
+    return vec2_midpoint(out_vec2, tri[1], tri[2]);
+}
+/**
+ * @returns {Triangle}
+ */
+function caMidPoint(out_vec2, tri) {
+    return vec2_midpoint(out_vec2, tri[2], tri[0]);
+}
+/**
+ * @returns {Triangle}
+ */
+function zero() {
+    return [[0, 0], [0, 0], [0, 0], true];
+}
+/**
+ * @returns {Triangle}
+ */
+function clone(tri) {
+    return [[tri[0][0], tri[0][1]], [tri[1][0], tri[1][1]], [tri[2][0], tri[2][1]], tri[3]];
+}
+/**
+ * @returns {Triangle}
+ */
+function copy(out, tri) {
+    out[0][0] = tri[0][0];
+    out[0][1] = tri[0][1];
+
+    out[1][0] = tri[1][0];
+    out[1][1] = tri[1][1];
+
+    out[2][0] = tri[2][0];
+    out[2][1] = tri[2][1];
+
+    out[3] = tri[3];
+
+    return out;
+}
+/**
+ * @returns {Vec2}
+ */
+function centroid(out_vec2, tri) {
+    out_vec2[0] = (tri[0][0] + tri[1][0] + tri[2][0]) * DIV3;
+    out_vec2[1] = (tri[0][1] + tri[1][1] + tri[2][1]) * DIV3;
+
+    return out_vec2;
+}
+/**
+ * @returns {Vec2}
+ */
+function incenter(out_vec2, tri) {
+    a = Vec2.distance(tri[1], tri[2]);
+    b = Vec2.distance(tri[2], tri[0]);
+    c = Vec2.distance(tri[0], tri[1]);
+
+    out_vec2[0] = (a * tri[0][0] + b * tri[1][0] + c * tri[2][0]) * DIV3;
+    out_vec2[1] = (a * tri[0][1] + b * tri[1][1] + c * tri[2][1]) * DIV3;
+
+    return out_vec2;
+}
+/**
+ * @returns {Vec2}
+ */
+function circumcenter(out_vec2, tri) {
+    var bx = tri[1][0] - tri[0][0],
+        by = tri[1][1] - tri[0][1],
+        bl = bx * bx + by * by,
+        cx = tri[2][0] - tri[0][0],
+        cy = tri[2][1] - tri[0][1],
+        cl = cx * cx + cy * cy,
+        d = 2 * (bx * cy - by * cx),
+        x = cy * bl - by * cl,
+        y = bx * cl - cx * bl;
+
+    out_vec2[0] = x / d + tri[0][0];
+    out_vec2[1] = y / d + tri[0][1];
+
+    return out_vec2;
+}
+/**
+ * @returns {Number}
+ */
+function area(tri) {
+    dab = Vec2.min(dbc, tri[1], tri[0]);
+    dbc = Vec2.min(dbc, tri[2], tri[0]);
+
+    return (dbc[1] * dab[0] - dbc[0] * dab[1]) * 0.5;
+}
+
+/**
+ * @returns {Triangle}
+ */
+function translate(out, tri, vec2) {
+    out[0][0] = tri[0][0] + vec2[0];
+    out[0][1] = tri[0][1] + vec2[1];
+
+    out[1][0] = tri[1][0] + vec2[0];
+    out[1][1] = tri[1][1] + vec2[1];
+
+    out[2][0] = tri[2][0] + vec2[0];
+    out[2][1] = tri[2][1] + vec2[1];
+
+    return out;
+}
+
+/**
+ * @class Triangle
+ */
+var Triangle = {
+    create: create,
+    zero: zero,
+    clone: clone,
+    copy: copy,
+
+    abMidPoint: abMidPoint,
+    bcMidPoint: bcMidPoint,
+    caMidPoint: caMidPoint,
+
+    centroid: centroid,
+    incenter: incenter,
+    circumcenter: circumcenter,
+    area: area,
+    translate: translate,
+
+    // alias
+    center: centroid,
+};
+
+module.exports = Triangle;
+},{"./vec2.js":17}],17:[function(require,module,exports){
 var aux_vec = [0, 0],
     __x = 0,
     __y = 0,
@@ -3371,6 +3690,7 @@ var aux_vec = [0, 0],
     sin  = Math.sin,
     __min  = Math.min,
     atan2 = Math.atan2,
+    __pow = Math.pow,
 
     DEG_TO_RAD = Math.DEG_TO_RAD,
     Vec2;
@@ -3818,6 +4138,22 @@ function scale(out, v1, factor) {
 /**
  * @returns {Vec2}
  */
+function pow(out, v1, factor) {
+    console.log("pow", out, v1);
+    if (factor === 2) {
+        out[0] = v1[0] * v1[0];
+        out[1] = v1[1] * v1[1];
+    } else {
+        out[0] = __pow(v1[0], factor);
+        out[1] = __pow(v1[1], factor);
+    }
+    console.log("pow", out, v1);
+
+    return out;
+}
+/**
+ * @returns {Vec2}
+ */
 function max(out, v1, v2) {
     out[0] = v1[0] > v2[0] ? v1[0] : v2[0];
     out[1] = v1[1] > v2[1] ? v1[1] : v2[1];
@@ -4050,6 +4386,7 @@ Vec2 = {
     divide: divide,
     divide2: divide2,
     scale: scale,
+    pow: pow,
     max: max,
     min: min,
     abs: abs,
@@ -4084,107 +4421,101 @@ Vec2 = {
 };
 
 module.exports = Vec2;
-},{}],17:[function(require,module,exports){
-var exp;
-(exp = function () {
-    "use strict";
+},{}],18:[function(require,module,exports){
+// from: http://jsdo.it/akm2/fhMC/js
+// don't know the author :)
+// I just lint the code... and adapt it to this lib philosophy
 
-    // from: http://jsdo.it/akm2/fhMC/js
-    // don't know the author, if you are contact me.
-    // I just lint the code... and adapt it to the lib philosophy
+// Helper
 
-    // Helper
+function _mash(data) {
+    data = data.toString();
+    var n = 0xefc8249d,
+        i,
+        len,
+        h;
 
-    function mash(data) {
-        data = data.toString();
-        var n = 0xefc8249d,
-            i,
-            len,
-            h;
+    for (i = 0, len = data.length; i < len; i++) {
+        n += data.charCodeAt(i);
+        h = 0.02519603282416938 * n;
+        n = h >>> 0;
+        h -= n;
+        h *= n;
+        n = h >>> 0;
+        h -= n;
+        n += h * 0x100000000;
+    }
+    return (n >>> 0) * 2.3283064365386963e-10;
+}
 
-        for (i = 0, len = data.length; i < len; i++) {
-            n += data.charCodeAt(i);
-            h = 0.02519603282416938 * n;
-            n = h >>> 0;
-            h -= n;
-            h *= n;
-            n = h >>> 0;
-            h -= n;
-            n += h * 0x100000000;
-        }
-        return (n >>> 0) * 2.3283064365386963e-10;
+/**
+ * Random numbers generator
+ * Returns an object with three methods
+ * * uint32()
+ * * random()
+ * * fract53()
+ *
+ * @see http://baagoe.com/en/RandomMusings/javascript/
+ * @see http://en.wikipedia.org/wiki/Xorshift
+ * @source http://jsdo.it/akm2/fhMC/js
+ */
+function create(seeds) {
+    var self = this,
+        seeds = (arguments.length) ? Array.prototype.slice.call(arguments) : [new Date().getTime()],
+
+        x = 123456789,
+        y = 362436069,
+        z = 521288629,
+        w = 88675123,
+        v = 886756453,
+        i,
+        len,
+        seed,
+        t;
+
+    for (i = 0, len = seeds.length; i < len; i++) {
+        seed = seeds[i];
+        x ^= _mash(seed) * 0x100000000;
+        y ^= _mash(seed) * 0x100000000;
+        z ^= _mash(seed) * 0x100000000;
+        v ^= _mash(seed) * 0x100000000;
+        w ^= _mash(seed) * 0x100000000;
     }
 
-    var Xorshift = {};
+    return {
+        uint32: function () {
+            t = (x ^ (x >>> 7)) >>> 0;
+            x = y;
+            y = z;
+            z = w;
+            w = v;
+            v = (v ^ (v << 6)) ^ (t ^ (t << 13)) >>> 0;
+            return ((y + y + 1) * v) >>> 0;
+        },
 
-    /**
-     * Random numbers generator
-     *
-     * @see http://baagoe.com/en/RandomMusings/javascript/
-     * @see http://en.wikipedia.org/wiki/Xorshift
-     */
-    Xorshift.create = function () {
-        var self = this,
-            seeds = (arguments.length) ? Array.prototype.slice.call(arguments) : [new Date().getTime()],
+        random: function () {
+            return self.uint32() * 2.3283064365386963e-10;
+        },
 
-            x = 123456789,
-            y = 362436069,
-            z = 521288629,
-            w = 88675123,
-            v = 886756453,
-            i,
-            len,
-            seed,
-            t;
-
-        for (i = 0, len = seeds.length; i < len; i++) {
-            seed = seeds[i];
-            x ^= mash(seed) * 0x100000000;
-            y ^= mash(seed) * 0x100000000;
-            z ^= mash(seed) * 0x100000000;
-            v ^= mash(seed) * 0x100000000;
-            w ^= mash(seed) * 0x100000000;
+        fract53: function () {
+            return self.random() + (self.uint32() & 0x1fffff) * 1.1102230246251565e-16;
         }
-
-        return {
-            uint32: function () {
-                t = (x ^ (x >>> 7)) >>> 0;
-                x = y;
-                y = z;
-                z = w;
-                w = v;
-                v = (v ^ (v << 6)) ^ (t ^ (t << 13)) >>> 0;
-                return ((y + y + 1) * v) >>> 0;
-            },
-
-            random: function () {
-                return self.uint32() * 2.3283064365386963e-10;
-            },
-
-            fract53: function () {
-                return self.random() + (self.uint32() & 0x1fffff) * 1.1102230246251565e-16;
-            }
-        };
     };
+};
 
-    return Xorshift;
+Xorshift = {
+    create: create
+};
 
-}());
-
-
-if ("undefined" === typeof module) {
-    window.Xorshift = exp;
-} else {
-    module.exports = exp;
-}
-},{}],18:[function(require,module,exports){
+module.exports = Xorshift;
+},{}],19:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/arrays.js");
 
 }());
-},{"./lib/arrays.js":19}],19:[function(require,module,exports){
+},{"./lib/arrays.js":20}],20:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -4724,14 +5055,14 @@ if ("undefined" === typeof module) {
         next();
     };
 }());
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/objects.js");
 
 }());
-},{"./lib/objects.js":21}],21:[function(require,module,exports){
+},{"./lib/objects.js":22}],22:[function(require,module,exports){
 (function () {
     "use strict";
 

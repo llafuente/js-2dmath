@@ -7,6 +7,7 @@ module.exports = {
     Rectangle: require("./lib/rectangle.js"),
     BB2: require("./lib/boundingbox2.js"),
     Circle: require("./lib/circle.js"),
+    Triangle: require("./lib/triangle.js"),
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
     Intersection: require("./lib/intersection.js"),
