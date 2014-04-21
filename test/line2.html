@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
+<title>js-2dmath: Demostration of various Intersections</title>
+
+<script src="../js-2dmath-browser.js" type="text/javascript" ></script>
+
+</head>
+<body>
+<h1>js-2dmath: Demostration of various Intersections</h1>
+<canvas id="canvas" width="680" height="680" style="border: 1px solid red;"></canvas>
+</body>
+</html>
+
+<script>
+var ctx = document.getElementById("canvas").getContext("2d");
+
+require("js-2dmath").globalize(window);
+ctx.translate(330, 330);
+Draw.cartesian_cs(ctx, 320, 16)
+
+var l1 = Line2.create(0, 0, 1);
+var l2 = Line2.offset(Line2.zero(), l1, 50);
+
+
+console.log(l1);
+console.log(l2);
+
+Draw.line2(ctx, l1, "red");
+Draw.text(ctx, "original", [-160, -120]);
+Draw.line2(ctx, l2, "blue");
+Draw.text(ctx, "offset(50)", [120, 50]);
+
+//var l3 = Line2.rotate(Line2.zero(), l1, Math.HALF_PI);
+var l3 = Line2.rotate(Line2.zero(), l1, Math.HALF_PI);
+console.log(l3);
+Draw.line2(ctx, l3, "purple");
+Draw.text(ctx, "rotate(90º)", [-125, 125]);
+
+var v1 = [50, 110];
+var v2 = Line2.closetPoint([], l1, v1);
+
+Draw.vec2(ctx, v1, "red");
+Draw.vec2(ctx, v2, "orange");
+Draw.text(ctx, "point", v1);
+Draw.text(ctx, "closetPoint", v2);
+
+console.log(v2);
+/* rotation test :)
+var angle = Math.HALF_PI / 16,
+    itrs = 0;
+
+setInterval(function() {
+
+    var l3 = Line2.rotate(Line2.zero(), l1, itrs * angle);
+    Draw.line2(ctx, l3, "purple");
+
+    ++itrs;
+
+}, 500);
+*/
+</script>

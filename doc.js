@@ -69,7 +69,7 @@ var methods,
             filename: "./lib/segment2.js",
             valid_arguments: {
                 out: "Segment2",
-                seg2: "Segment2",
+                seg2_2: "Segment2",
 
                 x1: "Number",
                 x2: "Number",

@@ -570,7 +570,7 @@ function translate(out, circle, vec2) {
  * @returns {Number}
  */
 function distance(circle, circle_2) {
-    return max(0, Vec2.distance(circle[0], circle_2[0]) - circle[1] - circle_2[1]);
+    return max(0, vec2_distance(circle[0], circle_2[0]) - circle[1] - circle_2[1]);
 }
 /**
  * @returns {Number}
@@ -583,6 +583,12 @@ function length(circle) {
  */
 function area(circle) {
     return PI * circle[1] * circle[1];
+}
+/**
+ * @returns {Boolean}
+ */
+function isInside(circle, vec2) {
+    return vec2_distance(circle[0], vec2) < circle[1];
 }
 /**
  * @class Circle
@@ -598,7 +604,8 @@ var Circle = {
     translate: translate,
     distance: distance,
     length: length,
-    area: area
+    area: area,
+    isInside: isInside
 };
 
 
@@ -741,6 +748,97 @@ function rectangle(context2d, rect, style) {
     context2d.strokeRect(rect[0][0], rect[0][1], rect[1][0] - rect[0][0], rect[1][1] - rect[0][1]);
 }
 
+function cartesian_cs(context2d, coords, count) {
+    context2d.save();
+    context2d.strokeStyle = 'rgba(0,0,0, 0.25)';
+    //context2d.strokeStyle = 'red';
+
+    context2d.font = "6pt Consolas";
+
+
+    coords = coords || 320;
+    count = count || 16;
+
+    context2d.beginPath();
+    context2d.moveTo(-coords, 0);
+    context2d.lineTo(coords, 0);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.moveTo(0, -coords);
+    context2d.lineTo(0, coords);
+    context2d.stroke();
+
+
+    if (context2d.setLineDash) {
+        context2d.setLineDash([1,2]);
+    } else {
+        context2d.strokeStyle = 'rgba(0,0,0, 0.125)';
+    }
+
+    context2d.beginPath();
+    context2d.moveTo(-coords, coords * 0.5);
+    context2d.lineTo(coords, coords * 0.5);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.moveTo(-coords, -coords * 0.5);
+    context2d.lineTo(coords, -coords * 0.5);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.moveTo(coords * 0.5, -coords);
+    context2d.lineTo(coords * 0.5, coords);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.moveTo(-coords * 0.5, -coords);
+    context2d.lineTo(-coords * 0.5, coords);
+    context2d.stroke();
+
+
+
+
+
+    context2d.strokeStyle = 'rgba(0,0,0, 0.25)';
+
+    var i,
+        inc = coords * 2 / count,
+        max = count,
+        x,
+        y;
+
+    context2d.textAlign = 'center';
+    for (i = 0; i <= max; ++i) {
+        x = -coords + i * inc;
+        context2d.beginPath();
+        context2d.moveTo(x, 4);
+        context2d.lineTo(x, -4);
+        context2d.stroke();
+
+        if (x != 0) {
+            context2d.fillText(x, x, -12);
+        }
+    }
+
+    context2d.fillText("(0,0)", 0, -12);
+
+    context2d.textAlign = 'left';
+    for (i = 0; i <= max; ++i) {
+        y = -coords + i * inc;
+        context2d.beginPath();
+        context2d.moveTo(4, y);
+        context2d.lineTo(-4, y);
+        context2d.stroke();
+
+        if (y != 0) {
+            context2d.fillText(y, +12, y + 2);
+        }
+    }
+
+    context2d.restore();
+}
+
 function circle(context2d, circle, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
@@ -755,12 +853,14 @@ function circle(context2d, circle, style) {
     context2d.stroke();
 }
 
-function line2(context2d, line2, style) {
+function line2(context2d, line2, style, length) {
 
     context2d.beginPath();
-    var m = line2[1] * 50;
-    context2d.moveTo(line2[0][0] + m, line2[0][1] + m);
-    context2d.lineTo(line2[0][0] - m, line2[0][1] - m);
+    var m = line2[1];
+    length = length || 100;
+
+    context2d.moveTo(line2[0][0] - (length * m), line2[0][1] - length);
+    context2d.lineTo(line2[0][0] + (length * m), line2[0][1] + length);
     context2d.stroke();
 
 }
@@ -835,6 +935,8 @@ function applyMatrix2D(context2d, m2d) {
 
 
 var Draw = {
+    cartesian_cs: cartesian_cs,
+
     vec2: vec2,
     rectangle: rectangle,
     circle: circle,
@@ -1497,7 +1599,11 @@ module.exports = Intersection;
 var dx,
     dy,
     r,
-    sqrt = Math.sqrt;
+    sqrt = Math.sqrt,
+    tan = Math.tan,
+    atan = Math.atan,
+    sin = Math.sin,
+    cos = Math.cos;
 
 /**
  * @returns {Line2}
@@ -1577,6 +1683,43 @@ function offset(out, line2, offset) {
     return out;
 }
 
+/**
+ * @returns {Line2}
+ */
+function rotate(out, line2, radians) {
+    out[0][0] = line2[0][0];
+    out[0][1] = line2[0][1];
+
+    out[1] = tan(atan(line2[1]) + radians);
+
+    return out;
+}
+
+/**
+ * @todo
+ * @source http://mathcentral.uregina.ca/QQ/database/QQ.09.04/carly1.html
+ */
+function closetPoint(out_vec2, line2, vec2) {
+    var m = line2[1];
+        mp = 1 / m; // optimization: do not negate
+
+    // y = m*x + y1
+    // (y - y2) = m' (x - x2)
+
+    // m*x =  m' * x - m' * x2 + y2 - y1
+    // (m - m') * x =  m' * x2 + y2 - y1
+    // x =  (m' * x2 + y2 - y1) / (m - m')
+
+
+    out_vec2[1] = (mp * vec2[0] + vec2[1] - line2[0][1]) / (m + mp);
+    out_vec2[0] = m * out_vec2[1] + line2[0][1];
+
+    return out_vec2;
+}
+
+function reflection() {
+
+}
 
 
 /**
@@ -1593,6 +1736,8 @@ var Line2 = {
     add: add,
     subtract: subtract,
     offset: offset,
+    rotate: rotate,
+    closetPoint: closetPoint,
 
     // alias
     translate: add,
@@ -2951,6 +3096,12 @@ function area(rect) {
 
     return a < 0 ? -a : a; //needed id normalized ?
 }
+/**
+ * @returns {Boolean}
+ */
+function isInside(rect, vec2) {
+    return rect[0][0] < vec2[0] && rect[1][0] > vec2[0] && rect[0][1] < vec2[1] && rect[1][1] > vec2[1];
+}
 
 /**
  * @class Rectangle
@@ -2965,7 +3116,8 @@ var Rectangle = {
     center: center,
     translate: translate,
     distance: distance,
-    area: area
+    area: area,
+    isInside: isInside
 };
 
 
@@ -3030,8 +3182,21 @@ function sqrLength(seg2) {
 
     return __x * __x + __y * __y;
 }
+/**
+ * @returns {Vec2}
+ */
+function midPoint(out_vec2, seg2) {
+    out_vec2[0] = (seg2[0] + seg2[2]) * 0.5;
+    out_vec2[1] = (seg2[1] + seg2[3]) * 0.5;
 
-
+    return out_vec2;
+}
+/**
+ * @returns {Number}
+ */
+function slope(seg2) {
+    return (seg2[0] - seg2[2]) / (seg2[1] - seg2[3]);
+}
 /**
  * @returns {Number}
  */
@@ -3041,15 +3206,21 @@ function cross(seg2, vec2) {
 /**
  * @returns {Boolean}
  */
-function collinear(seg2, vec2) {
+function isCollinear(seg2, vec2) {
     return (seg2[2] - seg2[0]) * (vec2[1] - vec2[1]) === (vec2[0] - seg2[0]) * (seg2[3] - seg2[1]);
 }
-
+/**
+ * @todo do it!
+ * @returns {Boolean}
+ */
+function isParallel(seg2, seg2_2) {
+    throw new Error("todo");
+}
 /**
  * @returns {Boolean}
  */
-function inside(seg2, vec2) {
-    return collinear(seg2, vec2) && Vec2.within([seg2[0], seg2[1]], vec2, [seg2[2], seg2[3]]);
+function isInside(seg2, vec2) {
+    return isCollinear(seg2, vec2) && within([seg2[0], seg2[1]], vec2, [seg2[2], seg2[3]]);
 }
 /**
  * @returns {Vec2}
@@ -3102,10 +3273,18 @@ var Segment2 =  {
     translate: translate,
     length: length,
     sqrLength: sqrLength,
+    midPoint: midPoint,
+    slope: slope,
     cross: cross,
-    collinear: collinear,
     closestPoint: closestPoint,
-    inside: inside,
+    isCollinear: isCollinear,
+    isParallel: isParallel,
+    isInside: isInside,
+
+    // alias
+    lengthSq: sqrLength,
+    contains: isInside,
+
     $: {
         inside: $inside,
         collinear: $collinear,
@@ -3536,22 +3715,33 @@ function create(x1, y1, x2, y2, x3, y3) {
     return out;
 }
 /**
- * @returns {Triangle}
+ * @returns {Vec2}
  */
 function abMidPoint(out_vec2, tri) {
     return vec2_midpoint(out_vec2, tri[0], tri[1]);
 }
 /**
- * @returns {Triangle}
+ * @returns {Vec2}
  */
 function bcMidPoint(out_vec2, tri) {
     return vec2_midpoint(out_vec2, tri[1], tri[2]);
 }
 /**
- * @returns {Triangle}
+ * @returns {Vec2}
  */
 function caMidPoint(out_vec2, tri) {
     return vec2_midpoint(out_vec2, tri[2], tri[0]);
+}
+/**
+ * @returns {Triangle}
+ */
+function midTriangle(out, tri) {
+    abMidPoint(out[0], tri);
+    bcMidPoint(out[1], tri);
+    caMidPoint(out[2], tri);
+
+    return out;
+
 }
 /**
  * @returns {Triangle}
@@ -3661,6 +3851,7 @@ var Triangle = {
     abMidPoint: abMidPoint,
     bcMidPoint: bcMidPoint,
     caMidPoint: caMidPoint,
+    midTriangle: midTriangle,
 
     centroid: centroid,
     incenter: incenter,

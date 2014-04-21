@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
+<title>js-2dmath: Demostration of various Intersections</title>
+
+<script src="../js-2dmath-browser.js" type="text/javascript" ></script>
+
+</head>
+<body>
+<h1>js-2dmath: Demostration of various Intersections</h1>
+<canvas id="canvas" width="680" height="680" style="border: 1px solid red;"></canvas>
+</body>
+</html>
+
+<script>
+var ctx = document.getElementById("canvas").getContext("2d");
+
+require("js-2dmath").globalize(window);
+ctx.translate(330, 330);
+Draw.cartesian_cs(ctx, 320, 16)
+
+
+var t1 = Triangle.create(0, 0, 50, 50, 0, 50);
+var t2 = Triangle.midTriangle(Triangle.zero(), t1);
+
+
+Draw.triangle(ctx, t1, "red");
+Draw.triangle(ctx, t2, "blue");
+</script>
