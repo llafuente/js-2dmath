@@ -69,6 +69,9 @@ for (i in module.exports) {
 },{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/draw.js":7,"./lib/intersection.js":8,"./lib/line2.js":9,"./lib/math.js":10,"./lib/matrix2d.js":11,"./lib/noise.js":12,"./lib/rectangle.js":13,"./lib/segment2.js":14,"./lib/transitions.js":15,"./lib/triangle.js":16,"./lib/vec2.js":17,"./lib/xorshift.js":18}],"js-2dmath":[function(require,module,exports){
 module.exports=require('Focm2+');
 },{}],3:[function(require,module,exports){
+// documentation
+// * http://pomax.github.io/bezierinfo/
+
 var sqrt = Math.sqrt,
     cl0 = 0,
     cl1 = 0,
@@ -90,10 +93,24 @@ function cubic(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y, cp3x, cp3y) {
     return [[cp0x, cp0y], [cp1x, cp1y], [cp2x, cp2y], [cp3x, cp3y]];
 }
 /**
+ * Figure 21.2
+ * http://pomax.github.io/bezierinfo/
+ */
+function cubicFrom3Points(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
+
+}
+/**
  * @returns {Beizer}
  */
 function quadric(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
     return [[cp0x, cp0y], [cp1x, cp1y], [cp2x, cp2y]];
+}
+/**
+ * Figure 21.1
+ * http://pomax.github.io/bezierinfo/
+ */
+function quadricFrom3Points(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
+    
 }
 /**
  * @returns {Vec2}
@@ -130,7 +147,21 @@ function get(out_vec2, curve, t) {
 
     return out_vec2;
 }
+/**
+ * @returns {Vec2}
+ */
+function getPoints(curve, npoints) {
+    var inv_npoints = 1 / npoints,
+        i,
+        output = [];
 
+    for (i = 0; i <= 1; i += inv_npoints) {
+        vec2 = [];
+        output.push(get(vec2, curve, t));
+    }
+
+    return output;
+}
 /**
  * Calculate the curve length by incrementally solving the curve every substep=CAAT.Curve.k. This value defaults
  * to .05 so at least 20 iterations will be performed.
@@ -227,6 +258,46 @@ function fromRectangle(rect) {
     normalize(out, out);
     return out;
 }
+/**
+ * inspired on: http://jsfiddle.net/4VCVX/3/
+ * @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves Timo answer
+ */
+function fromBeizer(beizer, npoints) {
+    npoints = npoints || 40;
+    var vec2_list = Beizer.get(beizer, npoints),
+        i,
+        l = Infinite,
+        b = Infinite,
+        r = -Infinite,
+        t = -Infinite,
+        v,
+        x,
+        y;
+
+    // loop min, max
+    for (i = 0; i < npoints; ++i) {
+        v = vec2_list[i];
+
+        x = v[0];
+        y = v[1];
+
+        if (x > r) {
+            r = x;
+        } else if (x < l) {
+            l = x;
+        }
+
+        if (y < b) {
+            b = y;
+        } else if (y > t) {
+            t = y;
+        }
+    }
+
+    return [l, b, r, t, true];
+
+}
+
 /**
  * @returns {BB2}
  */
@@ -722,6 +793,15 @@ function rectangle_vec2(rect, vec2) {
         segment2_vec2(s4, vec2)
     );
 }
+/*
+ * Figure 26.1
+ * http://pomax.github.io/bezierinfo/
+ * @todo
+ */
+
+function beizer_vec2() {
+
+}
 
 /**
  * @class Distance
@@ -881,6 +961,36 @@ function vec2(context2d, vec2, style) {
     context2d.stroke();
 }
 
+function angle(context2d, vec2, angle, style, length) {
+    length = length || 10;
+
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.beginPath();
+    context2d.moveTo(vec2[0] + 2, vec2[1] + 2);
+    context2d.lineTo(vec2[0] - 2, vec2[1] - 2);
+    context2d.stroke();
+
+    context2d.beginPath();
+    context2d.moveTo(vec2[0] - 2, vec2[1] + 2);
+    context2d.lineTo(vec2[0] + 2, vec2[1] - 2);
+    context2d.stroke();
+
+    context2d.save();
+
+    context2d.translate(vec2[0], vec2[1]);
+    context2d.rotate(angle);
+    context2d.beginPath();
+    context2d.moveTo(0, 0);
+    context2d.lineTo(length, 0);
+    context2d.stroke();
+
+    context2d.restore();
+
+}
+
 function segment2(context2d, seg2, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
@@ -942,6 +1052,7 @@ var Draw = {
     circle: circle,
     line2: line2,
     triangle: triangle,
+    angle: angle,
     segment2: segment2,
     bb2: bb2,
 
@@ -1315,7 +1426,7 @@ function circle_circle(circle_1, circle_2, collision, distance) {
         r1sq = r1 * r1,
         r2sq = r2 * r2,
         // Determine minimum and maximum radius where circles can intersect
-        r_max = r1sq + r2sq + r1 * r2 * 2,
+        r_max = r1 + r2,
         r_min = r1 - r2,
         // Determine actual distance between circle circles
         c_dist_sq = Vec2.distanceSq(c1, c2),
@@ -1852,23 +1963,27 @@ module.exports = Line2;
         return rounder(value / snapSize) * snapSize;
     };
 
-    Math.normalizeRadians = function (angle) {
-        if( angle > NPI && angle < PI) {
+    function normalizeRotation (angle) {
+        if (angle > NPI && angle < PI) {
             return angle;
         }
 
         angle = angle % (TWO_PI);
-        if( angle < NPI )
-            angle += TWO_PI;
-        else if( angle > PI )
-            angle -= TWO_PI;
-        return angle;
 
-    };
+        if (angle < NPI) {
+            angle += TWO_PI;
+        } else if (angle > PI) {
+            angle -= TWO_PI;
+        }
+
+        return angle;
+    }
+
+    Math.normalizeRadians = normalizeRotation;
 
     Math.deltaRotation = function (angle, target) {
       return normalizeRotation(angle - target);
-    }
+    };
 
 }());
 },{}],11:[function(require,module,exports){
@@ -3125,8 +3240,12 @@ module.exports = Rectangle;
 },{"./vec2.js":17}],14:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
+    aux_vec2 = [0, 0],
+    aux,
     within = Vec2.$.within,
     sqrt = Math.sqrt,
+    atan2 = Math.atan2,
+    PI = Math.PI,
     __x,
     __y,
     u = 0;
@@ -3200,6 +3319,12 @@ function slope(seg2) {
 /**
  * @returns {Number}
  */
+function angle(seg2) {
+    return atan2(seg2[3] - seg2[1], seg2[2] - seg2[0]);
+}
+/**
+ * @returns {Number}
+ */
 function cross(seg2, vec2) {
     return (seg2[0] - vec2[0]) * (seg2[3] - vec2[1]) - (seg2[1] - vec2[1]) * (seg2[2] - vec2[0]);
 }
@@ -3221,6 +3346,26 @@ function isParallel(seg2, seg2_2) {
  */
 function isInside(seg2, vec2) {
     return isCollinear(seg2, vec2) && within([seg2[0], seg2[1]], vec2, [seg2[2], seg2[3]]);
+}
+/**
+ * @returns {Boolean}
+ */
+function isAbove(seg2, vec2, cached_seg2_min_angle) {
+    Segment2.closestPoint(aux_vec2, seg2, vec2);
+    angle = Vec2.angleTo(aux_vec2, vec2);
+
+    cached_seg2_min_angle = cached_seg2_min_angle || Segment2.angle(seg2);
+
+    if (cached_seg2_min_angle >= 0) {
+        aux = cached_seg2_min_angle;
+        cached_seg2_min_angle = cached_seg2_min_angle - PI;
+        cache_seg2_angle_max = aux;
+        return angle > cached_seg2_min_angle && angle < cache_seg2_angle_max;
+    }
+
+    cache_seg2_angle_max = cached_seg2_min_angle + PI;            
+
+    return angle < cached_seg2_min_angle || angle > cache_seg2_angle_max;
 }
 /**
  * @returns {Vec2}
@@ -3275,11 +3420,13 @@ var Segment2 =  {
     sqrLength: sqrLength,
     midPoint: midPoint,
     slope: slope,
+    angle: angle,
     cross: cross,
     closestPoint: closestPoint,
     isCollinear: isCollinear,
     isParallel: isParallel,
     isInside: isInside,
+    isAbove: isAbove,
 
     // alias
     lengthSq: sqrLength,
@@ -3706,6 +3853,7 @@ var Vec2 = require("./vec2.js"),
     b = 0,
     c = 0;
 /**
+ * A, B, C
  * @returns {Triangle}
  */
 function create(x1, y1, x2, y2, x3, y3) {
