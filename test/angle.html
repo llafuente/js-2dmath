@@ -33,9 +33,24 @@ Draw.cartesianAxis(ctx, 320, 16); // coordinates
 Draw.text(ctx, "45º", [50, 35]);
 Draw.angle(ctx, [0,0], Math.HALF_PI * 0.5, "black", 100);
 
-var angle = Vec2.angleTo([0, 0], [50, -50]);
-
+var angle = Vec2.angleTo([0, 0], [50, 50]);
 Draw.text(ctx, "-45º = Vec2.angleTo([0, 0], [50, -50])", [50, -35])
 Draw.angle(ctx, [0,0], angle, "red", 100);
+console.log((angle * Math.RAD_TO_DEG).toFixed(0));
+
+var angle = Vec2.angleTo([0, 0], [-50, 50]);
+Draw.text(ctx, "-45º = Vec2.angleTo([0, 0], [50, 50])", [-50, -35])
+Draw.angle(ctx, [0,0], angle, "green", 100);
+console.log((angle * Math.RAD_TO_DEG).toFixed(0));
+
+var angle = Vec2.angleTo([0, 0], [-50, -50]);
+Draw.text(ctx, "-45º = Vec2.angleTo([0, 0], [50, 50])", [-50, -35])
+Draw.angle(ctx, [0,0], angle, "blue", 100);
+console.log((angle * Math.RAD_TO_DEG).toFixed(0));
+
+var angle = Vec2.angleTo([0, 0], [50, -50]);
+Draw.text(ctx, "-45º = Vec2.angleTo([0, 0], [50, 50])", [50, -35])
+Draw.angle(ctx, [0,0], angle, "black", 100);
+console.log((angle * Math.RAD_TO_DEG).toFixed(0));
 
 </script>

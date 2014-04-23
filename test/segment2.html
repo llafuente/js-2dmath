@@ -9,7 +9,9 @@
 
 </head>
 <body>
+<h1>js-2dmath: Segment2 test</h1>
 <canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
+<p> Move your mouse and see if you position the mouse above or below the segment</p>
 </body>
 </html>
 
@@ -22,31 +24,71 @@ require("js-2dmath").globalize(window);
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-Draw.invertAxis(canvas, ctx); // y-up
-ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
-Draw.cartesianAxis(ctx, 320, 16); // coordinates
 
 //
 // --- CODE ---
 //
-
-var ctx = document.getElementById("canvas").getContext("2d");
-
-require("js-2dmath").globalize(window);
-
-var s = Segment2.create(-50, -50, 50, 50),
+var seg2 = Segment2.create(-60, -50, 40, 50),
     a = Vec2.create(60, 20),
     b = Vec2.create(100, 0),
-    aux = [];
+    circle = Circle.create(-50, 50, 20),
+    aux = [],
+    seg2_normal = [],
+    offset = [canvas.width * 0.5, canvas.height * 0.5],
+    mouse = [0, 0];
 
-Segment2.closestPoint(aux, s, a);
+function render() {
+    var v1 = [seg2[0], seg2[1]];
 
-Draw.segment2(ctx, s, "red");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    Draw.invertAxis(canvas, ctx); // y-up
+    ctx.translate(offset[0], offset[1]); // center
+    Draw.cartesianAxis(ctx, 320, 16); // coordinates
 
-Draw.vec2(ctx, a, "red", 4);
-Draw.text(ctx, "point", Vec2.add([], a, [0,-15]));
+    Segment2.closestPoint(aux, seg2, a);
 
-Draw.vec2(ctx, aux, "blue", 4);
-Draw.text(ctx, "closest", Vec2.add([], aux, [-55,10]));
+    Draw.segment2(ctx, seg2, "red");
+    Draw.angle(ctx, [150, 0], Segment2.angle(seg2), "blue", 50);
+    Draw.text(ctx, "seg2.angle", [175, 15]);
 
+    Draw.vec2(ctx, a, "red", 4);
+    Draw.text(ctx, "point", Vec2.add([], a, [0,-15]));
+
+    Draw.vec2(ctx, aux, "blue", 4);
+    Draw.text(ctx, "closest", Vec2.add([], aux, [-55,10]));
+
+    Draw.angle(ctx, v1, Vec2.angle(seg2_normal), "blue", 50);
+
+    var prep = Vec2.perpendicular([], [seg2[2] - seg2[0], seg2[3] - seg2[1]]);
+
+    Draw.circle(ctx, circle, "green");
+    Draw.vec2(ctx, prep, "blue", 4);
+
+    if (Segment2.isAbove(seg2, mouse)) {
+        Draw.text(ctx, "above", [-80, -80]);
+        Segment2.rightNormal(seg2_normal, seg2);
+    } else {
+        Draw.text(ctx, "below", [-80, -80]);
+        Segment2.leftNormal(seg2_normal, seg2);
+    }
+}
+
+(function animloop(){
+  window.requestAnimFrame(animloop);
+  ctx.save();
+  render();
+  ctx.restore();
+})();
+
+
+canvas.addEventListener("mousemove", function(event) {
+    mouse = [event.pageX - canvas.offsetLeft - offset[0], -(event.pageY - canvas.offsetTop - offset[1])];
+});
+
+/*
+seg2 = Segment2.create(-50, 50, 50, -50),
+Draw.segment2(ctx, seg2, "yellow");
+prep = Vec2.perpendicular([], [seg2[2] - seg2[0], seg2[3] - seg2[1]]);
+Draw.vec2(ctx, prep, "yellow", 4);
+*/
 </script>

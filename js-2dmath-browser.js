@@ -1053,7 +1053,18 @@ if ("undefined" !== typeof CanvasRenderingContext2D) {
         fillText.call(this, a, b, -c);
         this.restore();
     }
+
+    window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       ||
+              window.webkitRequestAnimationFrame ||
+              window.mozRequestAnimationFrame    ||
+              function( callback ){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
 }
+
+
 
 /**
  * calling this override fillText so you didn't see inverted text
@@ -1132,7 +1143,7 @@ function cartesianAxis(context2d, coords, count) {
         context2d.lineTo(x, -4);
         context2d.stroke();
 
-        if (x != 0) {
+        if (x !== 0) {
             context2d.fillText(x, x, -12);
         }
     }
@@ -1147,7 +1158,7 @@ function cartesianAxis(context2d, coords, count) {
         context2d.lineTo(-4, y);
         context2d.stroke();
 
-        if (y != 0) {
+        if (y !== 0) {
             context2d.fillText(y, +12, y - 4);
         }
     }
@@ -1212,21 +1223,21 @@ function angle(context2d, vec2, angle, style, length) {
     context2d.stroke();
 
     context2d.beginPath();
-    context2d.moveTo(vec2[0] - 2, vec2[1] + 2);
-    context2d.lineTo(vec2[0] + 2, vec2[1] - 2);
+    context2d.moveTo(vec2[0], vec2[1]);
+    context2d.lineTo(vec2[0] + Math.cos(angle) * length, vec2[1] + Math.sin(angle) * length);
     context2d.stroke();
-
+/*
     context2d.save();
 
     context2d.translate(vec2[0], vec2[1]);
-    context2d.rotate(angle);
+    context2d.rotate(-angle);
     context2d.beginPath();
     context2d.moveTo(0, 0);
     context2d.lineTo(length, 0);
     context2d.stroke();
 
     context2d.restore();
-
+*/
 }
 
 function segment2(context2d, seg2, style) {
@@ -3479,6 +3490,7 @@ module.exports = Rectangle;
 },{"./vec2.js":18}],15:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
+    vec2_rotate = Vec2.rotate,
     aux_vec2 = [0, 0],
     aux,
     within = Vec2.$within,
@@ -3492,7 +3504,32 @@ var browser = "undefined" === typeof module,
  * @returns {Segment2}
  */
 function create(x1, y1, x2, y2) {
-    return [x1, y1, x2, y2];
+    if (x1 < x2) {
+        return [x1, y1, x2, y2];
+    }
+
+    return [x2, y2, x1, y1];
+}
+/**
+ * @returns {Segment2}
+ */
+function normalize(out, seg2) {
+    if (seg2[0] < seg2[1]) {
+        out[0] = seg2[0];
+        out[1] = seg2[1];
+        out[2] = seg2[2];
+        out[3] = seg2[3];
+    } else {
+        var x = seg2[0],
+            y = seg2[1];
+
+        out[0] = seg2[2];
+        out[1] = seg2[3];
+        out[2] = x;
+        out[3] = y;
+    }
+
+    return out;
 }
 /**
  * @returns {Segment2}
@@ -3590,9 +3627,10 @@ function isInside(seg2, vec2) {
  * @returns {Boolean}
  */
 function isAbove(seg2, vec2, cached_seg2_min_angle) {
-    Segment2.closestPoint(aux_vec2, seg2, vec2);
-    angle = Vec2.angleTo(aux_vec2, vec2);
-
+    aux_vec2[0] = seg2[0];
+    aux_vec2[1] = seg2[1];
+    angle = Vec2.angleTo(vec2, aux_vec2);
+    
     cached_seg2_min_angle = cached_seg2_min_angle || Segment2.angle(seg2);
 
     if (cached_seg2_min_angle >= 0) {
@@ -3605,6 +3643,28 @@ function isAbove(seg2, vec2, cached_seg2_min_angle) {
     cache_seg2_angle_max = cached_seg2_min_angle + PI;
 
     return angle < cached_seg2_min_angle || angle > cache_seg2_angle_max;
+}
+/**
+ * @returns {Vec2}
+ */
+function leftNormal(out_vec2, seg2) {
+    out_vec2[0] = seg2[2] - seg2[0];
+    out_vec2[1] = seg2[3] - seg2[1];
+
+    vec2_rotate(out_vec2, out_vec2, -Math.HALF_PI);
+
+    return out_vec2;
+}
+/**
+ * @returns {Vec2}
+ */
+function rightNormal(out_vec2, seg2) {
+    out_vec2[0] = seg2[2] - seg2[0];
+    out_vec2[1] = seg2[3] - seg2[1];
+
+    vec2_rotate(out_vec2, out_vec2, Math.HALF_PI);
+
+    return out_vec2;
 }
 /**
  * @returns {Vec2}
@@ -3654,6 +3714,7 @@ var Segment2 =  {
     create: create,
     clone: clone,
     copy: copy,
+    normalize: normalize,
     translate: translate,
     length: length,
     sqrLength: sqrLength,
@@ -3666,6 +3727,8 @@ var Segment2 =  {
     isParallel: isParallel,
     isInside: isInside,
     isAbove: isAbove,
+    leftNormal: leftNormal,
+    rightNormal: rightNormal,
 
     // alias
     lengthSq: sqrLength,
