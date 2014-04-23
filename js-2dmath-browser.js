@@ -11,6 +11,7 @@ module.exports = {
     Triangle: require("./lib/triangle.js"),
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
+    Collisions: require("./lib/collisions.js"),
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),
     Xorshift: require("./lib/xorshift.js"),
@@ -66,7 +67,7 @@ for (i in module.exports) {
     console.log();
 }
 */
-},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/draw.js":7,"./lib/intersection.js":8,"./lib/line2.js":9,"./lib/math.js":10,"./lib/matrix2d.js":11,"./lib/noise.js":12,"./lib/rectangle.js":13,"./lib/segment2.js":14,"./lib/transitions.js":15,"./lib/triangle.js":16,"./lib/vec2.js":17,"./lib/xorshift.js":18}],"js-2dmath":[function(require,module,exports){
+},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/collisions.js":6,"./lib/draw.js":8,"./lib/intersection.js":9,"./lib/line2.js":10,"./lib/math.js":11,"./lib/matrix2d.js":12,"./lib/noise.js":13,"./lib/rectangle.js":14,"./lib/segment2.js":15,"./lib/transitions.js":16,"./lib/triangle.js":17,"./lib/vec2.js":18,"./lib/xorshift.js":19}],"js-2dmath":[function(require,module,exports){
 module.exports=require('Focm2+');
 },{}],3:[function(require,module,exports){
 // documentation
@@ -148,7 +149,7 @@ function get(out_vec2, curve, t) {
     return out_vec2;
 }
 /**
- * @returns {Vec2}
+ * @returns {Array}
  */
 function getPoints(curve, npoints) {
     var inv_npoints = 1 / npoints,
@@ -490,8 +491,7 @@ if ("undefined" !== typeof module) {
     module.exports = BB2;
 }
 },{}],5:[function(require,module,exports){
-var browser = "undefined" === typeof module,
-    Vec2 = require("./vec2.js"),
+var Vec2 = require("./vec2.js"),
     vec2_distance = Vec2.distance,
     vec2_distance_sq = Vec2.distanceSq,
     vec2_midpoint = Vec2.midPoint,
@@ -681,7 +681,224 @@ var Circle = {
 
 
 module.exports = Circle;
-},{"./rectangle.js":13,"./triangle.js":16,"./vec2.js":17}],6:[function(require,module,exports){
+},{"./rectangle.js":14,"./triangle.js":17,"./vec2.js":18}],6:[function(require,module,exports){
+var Vec2 = require("./vec2.js"),
+    vec2_distance = Vec2.distance,
+    vec2_distance_sq = Vec2.distanceSq,
+    vec2_midpoint = Vec2.midPoint,
+    vec2_$near = Vec2.$near,
+    vec2_sub = Vec2.sub,
+    vec2_dot = Vec2.dot,
+
+    Segment2 = require("./segment2.js"),
+    Segment2_$closestPoint = Segment2.$closestPoint,
+
+    aux_vec2 = [0, 0],
+    ca = [0, 0],
+    ba = [0, 0],
+    pa = [0, 0],
+
+    EPS = Math.EPS = 0.001;
+
+
+function _near(num, num2, dist) {
+    return num > num2 - dist && num < num2 + dist;
+}
+
+
+function _rectangle_vec2(x1, y1, x2, y2, x3, y3) {
+    return (x1 > x3 || x2 < x3 || y1 > y3 || y2 < y3) ? false : true;
+}
+/**
+ * @returns {Boolean}
+ */
+function bb2_vec2(bb2, vec2) {
+    return _rectangle_vec2(bb2[0], bb2[1], bb2[2], bb2[3], vec2[0], vec2[1]);
+}
+/**
+ * @returns {Boolean}
+ */
+function vec2_bb2(vec2, bb2) {
+    return _rectangle_vec2(bb2[0], bb2[1], bb2[2], bb2[3], vec2[0], vec2[1]);
+}
+/**
+ * @returns {Boolean}
+ */
+function rectangle_vec2(rect, vec2) {
+    var tl = rect[0], br = rect[1];
+    return _rectangle_vec2(tl[0], tl[1], br[0], br[1], vec2[0], vec2[1]);
+}
+/**
+ * @returns {Boolean}
+ */
+function vec2_rectangle(vec2, rect) {
+    var tl = rect[0], br = rect[1];
+    return _rectangle_vec2(tl[0], tl[1], br[0], br[1], vec2[0], vec2[1]);
+}
+
+/**
+ * @benchmark
+ * @returns {Boolean}
+ */
+function segment2_vec2(seg2, vec2) {
+    var x = vec2[0],
+        y = vec2[1];
+
+    Segment2_$closestPoint(aux_vec2, seg2[0], seg2[1], seg2[2], seg2[3], x, y);
+
+    return vec2_$near(aux_vec2[0], aux_vec2[1], x, y);
+}
+/**
+ * @returns {Boolean}
+ */
+function vec2_segment2(vec2, seg2) {
+    return segment2_vec2(seg2, vec2);
+}
+/**
+ * @returns {Boolean}
+ */
+function vec2_line2(vec2, line2) {
+    //return _near(vec2[1], line2[1] * vec2[0] - line2[0][1]);
+    var p = line2[0];
+    return _near(line2[1], (vec2[1] - p[1]) / (vec2[0] - p[0]), EPS);
+}
+
+/**
+ * @returns {Boolean}
+ */
+function line2_vec2(line2, vec2) {
+    //return _near(vec2[1], line2[1] * vec2[0] - line2[0][1]);
+    var p = line2[0];
+    return _near(line2[1], (vec2[1] - p[1]) / (vec2[0] - p[0]), EPS);
+}
+
+
+
+/**
+ * @returns {Boolean}
+ */
+function circle_circle(circle_1, circle_2) {
+    strict = strict || false;
+
+    var // Determine minimum and maximum radius where circles can intersect
+        r_max = circle_1[1] + circle_2[1],
+        // Determine actual distance between circle circles
+        c_dist_sq = Vec2.distanceSq(circle_1[0], circle_2[0]);
+
+    if (c_dist_sq > r_max * r_max) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @returns {Boolean}
+ */
+function circle_vec2(circle, vec2) {
+    var distance_to_center = vec2_distance_sq(circle[0], vec2),
+        r = circle[1],
+        r2 = r * r;
+
+    return distance_to_center <= r2;
+}
+/**
+ * @returns {Boolean}
+ */
+function vec2_circle(vec2, circle) {
+    circle_vec2(circle, vec2);
+}
+/**
+ * @returns {Boolean}
+ */
+function triangle_vec2(tri, vec2) {
+    // Compute vectors
+    ca = vec2_sub(tri[2], tri[0]); // v0 = C - A
+    ba = vec2_sub(tri[1], tri[0]); // v1 = B - A
+    pa = vec2_sub(vec2, tri[0]); // v2 = P - A
+
+    // Compute dot products
+    var dot00 = vec2_dot(ca, ca); //dot00 = dot(v0, v0)
+    var dot01 = vec2_dot(ca, ba); //dot01 = dot(v0, v1)
+    var dot02 = vec2_dot(ca, pa); //dot02 = dot(v0, v2)
+    var dot11 = vec2_dot(ba, ba); //dot11 = dot(v1, v1)
+    var dot12 = vec2_dot(ba, pa); //dot12 = dot(v1, v2)
+
+    // Compute barycentric coordinates
+    var invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+    var u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    var v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    // Check if point is in triangle
+    return (u >= 0) && (v >= 0) && (u + v < 1);
+
+}
+/**
+ * @returns {Boolean}
+ */
+function vec2_triangle(tri, vec2) {
+    return triangle_vec2(tri, vec2)
+}
+
+/**
+ * @returns {Boolean}
+ */
+function vec2_vec2(vec2, vec2_2) {
+    return _near(vec2[0], vec2_2[0], EPS) &&
+        _near(vec2[1], vec2_2[1], EPS);
+}
+
+var Collisions = {
+    circle_circle: circle_circle,
+
+    //
+    // vec2 against the world!
+    //
+    bb2_vec2: bb2_vec2,
+    vec2_bb2: vec2_bb2,
+
+    rectangle_vec2: rectangle_vec2,
+    vec2_rectangle: vec2_rectangle,
+
+    segment2_vec2: segment2_vec2,
+    vec2_segment2: vec2_segment2,
+
+    circle_vec2: circle_vec2,
+    vec2_circle: vec2_circle,
+
+    vec2_line2: vec2_line2,
+    line2_vec2: line2_vec2,
+
+    triangle_vec2: triangle_vec2,
+    vec2_triangle: vec2_triangle,
+
+    vec2_vec2: vec2_vec2,
+};
+
+module.exports = Collisions;
+
+
+var primitives = ["circle", "rectangle", "vec2", "line2", "segment2", "bb2", "triangle"],
+    i,
+    j,
+    fn;
+for (i = 0; i < primitives.length; ++i) {
+    for (j = 0; j < primitives.length; ++j) {
+        fn = primitives[i] + "_" + primitives[j];
+        if (!Collisions[fn]) {
+            console.log("todo: Collisions.", fn);
+        }
+    }
+
+}
+
+/*
+
+console.log(vec2_line2([1, 1], [[0,0], 1]));
+console.log(vec2_line2([1, 2], [[0,0], 2]));
+
+*/
+},{"./segment2.js":15,"./vec2.js":18}],7:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     sqrt = Math.sqrt,
     abs = Math.abs,
@@ -819,7 +1036,7 @@ var Distance = {
 
 
 module.exports = Distance;
-},{"./rectangle.js":13}],7:[function(require,module,exports){
+},{"./rectangle.js":14}],8:[function(require,module,exports){
 function rectangle(context2d, rect, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
@@ -828,7 +1045,24 @@ function rectangle(context2d, rect, style) {
     context2d.strokeRect(rect[0][0], rect[0][1], rect[1][0] - rect[0][0], rect[1][1] - rect[0][1]);
 }
 
-function cartesian_cs(context2d, coords, count) {
+/**
+ * calling this override fillText so you didn't see inverted text
+ * You cannot must not call or modify the transformation matrix without the proper save/restore.
+ */
+function invertAxis(canvas, context2d) {
+    var fillText = CanvasRenderingContext2D.prototype.fillText;
+
+    CanvasRenderingContext2D.prototype.fillText = function(a, b, c) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        fillText.call(this, a, b, c + canvas.height);
+        ctx.restore();
+    }
+
+    context2d.setTransform(1, 0, 0, -1, 0, canvas.height)
+}
+
+function cartesianAxis(context2d, coords, count) {
     context2d.save();
     context2d.strokeStyle = 'rgba(0,0,0, 0.25)';
     //context2d.strokeStyle = 'red';
@@ -912,7 +1146,7 @@ function cartesian_cs(context2d, coords, count) {
         context2d.stroke();
 
         if (y != 0) {
-            context2d.fillText(y, +12, y + 2);
+            context2d.fillText(-y, +12, y + 2);
         }
     }
 
@@ -1045,7 +1279,8 @@ function applyMatrix2D(context2d, m2d) {
 
 
 var Draw = {
-    cartesian_cs: cartesian_cs,
+    invertAxis: invertAxis,
+    cartesianAxis: cartesianAxis,
 
     vec2: vec2,
     rectangle: rectangle,
@@ -1062,12 +1297,12 @@ var Draw = {
 };
 
 module.exports = Draw;
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Rectangle = browser ? window.Rectangle : require("./rectangle.js"),
     Distance = browser ? window.Distance : require("./distance.js"),
     Segment2 = browser ? window.Segment2 : require("./segment2.js"),
-    segment2$inside = Segment2.$.inside,
+    segment2$inside = Segment2.$inside,
     BB2 = browser ? window.BB2 : require("./boundingbox2.js"),
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     abs = Math.abs,
@@ -1696,17 +1931,15 @@ var Intersection = {
     segment2_vec2: segment2_vec2,
     vec2_segment2: vec2_segment2,
 
-    $: {
-        rectangle_rectangle: $rectangle_rectangle,
-        rectangle_vec2: $rectangle_vec2,
-        circle_segment2: $circle_segment2,
-        circle_rectangle: $circle_rectangle
-    }
+    $rectangle_rectangle: $rectangle_rectangle,
+    $rectangle_vec2: $rectangle_vec2,
+    $circle_segment2: $circle_segment2,
+    $circle_rectangle: $circle_rectangle
 };
 
 
 module.exports = Intersection;
-},{"./boundingbox2.js":4,"./distance.js":6,"./rectangle.js":13,"./segment2.js":14,"./vec2.js":17}],9:[function(require,module,exports){
+},{"./boundingbox2.js":4,"./distance.js":7,"./rectangle.js":14,"./segment2.js":15,"./vec2.js":18}],10:[function(require,module,exports){
 var dx,
     dy,
     r,
@@ -1717,6 +1950,8 @@ var dx,
     cos = Math.cos;
 
 /**
+ * Point-Slope Equation of a Line: y - y1 = m(x - x1)
+ *
  * @returns {Line2}
  */
 function create(x, y, m) {
@@ -1857,7 +2092,7 @@ var Line2 = {
 
 
 module.exports = Line2;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -1986,7 +2221,7 @@ module.exports = Line2;
     };
 
 }());
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // cache variables
 var DEG_TO_RAD = Math.DEG_TO_RAD,
     PI = Math.PI,
@@ -2788,7 +3023,7 @@ var Matrix2D =  {
 };
 
 module.exports = Matrix2D;
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var object = require("object-enhancements"),
     Xorshift = require("./xorshift.js"),
     GRAD3 = [
@@ -3091,7 +3326,7 @@ Noise = {
 };
 
 module.exports = Noise;
-},{"./xorshift.js":18,"object-enhancements":21}],13:[function(require,module,exports){
+},{"./xorshift.js":19,"object-enhancements":22}],14:[function(require,module,exports){
 var Vec2 = "undefined" === typeof exports ? window.Vec2 : require("./vec2.js"),
     vec2_distance = Vec2.distance,
     max = Math.max,
@@ -3237,7 +3472,7 @@ var Rectangle = {
 
 
 module.exports = Rectangle;
-},{"./vec2.js":17}],14:[function(require,module,exports){
+},{"./vec2.js":18}],15:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     aux_vec2 = [0, 0],
@@ -3363,7 +3598,7 @@ function isAbove(seg2, vec2, cached_seg2_min_angle) {
         return angle > cached_seg2_min_angle && angle < cache_seg2_angle_max;
     }
 
-    cache_seg2_angle_max = cached_seg2_min_angle + PI;            
+    cache_seg2_angle_max = cached_seg2_min_angle + PI;
 
     return angle < cached_seg2_min_angle || angle > cache_seg2_angle_max;
 }
@@ -3432,16 +3667,14 @@ var Segment2 =  {
     lengthSq: sqrLength,
     contains: isInside,
 
-    $: {
-        inside: $inside,
-        collinear: $collinear,
-        closestPoint: $closestPoint
-    },
+    $inside: $inside,
+    $collinear: $collinear,
+    $closestPoint: $closestPoint
 };
 
 
 module.exports = Segment2;
-},{"./vec2.js":17}],15:[function(require,module,exports){
+},{"./vec2.js":18}],16:[function(require,module,exports){
 //
 // @TODO expand all function, do not generate with loops
 //
@@ -3837,7 +4070,7 @@ Transitions.linear = linear;
 Transitions.create = create;
 
 module.exports = Transitions;
-},{"array-enhancements":19}],16:[function(require,module,exports){
+},{"array-enhancements":20}],17:[function(require,module,exports){
 var Vec2 = require("./vec2.js"),
     vec2_midpoint = Vec2.midPoint,
     vec2_pow = Vec2.pow,
@@ -4012,7 +4245,7 @@ var Triangle = {
 };
 
 module.exports = Triangle;
-},{"./vec2.js":17}],17:[function(require,module,exports){
+},{"./vec2.js":18}],18:[function(require,module,exports){
 var aux_vec = [0, 0],
     __x = 0,
     __y = 0,
@@ -4682,6 +4915,15 @@ function $within(px, py, qx, qy, rx, ry) {
           ((py <= qy && qy <= ry) || (ry <= qy && qy <= py));
 }
 
+/**
+ * Return true if q is between p and r(inclusive)
+ * @returns {Number}
+ */
+function $near(px, py, qx, qy, dist) {
+    return (px > qx ? (px - qx) < dist : (qx - px) < dist) &&
+           (py > qy ? (py - qy) < dist : (qy - py) < dist);
+}
+
 Vec2 = {
     create: create,
     dFromPolar: dFromPolar,
@@ -4754,13 +4996,12 @@ Vec2 = {
     div2: divide2,
     distanceSq: sqrDistance,
     lengthSq: sqrLength,
-    $: {
-        within: $within
-    }
+    $within: $within,
+    $near: $near
 };
 
 module.exports = Vec2;
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // from: http://jsdo.it/akm2/fhMC/js
 // don't know the author :)
 // I just lint the code... and adapt it to this lib philosophy
@@ -4847,14 +5088,14 @@ Xorshift = {
 };
 
 module.exports = Xorshift;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/arrays.js");
 
 }());
-},{"./lib/arrays.js":20}],20:[function(require,module,exports){
+},{"./lib/arrays.js":21}],21:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -5394,14 +5635,14 @@ module.exports = Xorshift;
         next();
     };
 }());
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/objects.js");
 
 }());
-},{"./lib/objects.js":22}],22:[function(require,module,exports){
+},{"./lib/objects.js":23}],23:[function(require,module,exports){
 (function () {
     "use strict";
 

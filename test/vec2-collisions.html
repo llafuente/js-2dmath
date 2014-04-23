@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
+<title>js-2dmath: Demostration of various Intersections</title>
+
+<script src="../js-2dmath-browser.js" type="text/javascript" ></script>
+
+</head>
+<body>
+<h1>js-2dmath: Collisions</h1>
+<canvas id="canvas" width="680" height="680" style="border: 1px solid red;"></canvas>
+</body>
+</html>
+
+<script>
+//
+// --- INIT ---
+//
+//expose js-2dmath globally, I'm lazy!
+require("js-2dmath").globalize(window);
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+Draw.invertAxis(canvas, ctx); // y-up
+ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
+Draw.cartesianAxis(ctx, 320, 16); // coordinates
+
+//
+// --- CODE ---
+//
+
+Draw.vec2(ctx, [40,40]);
+
+</script>

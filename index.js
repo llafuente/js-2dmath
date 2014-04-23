@@ -10,6 +10,7 @@ module.exports = {
     Triangle: require("./lib/triangle.js"),
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
+    Collisions: require("./lib/collisions.js"),
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),
     Xorshift: require("./lib/xorshift.js"),

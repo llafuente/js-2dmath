@@ -20,9 +20,9 @@ test("Line2 init", function(t) {
     t.equal(l1[1], 1, "t3-2");
 
 
-    Line2.parallel(l1, l1, [10,10]);
+    Line2.offset(l1, l1, 10);
 
-    t.equal(l1[0][0], 10, "t1-3");
+    t.equal(l1[0][0], 20, "t1-3");
     t.equal(l1[0][1], 10, "t2-3");
     t.equal(l1[1], 1, "t3-");
 
