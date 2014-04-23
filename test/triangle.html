@@ -14,11 +14,21 @@
 </html>
 
 <script>
-var ctx = document.getElementById("canvas").getContext("2d");
-
+//
+// --- INIT ---
+//
+//expose js-2dmath globally, I'm lazy!
 require("js-2dmath").globalize(window);
-ctx.translate(330, 330);
-Draw.cartesian_cs(ctx, 320, 16)
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+Draw.invertAxis(canvas, ctx); // y-up
+ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
+Draw.cartesianAxis(ctx, 320, 16); // coordinates
+
+//
+// code
+//
 
 
 var t1 = Triangle.create(0, 0, 50, 50, 0, 50);
