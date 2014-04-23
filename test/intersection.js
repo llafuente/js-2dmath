@@ -18,10 +18,7 @@ test("intersection_circle_vs_circle", function(t) {
         c4 = Circle(0,0,2);
 
     t.deepEqual(Intersection.circle_circle(c1, c2, true, true),
-        {reason: Intersection.COLLIDE, points: [
-            [2.609128788536429,4.790871211463569],
-            [4.790871211463569,2.609128788536429]
-        ]},
+        {reason: Intersection.OUTSIDE},
         "intersection_circle_vs_circle outside");
 
     t.deepEqual(Intersection.circle_circle(c1, c4, true),

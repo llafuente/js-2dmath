@@ -1044,22 +1044,24 @@ function rectangle(context2d, rect, style) {
 
     context2d.strokeRect(rect[0][0], rect[0][1], rect[1][0] - rect[0][0], rect[1][1] - rect[0][1]);
 }
+if ("undefined" !== typeof CanvasRenderingContext2D) {
+    var fillText = CanvasRenderingContext2D.prototype.fillText;
+    function invertFillText(a, b, c) {
+        this.save();
+        //ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.transform(1, 0, 0, -1, 0, 0);
+        fillText.call(this, a, b, -c);
+        this.restore();
+    }
+}
 
 /**
  * calling this override fillText so you didn't see inverted text
- * You cannot must not call or modify the transformation matrix without the proper save/restore.
+ * You must not modify the transformation matrix without the proper save/restore.
  */
 function invertAxis(canvas, context2d) {
-    var fillText = CanvasRenderingContext2D.prototype.fillText;
-
-    CanvasRenderingContext2D.prototype.fillText = function(a, b, c) {
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        fillText.call(this, a, b, c + canvas.height);
-        ctx.restore();
-    }
-
-    context2d.setTransform(1, 0, 0, -1, 0, canvas.height)
+    context2d.setTransform(1, 0, 0, -1, 0, canvas.height);
+    context2d.fillText = invertFillText;
 }
 
 function cartesianAxis(context2d, coords, count) {
@@ -1111,7 +1113,7 @@ function cartesianAxis(context2d, coords, count) {
     context2d.stroke();
 
 
-
+    context2d.setLineDash([]);
 
 
     context2d.strokeStyle = 'rgba(0,0,0, 0.25)';
@@ -1146,7 +1148,7 @@ function cartesianAxis(context2d, coords, count) {
         context2d.stroke();
 
         if (y != 0) {
-            context2d.fillText(-y, +12, y + 2);
+            context2d.fillText(y, +12, y - 4);
         }
     }
 
@@ -1179,19 +1181,21 @@ function line2(context2d, line2, style, length) {
 
 }
 
-function vec2(context2d, vec2, style) {
+function vec2(context2d, vec2, style, length) {
+    length = length || 2;
+
     if (style !== undefined) {
         context2d.strokeStyle = style;
     }
 
     context2d.beginPath();
-    context2d.moveTo(vec2[0] + 2, vec2[1] + 2);
-    context2d.lineTo(vec2[0] - 2, vec2[1] - 2);
+    context2d.moveTo(vec2[0] + length, vec2[1] + length);
+    context2d.lineTo(vec2[0] - length, vec2[1] - length);
     context2d.stroke();
 
     context2d.beginPath();
-    context2d.moveTo(vec2[0] - 2, vec2[1] + 2);
-    context2d.lineTo(vec2[0] + 2, vec2[1] - 2);
+    context2d.moveTo(vec2[0] - length, vec2[1] + length);
+    context2d.lineTo(vec2[0] + length, vec2[1] - length);
     context2d.stroke();
 }
 
@@ -1267,7 +1271,7 @@ function bb2(context2d, bb2, style) {
 }
 
 function text(context2d, text, vec2, font) {
-    font = font || "12pt Consolas";
+    font = font || "10pt Consolas";
     context2d.font = font;
 
     context2d.fillText(text, vec2[0], vec2[1]);
@@ -3477,7 +3481,7 @@ var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     aux_vec2 = [0, 0],
     aux,
-    within = Vec2.$.within,
+    within = Vec2.$within,
     sqrt = Math.sqrt,
     atan2 = Math.atan2,
     PI = Math.PI,
@@ -4246,6 +4250,10 @@ var Triangle = {
 
 module.exports = Triangle;
 },{"./vec2.js":18}],18:[function(require,module,exports){
+/**
+ * Vector 2D class.
+ * Represented as an array with two coordinates.
+ */
 var aux_vec = [0, 0],
     __x = 0,
     __y = 0,
@@ -4916,8 +4924,8 @@ function $within(px, py, qx, qy, rx, ry) {
 }
 
 /**
- * Return true if q is between p and r(inclusive)
- * @returns {Number}
+ * p is near x ± dist ("box test")
+ * @returns {Boolean}
  */
 function $near(px, py, qx, qy, dist) {
     return (px > qx ? (px - qx) < dist : (qx - px) < dist) &&

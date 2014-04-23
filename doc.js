@@ -16,6 +16,7 @@ var methods,
         rect: "Rectangle",
         tri: "Triangle",
         curve: "Beizer",
+        beizer: "Beizer",
         bb2: "BB2",
     },
     files = {
@@ -77,6 +78,8 @@ var methods,
                 y1: "Number",
                 y2: "Number",
                 y3: "Number",
+
+                cached_seg2_min_angle: "Number",
             }
         },
         Rectangle: {
@@ -109,7 +112,8 @@ var methods,
 
                 vec2_offset: "Vec2",
                 vec2_scale: "Vec2",
-                alignament: "Number"
+                alignament: "Number",
+                npoints: "Number",
             }
         },
         Circle: {
@@ -300,10 +304,46 @@ function is_fn(node) {
     }
 }
 
+function parse_comments(list) {
+    var comments = [];
+
+    list.forEach(function (c) {
+        var line;
+
+        if (c.indexOf("@returns") !== -1) {
+            c = c.substring(c.indexOf("{"));
+            c = c.substring(1, c.indexOf("}"));
+            methods[i].returns = c;
+        } else if (c.indexOf("@see") !== -1) {
+            line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
+            line = line.substring(5);
+            if (line.indexOf("http") === 0) {
+                comments.push("  **link**: [" + line + "](" + line + ")");
+            } else {
+                comments.push("  **see**: [" + line + "](#" + cls + "-" + line + ")");
+            }
+        } else if (c.indexOf("@source") !== -1) {
+            line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
+            line = line.substring(8);
+            comments.push("  **source**: [" + line + "](" + line + ")");
+        } else if (c.indexOf("@param") !== -1) {
+            //ignore
+        } else {
+            line = c.trim().replace(/^\*(\s{0,1})/, "").replace(/^\*$/, "");
+            if (line.length) {
+                comments.push("  " + line);
+            }
+        }
+    });
+
+    return comments.join("\n\n");
+}
+
 
 var cls_list = [],
     cls,
-    i;
+    i,
+    description;
 
 for (cls in files) {
     cls_list.push("[" + cls + "](#" + cls + ")");
@@ -315,6 +355,7 @@ console.log("");
 console.log("");
 
 for (cls in files) {
+    description = null;
 
     methods = {};
     src = fs.readFileSync(files[cls].filename, "utf-8");
@@ -335,27 +376,34 @@ for (cls in files) {
 
         // comment at first level!
         if (node.type === "Block" && node.parent.type === "Program") {
-            // search nearest
-            var fn,
-                min_diff = 9999;
+            if (node.loc.start.line === 1) {
+                // class comment
 
-            node.parent.body.every(function (subnode) {
-                if (subnode.type === "FunctionDeclaration") {
-                    var diff = subnode.loc.start.line - node.loc.end.line;
+                description = node.value.split("\n")
 
-                    if (diff > 0 && diff < min_diff) {
-                        min_diff = diff;
-                        fn = subnode;
+            } else {
+                // search nearest function
+                var fn,
+                    min_diff = 9999;
+
+                node.parent.body.every(function (subnode) {
+                    if (subnode.type === "FunctionDeclaration") {
+                        var diff = subnode.loc.start.line - node.loc.end.line;
+
+                        if (diff > 0 && diff < min_diff) {
+                            min_diff = diff;
+                            fn = subnode;
+                        }
                     }
+
+                    return true;
+
+                });
+                if (fn) {
+                    fname = fn.id.name;
+
+                    methods[fname].comments = node.value.split("\n");
                 }
-
-                return true;
-
-            });
-            if (fn) {
-                fname = fn.id.name;
-
-                methods[fname].comments = node.value.split("\n");
             }
         }
     });
@@ -395,6 +443,10 @@ for (cls in files) {
     console.log("<a name=\"" + cls + "\"></a>");
     console.log("## " + cls);
 
+    if (description) {
+        console.log(parse_comments(description));
+    }
+
     // DEFINES
     for (i in mod_required) {
         if ("function" !== typeof mod_required[i]) {
@@ -406,38 +458,7 @@ for (cls in files) {
 
     for (i in methods) {
         if (methods[i].comments.length) {
-            comments = [];
-
-            methods[i].comments.forEach(function (c) {
-                var line;
-
-                if (c.indexOf("@returns") !== -1) {
-                    c = c.substring(c.indexOf("{"));
-                    c = c.substring(1, c.indexOf("}"));
-                    methods[i].returns = c;
-                } else if (c.indexOf("@see") !== -1) {
-                    line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
-                    line = line.substring(5);
-                    if (line.indexOf("http") === 0) {
-                        comments.push("  **link**: [" + line + "](" + line + ")");
-                    } else {
-                        comments.push("  **see**: [" + line + "](#" + cls + "-" + line + ")");
-                    }
-                } else if (c.indexOf("@source") !== -1) {
-                    line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
-                    line = line.substring(8);
-                    comments.push("  **source**: [" + line + "](" + line + ")");
-                } else if (c.indexOf("@param") !== -1) {
-                    //ignore
-                } else {
-                    line = c.trim().replace(/^\*(\s{0,1})/, "").replace(/^\*$/, "");
-                    if (line.length) {
-                        comments.push("  " + line);
-                    }
-                }
-            });
-
-            methods[i].comments = comments.join("\n\n");
+            methods[i].comments = parse_comments(methods[i].comments);
         }
 
         console.log("");

@@ -14,9 +14,22 @@
 </html>
 
 <script>
-var ctx = document.getElementById("canvas").getContext("2d");
-
+//
+// --- INIT ---
+//
+//expose js-2dmath globally, I'm lazy!
 require("js-2dmath").globalize(window);
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+Draw.invertAxis(canvas, ctx); // y-up
+ctx.translate(25, 25); // center
+Draw.cartesianAxis(ctx, 640, 16); // coordinates
+
+//
+// --- CODE ---
+//
+
 function draw_test(draw1, val1, draw2, val2, int_fn) {
 
     var r = int_fn(val1, val2, true, true),
@@ -29,7 +42,7 @@ function draw_test(draw1, val1, draw2, val2, int_fn) {
     if (r.points && r.points.length) {
         draw2(ctx, val2, "green");
         for(i = 0; i < r.points.length; ++i) {
-            Draw.vec2(ctx, r.points[i], "red");
+            Draw.vec2(ctx, r.points[i], "red", 4);
         }
     } else if (r.segments && r.segments.length) {
         draw2(ctx, val2, "green");
@@ -43,7 +56,14 @@ function draw_test(draw1, val1, draw2, val2, int_fn) {
     }
 }
 
-draw_test(Draw.circle, Circle.create(35, 35, 20), Draw.bb2, BB2.create(10, 0, 50, 80), Intersection.circle_bb2);
+
+draw_test(Draw.circle, Circle.create(200, 200, 20), Draw.bb2, BB2.create(180, 180, 220, 220), Intersection.circle_bb2);
+draw_test(Draw.circle, Circle.create(300, 200, 20), Draw.bb2, BB2.create(280, 190, 320, 210), Intersection.circle_bb2);
+draw_test(Draw.circle, Circle.create(400, 200, 20), Draw.bb2, BB2.create(375, 160, 415, 220), Intersection.circle_bb2);
+
+
+draw_test(Draw.circle, Circle.create(50, 200, 20), Draw.segment2, Segment2.create(10, 200, 80, 200), Intersection.circle_segment2);
+draw_test(Draw.circle, Circle.create(110, 200, 20), Draw.segment2, Segment2.create(110, 200, 140, 200), Intersection.circle_segment2);
 
 
 
@@ -53,11 +73,7 @@ draw_test(Draw.circle, Circle.create(190, 100, 20), Draw.circle, Circle.create(2
 draw_test(Draw.circle, Circle.create(250, 100, 20), Draw.circle, Circle.create(250, 90, 20), Intersection.circle_circle);
 draw_test(Draw.circle, Circle.create(300, 80, 20), Draw.circle, Circle.create(300, 120, 20), Intersection.circle_circle);
 
-draw_test(Draw.circle, Circle.create(50, 200, 20), Draw.segment2, Segment2.create(10, 200, 80, 200), Intersection.circle_segment2);
-draw_test(Draw.circle, Circle.create(110, 200, 20), Draw.segment2, Segment2.create(110, 200, 140, 200), Intersection.circle_segment2);
 
-draw_test(Draw.circle, Circle.create(200, 200, 20), Draw.bb2, BB2.create(180, 180, 220, 220), Intersection.circle_bb2);
-draw_test(Draw.circle, Circle.create(250, 200, 20), Draw.bb2, BB2.create(230, 190, 270, 210), Intersection.circle_bb2);
 
 
 draw_test(Draw.rectangle, Rectangle.create(50, 300, 80, 330), Draw.rectangle, Rectangle.create(55, 305, 90, 340), Intersection.rectangle_rectangle);

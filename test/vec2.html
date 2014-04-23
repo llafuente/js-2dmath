@@ -15,23 +15,27 @@
 </html>
 
 <script>
-var ctx = document.getElementById("canvas").getContext("2d");
-
+//
+// --- INIT ---
+//
+//expose js-2dmath globally, I'm lazy!
 require("js-2dmath").globalize(window);
 
-ctx.strokeStyle = "grey";
-ctx.beginPath();
-ctx.moveTo(0, 480 * 0.5);
-ctx.lineTo(640, 480 * 0.5);
-ctx.stroke();
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+Draw.invertAxis(canvas, ctx); // y-up
+ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
+Draw.cartesianAxis(ctx, 320, 16); // coordinates
 
-ctx.beginPath();
-ctx.moveTo(640 * 0.5, 0);
-ctx.lineTo(640 * 0.5, 480);
-ctx.stroke();
-
-
-ctx.translate(640 * 0.5, 480 * 0.5);
+var canvas2 = document.getElementById("canvas2");
+var ctx2 = canvas2.getContext("2d");
+Draw.invertAxis(canvas2, ctx2); // y-up
+ctx2.translate(canvas2.width * 0.5, canvas2.height * 0.5); // center
+Draw.cartesianAxis(ctx2, 320, 16); // coordinates
+console.log(ctx2);
+//
+//
+//
 
 
 var v = Vec2.create(50, 50),
@@ -40,11 +44,11 @@ var v = Vec2.create(50, 50),
     aux = [];
 
 
-Draw.vec2(ctx, v, "red", "vec2");
+Draw.vec2(ctx, v, "red");
 Draw.text(ctx, "vec2", Vec2.add([], v, [7,7]));
 
 Vec2.perp(aux, v);
-Draw.vec2(ctx, aux, "red", "prep");
+Draw.vec2(ctx, aux, "red");
 Draw.text(ctx, "prep", Vec2.add([], aux, [7,7]));
 
 Vec2.rerp(aux, v);
@@ -52,10 +56,10 @@ Draw.vec2(ctx, aux, "red");
 Draw.text(ctx, "rperp", Vec2.add([], aux, [7,7]));
 
 
-Draw.vec2(ctx, a, "red", "a");
+Draw.vec2(ctx, a, "red");
 Draw.text(ctx, "a", Vec2.add([], a, [7,7]));
 
-Draw.vec2(ctx, b, "red", "b");
+Draw.vec2(ctx, b, "red");
 Draw.text(ctx, "b", Vec2.add([], b, [7,7]));
 
 Vec2.interpolate(aux, a, b, 2)
@@ -74,15 +78,13 @@ console.log(aux);
 Draw.vec2(ctx, aux, "red");
 Draw.text(ctx, "interpolate(b,a,2)", Vec2.add([], aux, [7,7]))
 
-
-var ctx = document.getElementById("canvas2").getContext("2d");
 aux = [50, 50];
-Draw.vec2(ctx, aux, "red");
+Draw.vec2(ctx2, aux, "red");
 var angle = Vec2.angleTo([0, 0], aux) * Math.RAD_TO_DEG;
 console.log(Math.RAD_TO_DEG);
 console.log(Vec2.angleTo([100, 0], aux));
 console.log(angle);
-Draw.text(ctx, "angleTo=" + angle.toFixed(2), Vec2.add([], aux, [7,7]))
+Draw.text(ctx2, "angleTo=" + angle.toFixed(2), Vec2.add([], aux, [7,7]))
 
 
 </script>

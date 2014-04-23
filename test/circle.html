@@ -8,17 +8,29 @@
 
 </head>
 <body>
-<h1>js-2dmath: Interpolate Matrix2D using Transitions (linear)</h1>
+<h1>js-2dmath: circle test</h1>
 <canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
 </body>
 </html>
 
 <script>
-var ctx = document.getElementById("canvas").getContext("2d");
-
+//
+// --- INIT ---
+//
+//expose js-2dmath globally, I'm lazy!
 require("js-2dmath").globalize(window);
 
-var circle = Circle.create(0, 0, 50);
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+Draw.invertAxis(canvas, ctx); // y-up
+ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
+Draw.cartesianAxis(ctx, 320, 16); // coordinates
+
+//
+// --- CODE ---
+//
+
+var circle = Circle.create(0, 0, 35);
 
 
 var rect = Rectangle.create(100, 100, 150, 150);
@@ -29,24 +41,20 @@ console.log(circle);
 console.log(rect);
 console.log(circle2);
 */
+Draw.text(ctx, "fromRectangle(*, true|false)", [40, 160]);
 Draw.circle(ctx, circle);
 Draw.rectangle(ctx, rect, "blue");
 Draw.circle(ctx, circle2, "purple");
 Draw.circle(ctx, circle3, "red");
 
-
-var tri = Triangle.create(200, 200, 250, 250, 300, 200);
+Draw.text(ctx, "fromTriangle(*, true|false, true|false)", [-280, 160]);
+var tri = Triangle.create(-150, 100, -200, 150, -250, 100);
 var circle4 = Circle.fromTriangle(tri, false, false);
 var circle5 = Circle.fromTriangle(tri, false, true);
 
 var circle6 = Circle.fromTriangle(tri, true, false);
 var circle7 = Circle.fromTriangle(tri, true, true);
-/*
-console.log(circle4);
-console.log(circle5);
-console.log(circle6);
-console.log(circle7);
-*/
+
 Draw.triangle(ctx, tri);
 Draw.circle(ctx, circle4, "blue");
 Draw.circle(ctx, circle5, "red");
@@ -56,7 +64,8 @@ Draw.circle(ctx, circle7, "purple");
 
 
 
-var seg2 = Segment2.create(350, 200, 350, 300);
+Draw.text(ctx, "fromSegment2(*)", [40, -40]);
+var seg2 = Segment2.create(75, -50, 100, -125);
 var circle8 = Circle.fromSegment2(seg2);
 
 console.log(seg2);
