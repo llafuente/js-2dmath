@@ -237,6 +237,11 @@ function create(l, b, r, t) {
     normalize(out, out);
     return out;
 }
+function fromSegment2(seg2) {
+    var out = [seg2[0], seg2[1], seg2[2], seg2[3], false];
+    normalize(out, out);
+    return out;
+}
 /**
  * @returns {BB2}
  */
@@ -471,6 +476,7 @@ var BB2 =  {
     BOTTOMRIGHT: BOTTOMRIGHT,
 
     create: create,
+    fromSegment2: fromSegment2,
     fromCircle: fromCircle,
     fromRectangle: fromRectangle,
     zero: zero,
@@ -1226,18 +1232,6 @@ function angle(context2d, vec2, angle, style, length) {
     context2d.moveTo(vec2[0], vec2[1]);
     context2d.lineTo(vec2[0] + Math.cos(angle) * length, vec2[1] + Math.sin(angle) * length);
     context2d.stroke();
-/*
-    context2d.save();
-
-    context2d.translate(vec2[0], vec2[1]);
-    context2d.rotate(-angle);
-    context2d.beginPath();
-    context2d.moveTo(0, 0);
-    context2d.lineTo(length, 0);
-    context2d.stroke();
-
-    context2d.restore();
-*/
 }
 
 function segment2(context2d, seg2, style) {
@@ -1469,7 +1463,7 @@ function $circle_segment2(cx, cy, r, x1, y1, x2, y2, collision, distance) {
         }
 
         if (points.length) {
-            return {reason: TANGENT, points: points};
+            return {reason: COLLIDE, points: points};
         }
 
         return {reason: OUTSIDE};
@@ -2125,7 +2119,8 @@ module.exports = Line2;
         NQUATER_PI,
         NHALF_PI,
         NTWO_PI,
-        NTWO_HALF_PI;
+        NTWO_HALF_PI,
+        EPS = 10e-3;
 
     PI = Math.PI;
     QUATER_PI = Math.QUATER_PI = 0.25 * Math.PI;
@@ -2144,16 +2139,11 @@ module.exports = Line2;
     Math.DEG_TO_RAD = Math.PI / 180;
 
     // this could be useful to tweak in your app, depends on your world resolution
-    Math.EPS = 10e-3;
+    Math.EPS = EPS;
 
-
-    Math.cross = function (x1, y1, x2, y2) {
-        return x1 * y2 - y1 * x2;
-    };
-
-    Math.dot = function (x1, y1, x2, y2) {
-        return x1 * x2 + y1 * y2;
-    };
+    function near(a, b) {
+        return a > b - EPS && a < b + EPS;
+    }
 
     /// Clamp @c f to be between @c min and @c max.
     Math.clamp = clamp = function (f, minv, maxv) {
@@ -2161,59 +2151,53 @@ module.exports = Line2;
     };
 
     /// Clamp @c f to be between 0 and 1.
-    Math.clamp01 = function (f) {
+    function clamp01(f) {
         return f < 0 ? 0 : (f > 1 ? 1 : f);
-    };
+    }
 
-    /// Linearly interpolate (or extrapolate) between @c f1 and @c f2 by @c t percent.
-    Math.lerp = function (f1, f2, t) {
+    /**
+     * Linearly interpolate (or extrapolate) between @c f1 and @c f2 by @c t percent.
+     */
+    function lerp(f1, f2, t) {
         return f1 * (1 - t) + f2 * t;
-    };
+    }
 
-    /// Linearly interpolate from @c f1 to @c f2 by no more than @c d.
-    Math.lerpconst = function (f1, f2, d) {
+    /**
+     * Linearly interpolate from @c f1 to @c f2 by no more than @c d.
+     */
+    function lerpconst(f1, f2, d) {
         return f1 + clamp(f2 - f1, -d, d);
-    };
+    }
 
-    Math.length = function (x, y) {
-        return sqrt(x * x + y * y);
-    };
-
-    Math.lengthSq = function (x, y) {
-        return x * x + y * y;
-    };
-    Math.sqrLength = Math.lengthSq;
-
-
-    Math.randRange = function (max, min) {
+    function randRange(max, min) {
         if (max === undefined) {
             return random();
         }
         min = min || 0;
 
         return random() * (max - min) + min;
-    };
+    }
 
-    Math.randInt = function (max, min) {
+    function randInt(max, min) {
         min = min || 0;
 
         return floor(random() * (max - min + 1) + min);
-    };
+    }
 
 
-    Math.snap = function (value, snapSize) {
+    function snap(value, snapSize) {
         return Math.floor(value / snapSize) * snapSize;
-    };
+    }
 
-    Math.snapRound = function (value, snapSize) {
+    function snapRound(value, snapSize) {
         var steps = value / snapSize | 0,
             remain = value - (steps * snapSize),
             rounder = remain > (snapSize / 2) ? ceil : floor;
 
         return rounder(value / snapSize) * snapSize;
-    };
+    }
 
-    function normalizeRotation (angle) {
+    function normalizeRotation(angle) {
         if (angle > NPI && angle < PI) {
             return angle;
         }
@@ -2229,12 +2213,21 @@ module.exports = Line2;
         return angle;
     }
 
+
+    function deltaRotation(angle, target) {
+        return normalizeRotation(angle - target);
+    }
+
+    Math.near = near;
+    Math.clamp01 = clamp01;
+    Math.lerp = lerp;
+    Math.lerpconst = lerpconst;
+    Math.randRange = randRange;
+    Math.randInt = randInt;
+    Math.snap = snap;
+    Math.snapRound = snapRound;
+    Math.deltaRotation = deltaRotation;
     Math.normalizeRadians = normalizeRotation;
-
-    Math.deltaRotation = function (angle, target) {
-      return normalizeRotation(angle - target);
-    };
-
 }());
 },{}],12:[function(require,module,exports){
 // cache variables
@@ -3467,7 +3460,12 @@ function area(rect) {
 function isInside(rect, vec2) {
     return rect[0][0] < vec2[0] && rect[1][0] > vec2[0] && rect[0][1] < vec2[1] && rect[1][1] > vec2[1];
 }
-
+/**
+ * @returns {Number}
+ */
+function perimeter(rect) {
+    return (rect[1][0] - rect[0][0]) * 2 + (rect[1][1] - rect[0][1]) * 2 ;
+}
 /**
  * @class Rectangle
  */
@@ -3482,12 +3480,17 @@ var Rectangle = {
     translate: translate,
     distance: distance,
     area: area,
-    isInside: isInside
+    isInside: isInside,
+    perimeter: perimeter
 };
 
 
 module.exports = Rectangle;
 },{"./vec2.js":18}],15:[function(require,module,exports){
+/**
+ * Segment2 is represented by a 4 coordinates array
+ * [x1, y1, x2, y2] normalized so x1 < x2
+ */
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     vec2_rotate = Vec2.rotate,
@@ -3497,6 +3500,7 @@ var browser = "undefined" === typeof module,
     sqrt = Math.sqrt,
     atan2 = Math.atan2,
     PI = Math.PI,
+    near = Math.near,
     __x,
     __y,
     u = 0;
@@ -3674,6 +3678,7 @@ function closestPoint(out_vec2, seg2, vec2) {
 }
 
 /**
+ * @todo optimize, "inline the if/else"
  * @returns {Vec2}
  */
 function $closestPoint(out_vec2, x1, y1, x2, y2, x3, y3) {
@@ -3698,7 +3703,8 @@ function $closestPoint(out_vec2, x1, y1, x2, y2, x3, y3) {
  * @returns {Boolean}
  */
 function $collinear(x1, y1, x2, y2, x3, y3) {
-    return (x2 - x1) * (y3 - y1) === (x3 - x1) * (y2 - y1);
+    //strict return (x2 - x1) * (y3 - y1) === (x3 - x1) * (y2 - y1);
+    return near((x2 - x1) * (y3 - y1), (x3 - x1) * (y2 - y1));
 }
 /**
  * @returns {Boolean}
@@ -4140,6 +4146,7 @@ module.exports = Transitions;
 },{"array-enhancements":20}],17:[function(require,module,exports){
 var Vec2 = require("./vec2.js"),
     vec2_midpoint = Vec2.midPoint,
+    vec2_distance = Vec2.distance,
     vec2_pow = Vec2.pow,
     DIV3 = 1 / 3,
     ah = [0, 0],
@@ -4190,6 +4197,14 @@ function midTriangle(out, tri) {
 
     return out;
 
+}
+/**
+ * @returns {Number}
+ */
+function perimeter(tri) {
+    return vec2_distance(tri[0], tri[1]) +
+        vec2_distance(tri[1], tri[2]) +
+        vec2_distance(tri[2], tri[0]);
 }
 /**
  * @returns {Triangle}
@@ -4301,6 +4316,8 @@ var Triangle = {
     caMidPoint: caMidPoint,
     midTriangle: midTriangle,
 
+    perimeter: perimeter,
+
     centroid: centroid,
     incenter: incenter,
     circumcenter: circumcenter,
@@ -4314,8 +4331,8 @@ var Triangle = {
 module.exports = Triangle;
 },{"./vec2.js":18}],18:[function(require,module,exports){
 /**
- * Vector 2D class.
- * Represented as an array with two coordinates.
+ * Vec2 is represented as a two coordinates array
+ * [x, y]
  */
 var aux_vec = [0, 0],
     __x = 0,
@@ -4782,7 +4799,6 @@ function scale(out, v1, factor) {
  * @returns {Vec2}
  */
 function pow(out, v1, factor) {
-    console.log("pow", out, v1);
     if (factor === 2) {
         out[0] = v1[0] * v1[0];
         out[1] = v1[1] * v1[1];
@@ -4790,7 +4806,6 @@ function pow(out, v1, factor) {
         out[0] = __pow(v1[0], factor);
         out[1] = __pow(v1[1], factor);
     }
-    console.log("pow", out, v1);
 
     return out;
 }
@@ -4995,6 +5010,14 @@ function $near(px, py, qx, qy, dist) {
            (py > qy ? (py - qy) < dist : (qy - py) < dist);
 }
 
+function $cross(x1, y1, x2, y2) {
+    return x1 * y2 - y1 * x2;
+}
+
+function $dot(x1, y1, x2, y2) {
+    return x1 * x2 + y1 * y2;
+}
+
 Vec2 = {
     create: create,
     dFromPolar: dFromPolar,
@@ -5068,7 +5091,9 @@ Vec2 = {
     distanceSq: sqrDistance,
     lengthSq: sqrLength,
     $within: $within,
-    $near: $near
+    $near: $near,
+    $cross: $cross,
+    $dot: $dot
 };
 
 module.exports = Vec2;
