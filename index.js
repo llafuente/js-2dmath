@@ -4,13 +4,16 @@ module.exports = {
     Vec2: require("./lib/vec2.js"),
     Line2: require("./lib/line2.js"),
     Segment2: require("./lib/segment2.js"),
+    //geom
     Rectangle: require("./lib/rectangle.js"),
     BB2: require("./lib/boundingbox2.js"),
     Circle: require("./lib/circle.js"),
     Triangle: require("./lib/triangle.js"),
+    Polygon: require("./lib/polygon.js"),
+
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
-    Collisions: require("./lib/collisions.js"),
+    Collide: require("./lib/collide.js"),
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),
     Xorshift: require("./lib/xorshift.js"),
