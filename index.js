@@ -6,7 +6,7 @@ module.exports = {
     Segment2: require("./lib/segment2.js"),
     //geom
     Rectangle: require("./lib/rectangle.js"),
-    BB2: require("./lib/boundingbox2.js"),
+    AABB2: require("./lib/aabb2.js"),
     Circle: require("./lib/circle.js"),
     Triangle: require("./lib/triangle.js"),
     Polygon: require("./lib/polygon.js"),
@@ -30,7 +30,7 @@ module.exports = {
 
 /*
 // todo list
-["Vec2", "Line2", "Segment2", "Rectangle", "Circle", "BB2"].forEach(function(v) {
+["Vec2", "Line2", "Segment2", "Rectangle", "Circle", "AABB2"].forEach(function(v) {
     //console.log(v, module.exports[v]);
     if("function" !== typeof module.exports[v].distance) {
         console.log(v, " distance is missing");

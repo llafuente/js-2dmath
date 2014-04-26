@@ -5,13 +5,16 @@ module.exports = {
     Vec2: require("./lib/vec2.js"),
     Line2: require("./lib/line2.js"),
     Segment2: require("./lib/segment2.js"),
+    //geom
     Rectangle: require("./lib/rectangle.js"),
-    BB2: require("./lib/boundingbox2.js"),
+    AABB2: require("./lib/aabb2.js"),
     Circle: require("./lib/circle.js"),
     Triangle: require("./lib/triangle.js"),
+    Polygon: require("./lib/polygon.js"),
+
     Beizer: require("./lib/beizer.js"),
     Matrix2D: require("./lib/matrix2d.js"),
-    Collisions: require("./lib/collisions.js"),
+    Collide: require("./lib/collide.js"),
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),
     Xorshift: require("./lib/xorshift.js"),
@@ -28,7 +31,7 @@ module.exports = {
 
 /*
 // todo list
-["Vec2", "Line2", "Segment2", "Rectangle", "Circle", "BB2"].forEach(function(v) {
+["Vec2", "Line2", "Segment2", "Rectangle", "Circle", "AABB2"].forEach(function(v) {
     //console.log(v, module.exports[v]);
     if("function" !== typeof module.exports[v].distance) {
         console.log(v, " distance is missing");
@@ -67,11 +70,354 @@ for (i in module.exports) {
     console.log();
 }
 */
-},{"./lib/beizer.js":3,"./lib/boundingbox2.js":4,"./lib/circle.js":5,"./lib/collisions.js":6,"./lib/draw.js":8,"./lib/intersection.js":9,"./lib/line2.js":10,"./lib/math.js":11,"./lib/matrix2d.js":12,"./lib/noise.js":13,"./lib/rectangle.js":14,"./lib/segment2.js":15,"./lib/transitions.js":16,"./lib/triangle.js":17,"./lib/vec2.js":18,"./lib/xorshift.js":19}],"js-2dmath":[function(require,module,exports){
+},{"./lib/aabb2.js":3,"./lib/beizer.js":4,"./lib/circle.js":5,"./lib/collide.js":6,"./lib/draw.js":8,"./lib/intersection.js":9,"./lib/line2.js":10,"./lib/math.js":11,"./lib/matrix2d.js":12,"./lib/noise.js":13,"./lib/polygon.js":14,"./lib/rectangle.js":15,"./lib/segment2.js":16,"./lib/transitions.js":17,"./lib/triangle.js":18,"./lib/vec2.js":19,"./lib/xorshift.js":20}],"js-2dmath":[function(require,module,exports){
 module.exports=require('Focm2+');
 },{}],3:[function(require,module,exports){
+var min = Math.min,
+    max = Math.max,
+    TOPLEFT = 1,
+    TOPMIDDLE = 2,
+    TOPRIGHT = 3,
+
+    CENTERLEFT = 4,
+    CENTER = 5,
+    CENTERRIGHT = 6,
+
+    BOTTOMLEFT = 7,
+    BOTTOM = 8,
+    BOTTOMRIGHT = 9,
+
+    r = 0,
+    x = 0,
+    y = 0,
+
+    min_x = 0,
+    max_x = 0,
+    min_y = 0,
+    max_y = 0;
+
+/**
+ * BoundingBox2 is an array [left: Number, bottom: Number, right: Number, top: Number, nomalized: Boolean]
+ * @returns {AABB}
+ */
+function create(l, b, r, t) {
+    var out = [l, b, r, t, false];
+    normalize(out, out);
+    return out;
+}
+/**
+ * @returns {AABB}
+ */
+function fromSegment2(seg2) {
+    var out = [seg2[0], seg2[1], seg2[2], seg2[3], false];
+    normalize(out, out);
+    return out;
+}
+/**
+ * @returns {AABB}
+ */
+function fromCircle(circle) {
+    r = circle[1];
+    x = circle[0][0];
+    y = circle[0][1];
+    return create(
+        x - r,
+        y - r,
+        x + r,
+        y + r
+    );
+}
+/**
+ * @returns {AABB}
+ */
+function fromRectangle(rect) {
+    var out = [rect[0][0], rect[0][1], rect[1][0], rect[1][1], false];
+    normalize(out, out);
+    return out;
+}
+/**
+ * inspired on: http://jsfiddle.net/4VCVX/3/
+ * @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves Timo answer
+ * @returns {AABB}
+ */
+function fromBeizer(beizer, npoints) {
+    npoints = npoints || 40;
+    var vec2_list = Beizer.get(beizer, npoints),
+        i,
+        l = Infinite,
+        b = Infinite,
+        r = -Infinite,
+        t = -Infinite,
+        v,
+        x,
+        y;
+
+    // loop min, max
+    for (i = 0; i < npoints; ++i) {
+        v = vec2_list[i];
+
+        x = v[0];
+        y = v[1];
+
+        if (x > r) {
+            r = x;
+        } else if (x < l) {
+            l = x;
+        }
+
+        if (y < b) {
+            b = y;
+        } else if (y > t) {
+            t = y;
+        }
+    }
+
+    return [l, b, r, t, true];
+
+}
+
+/**
+ * @returns {AABB}
+ */
+function zero() {
+    return [0, 0, 0, 0, true];
+}
+/**
+ * @returns {AABB}
+ */
+function clone(aabb2) {
+    return [aabb2[0], aabb2[1], aabb2[2], aabb2[3], aabb2[4]];
+}
+/**
+ * @returns {AABB}
+ */
+function copy(out, aabb2) {
+    out[0] = aabb2[0];
+    out[1] = aabb2[1];
+    out[2] = aabb2[2];
+    out[3] = aabb2[3];
+    out[4] = aabb2[4];
+
+    return out;
+}
+/**
+ * @returns {AABB}
+ */
+function expand(out, aabb2, margin) {
+    out[0] = aabb2[0] - margin;
+    out[1] = aabb2[1] - margin;
+    out[2] = aabb2[2] + margin;
+    out[3] = aabb2[3] + margin;
+
+    return out;
+}
+/**
+ * @returns {AABB}
+ */
+function merge(out, aabb2_1, aabb2_2) {
+    out[0] = min(aabb2_1[0], aabb2_2[0]);
+    out[1] = min(aabb2_1[1], aabb2_2[1]);
+    out[2] = max(aabb2_1[2], aabb2_2[2]);
+    out[3] = max(aabb2_1[3], aabb2_2[3]);
+
+    return out;
+}
+/**
+ * @returns {AABB}
+ */
+function offsetMerge(out, aabb2_1, aabb2_2, vec2_offset) {
+    out[0] = min(aabb2_1[0], aabb2_2[0] + vec2_offset[0]);
+    out[1] = min(aabb2_1[1], aabb2_2[1] + vec2_offset[1]);
+    out[2] = max(aabb2_1[2], aabb2_2[2] + vec2_offset[0]);
+    out[3] = max(aabb2_1[3], aabb2_2[3] + vec2_offset[1]);
+
+    return out;
+}
+/**
+ * offset & scale merge
+ * @returns {AABB}
+ */
+function osMerge(out, aabb2_1, aabb2_2, vec2_offset, vec2_scale) {
+    out[0] = min(aabb2_1[0], (aabb2_2[0] * vec2_scale[0]) + vec2_offset[0]);
+    out[1] = min(aabb2_1[1], (aabb2_2[1] * vec2_scale[1]) + vec2_offset[1]);
+    out[2] = max(aabb2_1[2], (aabb2_2[2] * vec2_scale[0]) + vec2_offset[0]);
+    out[3] = max(aabb2_1[3], (aabb2_2[3] * vec2_scale[1]) + vec2_offset[1]);
+
+    return out;
+}
+/**
+ * @returns {Number}
+ */
+function area(aabb2) {
+    return (aabb2.r - aabb2.l) * (aabb2.t - aabb2.b);
+}
+/**
+ * @returns {AABB}
+ */
+function normalize(out, aabb2) {
+    min_x = aabb2[0] > aabb2[2] ? aabb2[2] : aabb2[0];
+    max_x = aabb2[0] > aabb2[2] ? aabb2[0] : aabb2[2];
+    min_y = aabb2[1] > aabb2[3] ? aabb2[3] : aabb2[1];
+    max_y = aabb2[1] > aabb2[3] ? aabb2[1] : aabb2[3];
+
+    out[0] = min_x;
+    out[1] = min_y;
+
+    out[2] = max_x;
+    out[3] = max_y;
+
+    out[4] = true;
+
+}
+/**
+ * @returns {AABB}
+ */
+function translate(out, aabb2, vec2) {
+    x = vec2[0];
+    y = vec2[1];
+
+    out[0] = aabb2[0] + x;
+    out[1] = aabb2[1] + y;
+    out[2] = aabb2[2] + x;
+    out[3] = aabb2[3] + y;
+
+    return out;
+}
+/**
+ * @returns {Vec2}
+ */
+function clampVec(out_vec2, aabb2, vec2) {
+    out_vec2[0] = min(max(aabb2.l, vec2[0]), aabb2.r);
+    out_vec2[1] = min(max(aabb2.b, vec2[1]), aabb2.t);
+
+    return out_vec2;
+}
+
+function center(out_vec2, aabb2) {
+    out_vec2[0] = (aabb2[0] + aabb2[1]) * 0.5;
+    out_vec2[1] = (aabb2[3] + aabb2[2]) * 0.5;
+
+    return out_vec2;
+}
+
+/**
+ * alignament values: AABB2.TOPLEFT, AABB2.TOPMIDDLE, AABB2.TOPRIGHT, AABB2.CENTERLEFT, AABB2.CENTER, AABB2.CENTERRIGHT, AABB2.BOTTOMLEFT, AABB2.BOTTOM, AABB2.BOTTOMRIGH
+ * @returns {Vec2}
+ */
+function align(out_vec2, aabb2, alignament) {
+    switch (alignament) {
+    case TOPLEFT:
+        // do nothing!
+        out_vec2[0] = aabb2[0];
+        out_vec2[1] = aabb2[1];
+        break;
+    case TOPMIDDLE:
+        out_vec2[0] = (aabb2[2] - aabb2[0]) * 0.5 + aabb2[0];
+        out_vec2[1] = aabb2[1];
+        break;
+    case TOPRIGHT:
+        out_vec2[0] = aabb2[2];
+        out_vec2[1] = aabb2[1];
+        break;
+
+    case CENTERLEFT:
+        out_vec2[0] = aabb2[0];
+        out_vec2[1] = (aabb2[3] - aabb2[1]) * 0.5 + aabb2[1];
+        break;
+    case CENTER:
+        out_vec2[0] = (aabb2[2] - aabb2[0]) * 0.5 + aabb2[0];
+        out_vec2[1] = (aabb2[3] - aabb2[1]) * 0.5 + aabb2[1];
+        break;
+    case CENTERRIGHT:
+        out_vec2[0] = aabb2[2];
+        out_vec2[1] = (aabb2[3] - aabb2[1]) * 0.5 + aabb2[1];
+        break;
+
+    case BOTTOMLEFT:
+        out_vec2[0] = aabb2[0];
+        out_vec2[1] = aabb2[3];
+        break;
+    case BOTTOM:
+        out_vec2[0] = (aabb2[2] - aabb2[0]) * 0.5 + aabb2[0];
+        out_vec2[1] = aabb2[3];
+        break;
+    case BOTTOMRIGHT:
+        out_vec2[0] = aabb2[2];
+        out_vec2[1] = aabb2[3];
+        break;
+    }
+
+    return out_vec2;
+}
+/**
+ * @return {Boolean}
+ */
+function isVec2Inside(aabb2, vec2) {
+    return aabb2[0] < vec2[0] && aabb2[2] > vec2[0] && aabb2[1] < vec2[1] && aabb2[3] > vec2[1];
+}
+/**
+ * @return {Boolean}
+ */
+function isAABB2Inside(aabb2, aabb2_2) {
+    return aabb2[0] <= aabb2_2[0] &&
+        aabb2[1] <= aabb2_2[1] &&
+        aabb2_2[2] <= aabb2[2] &&
+        aabb2_2[3] <= aabb2[3];
+}
+/**
+ * @returns {Number}
+ */
+function perimeter(aabb2) {
+    return (aabb2[2] - aabb2[0]) * 2 + (aabb2[3] - aabb2[1]) * 2 ;
+}
+
+/**
+ * @class AABB2
+ */
+var AABB2 =  {
+    // defines
+    TOPLEFT: TOPLEFT,
+    TOPMIDDLE: TOPMIDDLE,
+    TOPRIGHT: TOPRIGHT,
+    CENTERLEFT: CENTERLEFT,
+    CENTER: CENTER,
+    CENTERRIGHT: CENTERRIGHT,
+    BOTTOMLEFT: BOTTOMLEFT,
+    BOTTOM: BOTTOM,
+    BOTTOMRIGHT: BOTTOMRIGHT,
+
+    create: create,
+    fromSegment2: fromSegment2,
+    fromCircle: fromCircle,
+    fromRectangle: fromRectangle,
+    zero: zero,
+    clone: clone,
+    copy: copy,
+    expand: expand,
+    merge: merge,
+    offsetMerge: offsetMerge,
+    osMerge: osMerge,
+    area: area,
+    normalize: normalize,
+    translate: translate,
+    clampVec: clampVec,
+    center: center,
+    align: align,
+    isVec2Inside: isVec2Inside,
+    isAABB2Inside: isAABB2Inside,
+
+    // alias
+    contains: isAABB2Inside
+};
+
+module.exports = AABB2;
+},{}],4:[function(require,module,exports){
 // documentation
 // * http://pomax.github.io/bezierinfo/
+// * https://github.com/jackcviers/Degrafa/blob/master/Degrafa/com/degrafa/geometry/utilities/BezierUtils.as
+// * http://cagd.cs.byu.edu/~557/text/ch7.pdf
+// * http://algorithmist.wordpress.com/2009/02/02/degrafa-closest-point-on-quad-bezier/
+// * http://algorithmist.wordpress.com/2009/01/26/degrafa-bezierutils-class/
 
 var sqrt = Math.sqrt,
     cl0 = 0,
@@ -98,7 +444,6 @@ function cubic(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y, cp3x, cp3y) {
  * http://pomax.github.io/bezierinfo/
  */
 function cubicFrom3Points(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
-
 }
 /**
  * @returns {Beizer}
@@ -111,7 +456,7 @@ function quadric(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
  * http://pomax.github.io/bezierinfo/
  */
 function quadricFrom3Points(cp0x, cp0y, cp1x, cp1y, cp2x, cp2y) {
-    
+
 }
 /**
  * @returns {Vec2}
@@ -204,300 +549,9 @@ var Beizer = {
 
 
 module.exports = Beizer;
-},{}],4:[function(require,module,exports){
-var min = Math.min,
-    max = Math.max,
-    TOPLEFT = 1,
-    TOPMIDDLE = 2,
-    TOPRIGHT = 3,
-
-    CENTERLEFT = 4,
-    CENTER = 5,
-    CENTERRIGHT = 6,
-
-    BOTTOMLEFT = 7,
-    BOTTOM = 8,
-    BOTTOMRIGHT = 9,
-
-    r = 0,
-    x = 0,
-    y = 0,
-
-    min_x = 0,
-    max_x = 0,
-    min_y = 0,
-    max_y = 0;
-
-/**
- * BoundingBox2 is an array [left: Number, bottom: Number, right: Number, top: Number, nomalized: Boolean]
- * @returns {BB2}
- */
-function create(l, b, r, t) {
-    var out = [l, b, r, t, false];
-    normalize(out, out);
-    return out;
-}
-function fromSegment2(seg2) {
-    var out = [seg2[0], seg2[1], seg2[2], seg2[3], false];
-    normalize(out, out);
-    return out;
-}
-/**
- * @returns {BB2}
- */
-function fromCircle(circle) {
-    r = circle[1];
-    x = circle[0][0];
-    y = circle[0][1];
-    return create(
-        x - r,
-        y - r,
-        x + r,
-        y + r
-    );
-}
-/**
- * @returns {BB2}
- */
-function fromRectangle(rect) {
-    var out = [rect[0][0], rect[0][1], rect[1][0], rect[1][1], false];
-    normalize(out, out);
-    return out;
-}
-/**
- * inspired on: http://jsfiddle.net/4VCVX/3/
- * @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves Timo answer
- */
-function fromBeizer(beizer, npoints) {
-    npoints = npoints || 40;
-    var vec2_list = Beizer.get(beizer, npoints),
-        i,
-        l = Infinite,
-        b = Infinite,
-        r = -Infinite,
-        t = -Infinite,
-        v,
-        x,
-        y;
-
-    // loop min, max
-    for (i = 0; i < npoints; ++i) {
-        v = vec2_list[i];
-
-        x = v[0];
-        y = v[1];
-
-        if (x > r) {
-            r = x;
-        } else if (x < l) {
-            l = x;
-        }
-
-        if (y < b) {
-            b = y;
-        } else if (y > t) {
-            t = y;
-        }
-    }
-
-    return [l, b, r, t, true];
-
-}
-
-/**
- * @returns {BB2}
- */
-function zero() {
-    return [0, 0, 0, 0, true];
-}
-/**
- * @returns {BB2}
- */
-function clone(bb2) {
-    return [bb2[0], bb2[1], bb2[2], bb2[3], bb2[4]];
-}
-/**
- * @returns {BB2}
- */
-function copy(out, bb2) {
-    out[0] = bb2[0];
-    out[1] = bb2[1];
-    out[2] = bb2[2];
-    out[3] = bb2[3];
-    out[4] = bb2[4];
-
-    return out;
-}
-/**
- * @returns {BB2}
- */
-function merge(out, bb2_1, bb2_2) {
-    out[0] = min(bb2_1[0], bb2_2[0]);
-    out[1] = min(bb2_1[1], bb2_2[1]);
-    out[2] = max(bb2_1[2], bb2_2[2]);
-    out[3] = max(bb2_1[3], bb2_2[3]);
-
-    return out;
-}
-/**
- * @returns {BB2}
- */
-function offsetMerge(out, bb2_1, bb2_2, vec2_offset) {
-    out[0] = min(bb2_1[0], bb2_2[0] + vec2_offset[0]);
-    out[1] = min(bb2_1[1], bb2_2[1] + vec2_offset[1]);
-    out[2] = max(bb2_1[2], bb2_2[2] + vec2_offset[0]);
-    out[3] = max(bb2_1[3], bb2_2[3] + vec2_offset[1]);
-
-    return out;
-}
-/**
- * offset & scale merge
- * @returns {BB2}
- */
-function osMerge(out, bb2_1, bb2_2, vec2_offset, vec2_scale) {
-    out[0] = min(bb2_1[0], (bb2_2[0] * vec2_scale[0]) + vec2_offset[0]);
-    out[1] = min(bb2_1[1], (bb2_2[1] * vec2_scale[1]) + vec2_offset[1]);
-    out[2] = max(bb2_1[2], (bb2_2[2] * vec2_scale[0]) + vec2_offset[0]);
-    out[3] = max(bb2_1[3], (bb2_2[3] * vec2_scale[1]) + vec2_offset[1]);
-
-    return out;
-}
-/**
- * @returns {Number}
- */
-function area(bb2) {
-    return (bb2.r - bb2.l) * (bb2.t - bb2.b);
-}
-/**
- * @returns {BB2}
- */
-function normalize(out, bb2) {
-    min_x = bb2[0] > bb2[2] ? bb2[2] : bb2[0];
-    max_x = bb2[0] > bb2[2] ? bb2[0] : bb2[2];
-    min_y = bb2[1] > bb2[3] ? bb2[3] : bb2[1];
-    max_y = bb2[1] > bb2[3] ? bb2[1] : bb2[3];
-
-    out[0] = min_x;
-    out[1] = min_y;
-
-    out[2] = max_x;
-    out[3] = max_y;
-
-    out[4] = true;
-
-}
-/**
- * @returns {BB2}
- */
-function translate(out, bb2, vec2) {
-    x = vec2[0];
-    y = vec2[1];
-
-    out[0] = bb2[0] + x;
-    out[1] = bb2[1] + y;
-    out[2] = bb2[2] + x;
-    out[3] = bb2[3] + y;
-
-    return out;
-}
-/**
- * @returns {Vec2}
- */
-function clampVec(out_vec2, bb2, vec2) {
-    out_vec2[0] = min(max(bb2.l, vec2[0]), bb2.r);
-    out_vec2[1] = min(max(bb2.b, vec2[1]), bb2.t);
-
-    return out_vec2;
-}
-
-/**
- * alignament values: BB2.TOPLEFT, BB2.TOPMIDDLE, BB2.TOPRIGHT, BB2.CENTERLEFT, BB2.CENTER, BB2.CENTERRIGHT, BB2.BOTTOMLEFT, BB2.BOTTOM, BB2.BOTTOMRIGH
- * @returns {Vec2}
- */
-function align(out_vec2, bb2, alignament) {
-    switch (alignament) {
-    case TOPLEFT:
-        // do nothing!
-        out_vec2[0] = bb2[0];
-        out_vec2[1] = bb2[1];
-        break;
-    case TOPMIDDLE:
-        out_vec2[0] = (bb2[2] - bb2[0]) * 0.5 + bb2[0];
-        out_vec2[1] = bb2[1];
-        break;
-    case TOPRIGHT:
-        out_vec2[0] = bb2[2];
-        out_vec2[1] = bb2[1];
-        break;
-
-    case CENTERLEFT:
-        out_vec2[0] = bb2[0];
-        out_vec2[1] = (bb2[3] - bb2[1]) * 0.5 + bb2[1];
-        break;
-    case CENTER:
-        out_vec2[0] = (bb2[2] - bb2[0]) * 0.5 + bb2[0];
-        out_vec2[1] = (bb2[3] - bb2[1]) * 0.5 + bb2[1];
-        break;
-    case CENTERRIGHT:
-        out_vec2[0] = bb2[2];
-        out_vec2[1] = (bb2[3] - bb2[1]) * 0.5 + bb2[1];
-        break;
-
-    case BOTTOMLEFT:
-        out_vec2[0] = bb2[0];
-        out_vec2[1] = bb2[3];
-        break;
-    case BOTTOM:
-        out_vec2[0] = (bb2[2] - bb2[0]) * 0.5 + bb2[0];
-        out_vec2[1] = bb2[3];
-        break;
-    case BOTTOMRIGHT:
-        out_vec2[0] = bb2[2];
-        out_vec2[1] = bb2[3];
-        break;
-    }
-
-    return out_vec2;
-}
-
-/**
- * @class BB2
- */
-var BB2 =  {
-    // defines
-    TOPLEFT: TOPLEFT,
-    TOPMIDDLE: TOPMIDDLE,
-    TOPRIGHT: TOPRIGHT,
-    CENTERLEFT: CENTERLEFT,
-    CENTER: CENTER,
-    CENTERRIGHT: CENTERRIGHT,
-    BOTTOMLEFT: BOTTOMLEFT,
-    BOTTOM: BOTTOM,
-    BOTTOMRIGHT: BOTTOMRIGHT,
-
-    create: create,
-    fromSegment2: fromSegment2,
-    fromCircle: fromCircle,
-    fromRectangle: fromRectangle,
-    zero: zero,
-    clone: clone,
-    copy: copy,
-    merge: merge,
-    offsetMerge: offsetMerge,
-    osMerge: osMerge,
-    area: area,
-    normalize: normalize,
-    translate: translate,
-    clampVec: clampVec,
-    align: align,
-};
-
-
-if ("undefined" !== typeof module) {
-    module.exports = BB2;
-}
 },{}],5:[function(require,module,exports){
 var Vec2 = require("./vec2.js"),
+    vec2_sub = Vec2.sub,
     vec2_distance = Vec2.distance,
     vec2_distance_sq = Vec2.distanceSq,
     vec2_midpoint = Vec2.midPoint,
@@ -644,6 +698,16 @@ function translate(out, circle, vec2) {
     return out;
 }
 /**
+ * @returns {Circle}
+ */
+function moveTo(out, circle, vec2) {
+    out[0][0] = vec2[0];
+    out[0][1] = vec2[1];
+    out[1] = circle[1];
+
+    return out;
+}
+/**
  * @returns {Number}
  */
 function distance(circle, circle_2) {
@@ -664,8 +728,26 @@ function area(circle) {
 /**
  * @returns {Boolean}
  */
-function isInside(circle, vec2) {
+function isVec2Inside(circle, vec2) {
     return vec2_distance(circle[0], vec2) < circle[1];
+}
+/**
+ * @returns {Vec2}
+ */
+function closestPoint(out_vec2, circle, vec2) {
+    //const Vector& P, const Vector& Centre, float radius, bool* inside)
+    vec2_sub(out_vec2, vec2 - cirlce[0]);
+
+    var dist2 = vec2_length(out_vec2);
+
+    // is inside? (dist2 <= radius * radius);
+
+    //if(dist2 > EPS) Delta /= sqrt(dist2);
+
+    vec2_scale(out_vec2, out_vec2, scale);
+    vec2_add(out_vec2, cirlce[0], scale);
+
+    return out_vec2;
 }
 /**
  * @class Circle
@@ -679,15 +761,27 @@ var Circle = {
     clone: clone,
     copy: copy,
     translate: translate,
+    moveTo: moveTo,
     distance: distance,
     length: length,
     area: area,
-    isInside: isInside
+    isVec2Inside: isVec2Inside,
+
+    // alias
+    perimeter: length,
+    move: moveTo
 };
 
 
 module.exports = Circle;
-},{"./rectangle.js":14,"./triangle.js":17,"./vec2.js":18}],6:[function(require,module,exports){
+},{"./rectangle.js":15,"./triangle.js":18,"./vec2.js":19}],6:[function(require,module,exports){
+/**
+ * This need revision.
+ * **inside:Boolean** param must be added to all functions
+ * *Note** this not return the contact points, use intersections for that.
+ */
+// http://members.gamedev.net/oliii/satpost/SpherePolygonCollision.cpp
+
 var Vec2 = require("./vec2.js"),
     vec2_distance = Vec2.distance,
     vec2_distance_sq = Vec2.distanceSq,
@@ -854,7 +948,7 @@ function vec2_vec2(vec2, vec2_2) {
         _near(vec2[1], vec2_2[1], EPS);
 }
 
-var Collisions = {
+var Collide = {
     circle_circle: circle_circle,
 
     //
@@ -881,9 +975,9 @@ var Collisions = {
     vec2_vec2: vec2_vec2,
 };
 
-module.exports = Collisions;
+module.exports = Collide;
 
-
+/*
 var primitives = ["circle", "rectangle", "vec2", "line2", "segment2", "bb2", "triangle"],
     i,
     j,
@@ -898,13 +992,11 @@ for (i = 0; i < primitives.length; ++i) {
 
 }
 
-/*
-
 console.log(vec2_line2([1, 1], [[0,0], 1]));
 console.log(vec2_line2([1, 2], [[0,0], 2]));
 
 */
-},{"./segment2.js":15,"./vec2.js":18}],7:[function(require,module,exports){
+},{"./segment2.js":16,"./vec2.js":19}],7:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     sqrt = Math.sqrt,
     abs = Math.abs,
@@ -1042,7 +1134,7 @@ var Distance = {
 
 
 module.exports = Distance;
-},{"./rectangle.js":14}],8:[function(require,module,exports){
+},{"./rectangle.js":15}],8:[function(require,module,exports){
 function rectangle(context2d, rect, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
@@ -1312,7 +1404,7 @@ var browser = "undefined" === typeof module,
     Distance = browser ? window.Distance : require("./distance.js"),
     Segment2 = browser ? window.Segment2 : require("./segment2.js"),
     segment2$inside = Segment2.$inside,
-    BB2 = browser ? window.BB2 : require("./boundingbox2.js"),
+    AABB2 = browser ? window.AABB2 : require("./aabb2.js"),
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     abs = Math.abs,
     sqrt = Math.sqrt,
@@ -1538,8 +1630,8 @@ function $circle_rectangle(cx, cy, r, x1, y1, x2, y2, collision, distance) {
 }
 
 function bb2_bb2(bb2_1, bb2_2, collision, distance) {
-    BB2.normalize(bb2_1, bb2_1);
-    BB2.normalize(bb2_2, bb2_2);
+    AABB2.normalize(bb2_1, bb2_1);
+    AABB2.normalize(bb2_2, bb2_2);
 
     // x1 should be further left!
     if (bb2_2[0] < bb2_1[0]) {
@@ -1597,7 +1689,7 @@ function rectangle_rectangle(rect1, rect2, collision, distance) {
  * TODO segments of collision
  */
 function bb2_rectangle(bb2, rect, collision, distance) {
-    BB2.normalize(bb2, bb2);
+    AABB2.normalize(bb2, bb2);
     Rectangle.normalize(rect, rect);
 
     // r1 should be further left!
@@ -1671,7 +1763,7 @@ function circle_circle(circle_1, circle_2, collision, distance) {
         r2sq = r2 * r2,
         // Determine minimum and maximum radius where circles can intersect
         r_max = r1 + r2,
-        r_min = r1 - r2,
+        r_min,
         // Determine actual distance between circle circles
         c_dist_sq = Vec2.distanceSq(c1, c2),
         c_dist,
@@ -1684,6 +1776,8 @@ function circle_circle(circle_1, circle_2, collision, distance) {
     if (c_dist_sq > r_max * r_max) {
         return {reason: OUTSIDE};
     }
+
+    r_min = r1 - r2;
 
     if (c_dist_sq < r_min * r_min) {
         return {reason: INSIDE};
@@ -1948,7 +2042,7 @@ var Intersection = {
 
 
 module.exports = Intersection;
-},{"./boundingbox2.js":4,"./distance.js":7,"./rectangle.js":14,"./segment2.js":15,"./vec2.js":18}],10:[function(require,module,exports){
+},{"./aabb2.js":3,"./distance.js":7,"./rectangle.js":15,"./segment2.js":16,"./vec2.js":19}],10:[function(require,module,exports){
 var dx,
     dy,
     r,
@@ -2110,9 +2204,11 @@ module.exports = Line2;
         random = Math.random,
         ceil = Math.ceil,
         floor = Math.floor,
+        log = Math.log,
         PI,
         QUATER_PI,
         HALF_PI,
+        HALF_NPI,
         TWO_PI,
         TWO_HALF_PI,
         NPI,
@@ -2120,11 +2216,13 @@ module.exports = Line2;
         NHALF_PI,
         NTWO_PI,
         NTWO_HALF_PI,
-        EPS = 10e-3;
+        EPS = 10e-3,
+        LOG2;
 
     PI = Math.PI;
     QUATER_PI = Math.QUATER_PI = 0.25 * Math.PI;
     HALF_PI = Math.HALF_PI = 0.5 * Math.PI;
+    HALF_NPI = Math.HALF_NPI = -0.5 * Math.PI;
     TWO_PI = Math.TWO_PI = 2 * Math.PI;
     TWO_HALF_PI = Math.TWO_HALF_PI = (2 * Math.PI) + Math.HALF_PI;
     NPI = Math.NPI = -Math.PI;
@@ -2132,6 +2230,7 @@ module.exports = Line2;
     NHALF_PI = Math.NHALF_PI = 0.5 * Math.NPI;
     NTWO_PI = Math.NTWO_PI = 2 * Math.NPI;
     NTWO_HALF_PI = Math.NTWO_HALF_PI = (2 * Math.NPI) + Math.HALF_PI;
+    LOG2 = Math.LOG2 = log(2);
 
     Math.INV_PI = 1 / Math.PI;
 
@@ -2161,12 +2260,21 @@ module.exports = Line2;
     function lerp(f1, f2, t) {
         return f1 * (1 - t) + f2 * t;
     }
+    function lerp2(a, b, percent) {
+        return a + (b - a) * percent;
+    }
+console.log(lerp(0, 1, 0.5));
+console.log(lerp2(0, 1, 0.5));
 
     /**
      * Linearly interpolate from @c f1 to @c f2 by no more than @c d.
      */
     function lerpconst(f1, f2, d) {
         return f1 + clamp(f2 - f1, -d, d);
+    }
+
+    function randInRange(min, max) {
+        return lerp(min, max, random());
     }
 
     function randRange(max, min) {
@@ -2218,6 +2326,21 @@ module.exports = Line2;
         return normalizeRotation(angle - target);
     }
 
+
+    /**
+     * Mathematical aproach rather than computaional/performance because JS Number representation is elusive
+     * @todo study bitwise operations can be used in all cases ?
+     */
+    function powerOfTwo(x) {
+        next = pow(2, ceil(log(x)/LOG2));
+    }
+    /**
+     * from Three.js
+     */
+    function isPowerOfTwo_( value ) {
+       return ( value & ( value - 1 ) ) === 0 && value !== 0;
+    }
+
     Math.near = near;
     Math.clamp01 = clamp01;
     Math.lerp = lerp;
@@ -2228,14 +2351,24 @@ module.exports = Line2;
     Math.snapRound = snapRound;
     Math.deltaRotation = deltaRotation;
     Math.normalizeRadians = normalizeRotation;
+    Math.powerOfTwo = powerOfTwo;
+    Math.isPowerOfTwo_ = isPowerOfTwo_;
 }());
 },{}],12:[function(require,module,exports){
+/**
+ * 2x3 Transformation matrix used in 2D represented as a 8 coordinates array
+ * [m11:Number, m12:Number, m13:Number, m21:Number, m22:Number, m23:Number, **cache**, nomalize:boolean]
+ * cache = [xScale:Number, yScale:Number, xSkew:Number, yScale:Number, rotation:Number]
+ * why cache? to speed up many operations avoiding tan/atan2/sqrt
+ */
+
 // cache variables
 var DEG_TO_RAD = Math.DEG_TO_RAD,
     PI = Math.PI,
     cos = Math.cos,
     sin = Math.sin,
     tan = Math.tan,
+    atan2 = Math.atan2,
     __x,
     __y,
     aux_vec = [0, 0],
@@ -2269,6 +2402,17 @@ function create() {
  * @returns {Matrix2D} a new 2x3 matrix
  */
 function fromPoints() {
+}
+
+/**
+ * Creates a new matrix given 4 points(a Rectangle)
+ *
+ * @todo
+ * @see http://jsfiddle.net/dFrHS/1/
+ * @returns {Matrix2D} a new 2x3 matrix
+ */
+function fromAngle() {
+    return [1, 0, 0, 1, 0, 0, [1, 1, 0, 0, 0], false];
 }
 
 /**
@@ -2933,6 +3077,19 @@ function skewYMatrix(radians) {
     return [ 1, tan(radians), 0, 1, 0, 0 ];
 }
 
+/**
+ * Returns a 3x2 2D column-major y-skew matrix for the given radians.
+ *
+ * @param {Number} radians
+ * @returns {Matrix2D} a new 2x3 matrix
+ */
+function rotationMatrix(radians) {
+    var c = cos(radians),
+        s = sin(radians);
+
+    return [c, -s, s, c, 0, 0 ];
+}
+
 
 /**
  * Returns a 3x2 2D column-major scaling matrix for sx and sy.
@@ -2975,6 +3132,15 @@ function interpolate(out, m2d, m2d_2, factor) {
     return out;
 }
 
+/**
+ * For completeness because it's not need in the current implementation m2d[6][4]
+ *
+ * @param {Number} sx
+ * @param {Number} sy
+ */
+function toAngle(m2d) {
+    return atan2(m2d[1], m2d[0]);
+}
 
 /**
  * Transformation matrix used for 2D(column-major), AKA matrix2X3
@@ -3021,6 +3187,8 @@ var Matrix2D =  {
     dSkewYMatrix: dSkewYMatrix,
     skewYMatrix: skewYMatrix,
     scalingMatrix: scalingMatrix,
+    rotationMatrix: rotationMatrix,
+
     interpolate: interpolate,
 
     // alias
@@ -3334,7 +3502,115 @@ Noise = {
 };
 
 module.exports = Noise;
-},{"./xorshift.js":19,"object-enhancements":22}],14:[function(require,module,exports){
+},{"./xorshift.js":20,"object-enhancements":23}],14:[function(require,module,exports){
+var browser = "undefined" === typeof module,
+    Vec2 = browser ? window.Vec2 : require("./vec2.js"),
+    vec2_add = Vec2.add,
+    vec2_cross = Vec2.cross,
+    vec2_scale = Vec2.scale,
+    vec2_1 = [0, 0],
+    vec2_2 = [0, 0],
+    sum = 0,
+    cross = 0,
+    len = 0,
+    i = 0,
+    sqrt = Math.sqrt;
+/**
+ * @returns {Polygon}
+ */
+function create() {
+    var i,
+        out = new Array(arguments.length);
+
+    for (i = 0; i < arguments.length; ++i) {
+        out[i] = arguments[i];
+    }
+    return out;
+}
+function fromAABB(aabb) {
+    out = new Array(2);
+    out[0] = [aabb[0], aabb[1]];
+    out[1] = [aabb[2], aabb[3]];
+
+    return out;
+}
+/**
+ * @returns {Vec2}
+ */
+function centroid(out_vec2, poly) {
+    sum = 0;
+    out_vec2[0] = 0;
+    out_vec2[1] = 1;
+
+    for (i = 0, len = poly.length; i < len; i += 2) {
+        vec2_1[0] = poly[i];
+        vec2_1[1] = poly[i + 1];
+
+        vec2_2[0] = poly[(i + 2) % len];
+        vec2_2[0] = poly[(i + 3) % len];
+
+
+        cross = vec2_cross(vec2_1, vec2_2);
+
+        sum += cross;
+        vec2_add(vec2_1, vec2_1, vec2_2);
+        vec2_scale(vec2_1, vec2_1, cross);
+        vec2_add(out_vec2, out_vec2, vec2_1);
+    }
+
+    return vec2_scale(out_vec2, 1 / (3 * sum));
+}
+/**
+ * @returns {Polygon}
+ */
+function recenter(out, poly) {
+    centroid(vec2_1, poly);
+
+    for (i = 0, len = poly.length; i < len; ++i) {
+        out[i] = out[i] + vec2_1[0];
+        ++i;
+        out[i] = out[i] + vec2_1[1];
+    }
+}
+/**
+* @TODO review, this doesn't seems to be right!
+* Get the circumeter of polygon
+* @param {Complex[]} p The polygon
+function circumcenter(out, poly) {
+    var circ = 0, i = 1;
+    for (; i < poly.length; i++) {
+      var dx = poly[i].x - poly[i - 1].x;
+      var dy = poly[i].y - poly[i - 1].y;
+      circ += sqrt(dx * dx + dy * dy);
+    }
+    return circ;
+},
+*/
+/**
+ * @returns {Number}
+ */
+function area(poly) {
+    var value = 0;
+    for (i = 0, len = poly.length; i < len; i += 2) {
+        //value += Vec2.cross(Vec2.create(poly[i], poly[i+1]), Vec2.create(poly[(i+2)%len], poly[(i+3)%len]));
+        value -= (poly[i] * poly[(i + 3) % len]) - (poly[i + 1] * poly[(i + 2) % len]);
+    }
+
+    return value * 0.5;
+}
+/**
+ * @class Polygon
+ */
+var Polygon = {
+    create: create,
+    centroid: centroid,
+    recenter: recenter,
+    //circumcenter: circumcenter,
+    area: area,
+};
+
+module.exports = Polygon;
+},{"./vec2.js":19}],15:[function(require,module,exports){
 var Vec2 = "undefined" === typeof exports ? window.Vec2 : require("./vec2.js"),
     vec2_distance = Vec2.distance,
     max = Math.max,
@@ -3457,7 +3733,7 @@ function area(rect) {
 /**
  * @returns {Boolean}
  */
-function isInside(rect, vec2) {
+function isVec2Inside(rect, vec2) {
     return rect[0][0] < vec2[0] && rect[1][0] > vec2[0] && rect[0][1] < vec2[1] && rect[1][1] > vec2[1];
 }
 /**
@@ -3480,13 +3756,13 @@ var Rectangle = {
     translate: translate,
     distance: distance,
     area: area,
-    isInside: isInside,
+    isVec2Inside: isVec2Inside,
     perimeter: perimeter
 };
 
 
 module.exports = Rectangle;
-},{"./vec2.js":18}],15:[function(require,module,exports){
+},{"./vec2.js":19}],16:[function(require,module,exports){
 /**
  * Segment2 is represented by a 4 coordinates array
  * [x1, y1, x2, y2] normalized so x1 < x2
@@ -3624,7 +3900,7 @@ function isParallel(seg2, seg2_2) {
 /**
  * @returns {Boolean}
  */
-function isInside(seg2, vec2) {
+function isVec2Inside(seg2, vec2) {
     return isCollinear(seg2, vec2) && within([seg2[0], seg2[1]], vec2, [seg2[2], seg2[3]]);
 }
 /**
@@ -3634,7 +3910,7 @@ function isAbove(seg2, vec2, cached_seg2_min_angle) {
     aux_vec2[0] = seg2[0];
     aux_vec2[1] = seg2[1];
     angle = Vec2.angleTo(vec2, aux_vec2);
-    
+
     cached_seg2_min_angle = cached_seg2_min_angle || Segment2.angle(seg2);
 
     if (cached_seg2_min_angle >= 0) {
@@ -3731,14 +4007,14 @@ var Segment2 =  {
     closestPoint: closestPoint,
     isCollinear: isCollinear,
     isParallel: isParallel,
-    isInside: isInside,
+    isVec2Inside: isVec2Inside,
     isAbove: isAbove,
     leftNormal: leftNormal,
     rightNormal: rightNormal,
 
     // alias
     lengthSq: sqrLength,
-    contains: isInside,
+    contains: isVec2Inside,
 
     $inside: $inside,
     $collinear: $collinear,
@@ -3747,7 +4023,7 @@ var Segment2 =  {
 
 
 module.exports = Segment2;
-},{"./vec2.js":18}],16:[function(require,module,exports){
+},{"./vec2.js":19}],17:[function(require,module,exports){
 //
 // @TODO expand all function, do not generate with loops
 //
@@ -4143,7 +4419,7 @@ Transitions.linear = linear;
 Transitions.create = create;
 
 module.exports = Transitions;
-},{"array-enhancements":20}],17:[function(require,module,exports){
+},{"array-enhancements":21}],18:[function(require,module,exports){
 var Vec2 = require("./vec2.js"),
     vec2_midpoint = Vec2.midPoint,
     vec2_distance = Vec2.distance,
@@ -4329,7 +4605,7 @@ var Triangle = {
 };
 
 module.exports = Triangle;
-},{"./vec2.js":18}],18:[function(require,module,exports){
+},{"./vec2.js":19}],19:[function(require,module,exports){
 /**
  * Vec2 is represented as a two coordinates array
  * [x, y]
@@ -4351,6 +4627,9 @@ var aux_vec = [0, 0],
     __min  = Math.min,
     atan2 = Math.atan2,
     __pow = Math.pow,
+
+    HALF_NPI = Math.HALF_NPI,
+    HALF_PI = Math.HALF_PI,
 
     DEG_TO_RAD = Math.DEG_TO_RAD,
     Vec2;
@@ -4527,10 +4806,7 @@ function negate(out, v1) {
     return out;
 }
 /**
- * Negate v1 and return it into out
- *
- * @param {Vec2} out
- * @param {Vec2} v1
+ * Rotate the vector clockwise
  * @returns {Vec2}
  */
 function perpendicular(out, v1) {
@@ -4557,6 +4833,7 @@ function normalize(out, v1) {
     return out;
 }
 /**
+ * Rotate the vector counterclockwise
  * @returns {Vec2}
  */
 function rperpendicular(out, v1) {
@@ -4918,7 +5195,8 @@ function compare(v1, v2) {
 }
 
 /**
- * Vector dot product.
+ * v1 · v2 = |a| * |b| * sin θ
+ *
  * @returns {Number}
  */
 function dot(v1, v2) {
@@ -4926,12 +5204,33 @@ function dot(v1, v2) {
 }
 
 /**
+ * v1 × v2 = |a| * |b| * sin θ
+ *
  * @returns {Number}
  */
 function cross(v1, v2) {
     return v1[0] * v2[1] - v1[1] * v2[0];
 }
+/**
+ *  Cross product between a vector and the Z component of a vector
+ * @todo test use rprependicular ?
+ */
+function cossVZ(out, vec2, factor) {
+    rotate(out, vec2, HALF_NPI); // Rotate according to the right hand rule
+    scale(out, out, zcomp);     // Scale with z
 
+    return out;
+}
+/**
+ * Cross product between a vector and the Z component of a vector
+ * @todo test use prependicular ?
+ */
+function cossZV(out, factor, vec2) {
+    rotate(out, vec2, HALF_PI);
+    scale(out, out, zcomp);
+
+    return out;
+}
 /**
  * @returns {Number}
  */
@@ -5097,7 +5396,7 @@ Vec2 = {
 };
 
 module.exports = Vec2;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 // from: http://jsdo.it/akm2/fhMC/js
 // don't know the author :)
 // I just lint the code... and adapt it to this lib philosophy
@@ -5184,14 +5483,14 @@ Xorshift = {
 };
 
 module.exports = Xorshift;
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/arrays.js");
 
 }());
-},{"./lib/arrays.js":21}],21:[function(require,module,exports){
+},{"./lib/arrays.js":22}],22:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -5731,14 +6030,14 @@ module.exports = Xorshift;
         next();
     };
 }());
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/objects.js");
 
 }());
-},{"./lib/objects.js":23}],23:[function(require,module,exports){
+},{"./lib/objects.js":24}],24:[function(require,module,exports){
 (function () {
     "use strict";
 

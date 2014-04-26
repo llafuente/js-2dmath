@@ -20,8 +20,8 @@ test("Vec2 init", function(t) {
 
 
     for (i = 0; i < segments.length; ++i) {
-        t.ok(Segment2.isAbove(segments[i], test_point));
-        t.ok(!Segment2.isAbove(segments[i], test_point2));
+        t.ok(!Segment2.isAbove(segments[i], test_point));
+        t.ok(Segment2.isAbove(segments[i], test_point2));
     }
 
     //t.deepEqual(m2d1, m2d2, "t1");

@@ -17,7 +17,16 @@ var methods,
         tri: "Triangle",
         curve: "Beizer",
         beizer: "Beizer",
-        bb2: "BB2",
+        aabb2: "AABB2",
+
+        x1: "Number",
+        x2: "Number",
+        y1: "Number",
+        y2: "Number",
+        x3: "Number",
+        y3: "Number",
+        x4: "Number",
+        y4: "Number",
     },
     files = {
         Vec2: {
@@ -57,10 +66,6 @@ var methods,
                 x: "Number",
                 y: "Number",
                 m: "Number",
-                x1: "Number",
-                x2: "Number",
-                y1: "Number",
-                y2: "Number",
                 seg2: "Segment2",
                 v1: "Vec2",
                 v2: "Vec2",
@@ -72,12 +77,7 @@ var methods,
                 out: "Segment2",
                 seg2_2: "Segment2",
 
-                x1: "Number",
-                x2: "Number",
-                x3: "Number",
-                y1: "Number",
-                y2: "Number",
-                y3: "Number",
+
 
                 cached_seg2_min_angle: "Number",
             }
@@ -90,21 +90,15 @@ var methods,
                 rect2: "Rectangle",
                 force: "Boolean",
 
-                x1: "Number",
-                x2: "Number",
-                y1: "Number",
-                y2: "Number",
-
-                bb2: "BB2"
+                bb2: "AABB2"
             }
         },
-        BB2: {
-            filename: "./lib/boundingbox2.js",
+        AABB2: {
+            filename: "./lib/aabb2.js",
             valid_arguments: {
-                out: "BB2",
-                bb2: "BB2",
-                bb2_1: "BB2",
-                bb2_2: "BB2",
+                out: "AABB2",
+                aabb2_1: "AABB2",
+                aabb2_2: "AABB2",
                 l: "Number",
                 b: "Number",
                 r: "Number",
@@ -114,6 +108,7 @@ var methods,
                 vec2_scale: "Vec2",
                 alignament: "Number",
                 npoints: "Number",
+                margin: "Number",
             }
         },
         Circle: {
@@ -173,13 +168,6 @@ var methods,
             valid_arguments: {
                 out: "Triangle",
 
-                x1: "Number",
-                x2: "Number",
-                x3: "Number",
-                y1: "Number",
-                y2: "Number",
-                y3: "Number",
-
                 rect: "Rectangle",
             }
         },
@@ -191,14 +179,8 @@ var methods,
                 collision: "Boolean",
                 distance: "Boolean",
 
-                x1: "Number",
-                x2: "Number",
-                x3: "Number",
-                x4: "Number",
-                y1: "Number",
-                y2: "Number",
-                y3: "Number",
-                y4: "Number",
+
+
 
                 cx: "Number",
                 cy: "Number",
@@ -213,8 +195,8 @@ var methods,
                 circle_1: "Circle",
                 circle_2: "Circle",
 
-                bb2_1: "BB2",
-                bb2_2: "BB2",
+                bb2_1: "AABB2",
+                bb2_2: "AABB2",
 
                 rect1: "Rectangle",
                 rect2: "Rectangle",
@@ -223,19 +205,7 @@ var methods,
         Distance: {
             filename: "./lib/distance.js",
             valid_arguments: {
-                x1: "Number",
-                x2: "Number",
-                x3: "Number",
-                x4: "Number",
-                y1: "Number",
-                y2: "Number",
-                y3: "Number",
-                y4: "Number",
-
-
-
-
-                bb2: "BB2",
+                bb2: "AABB2",
                 rect: "Rectangle",
             }
         },
