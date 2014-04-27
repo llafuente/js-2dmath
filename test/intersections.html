@@ -57,9 +57,9 @@ function draw_test(draw1, val1, draw2, val2, int_fn) {
 }
 
 
-draw_test(Draw.circle, Circle.create(200, 200, 20), Draw.bb2, AABB2.create(180, 180, 220, 220), Intersection.circle_bb2);
-draw_test(Draw.circle, Circle.create(300, 200, 20), Draw.bb2, AABB2.create(280, 190, 320, 210), Intersection.circle_bb2);
-draw_test(Draw.circle, Circle.create(400, 200, 20), Draw.bb2, AABB2.create(375, 160, 415, 220), Intersection.circle_bb2);
+draw_test(Draw.circle, Circle.create(200, 200, 20), Draw.aabb2, AABB2.create(180, 180, 220, 220), Intersection.circle_bb2);
+draw_test(Draw.circle, Circle.create(300, 200, 20), Draw.aabb2, AABB2.create(280, 190, 320, 210), Intersection.circle_bb2);
+draw_test(Draw.circle, Circle.create(400, 200, 20), Draw.aabb2, AABB2.create(375, 160, 415, 220), Intersection.circle_bb2);
 
 
 draw_test(Draw.circle, Circle.create(50, 200, 20), Draw.segment2, Segment2.create(10, 200, 80, 200), Intersection.circle_segment2);

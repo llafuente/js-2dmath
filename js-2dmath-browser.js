@@ -20,6 +20,8 @@ module.exports = {
     Xorshift: require("./lib/xorshift.js"),
     Noise: require("./lib/noise.js"),
     Draw: require("./lib/draw.js"),
+
+    NMtree: require("./lib/nmtree.js"),
     globalize: function(object) {
         var i;
         for (i in this) {
@@ -70,7 +72,7 @@ for (i in module.exports) {
     console.log();
 }
 */
-},{"./lib/aabb2.js":3,"./lib/beizer.js":4,"./lib/circle.js":5,"./lib/collide.js":6,"./lib/draw.js":8,"./lib/intersection.js":9,"./lib/line2.js":10,"./lib/math.js":11,"./lib/matrix2d.js":12,"./lib/noise.js":13,"./lib/polygon.js":14,"./lib/rectangle.js":15,"./lib/segment2.js":16,"./lib/transitions.js":17,"./lib/triangle.js":18,"./lib/vec2.js":19,"./lib/xorshift.js":20}],"js-2dmath":[function(require,module,exports){
+},{"./lib/aabb2.js":3,"./lib/beizer.js":4,"./lib/circle.js":5,"./lib/collide.js":6,"./lib/draw.js":8,"./lib/intersection.js":9,"./lib/line2.js":10,"./lib/math.js":11,"./lib/matrix2d.js":12,"./lib/nmtree.js":13,"./lib/noise.js":14,"./lib/polygon.js":15,"./lib/rectangle.js":16,"./lib/segment2.js":17,"./lib/transitions.js":18,"./lib/triangle.js":19,"./lib/vec2.js":20,"./lib/xorshift.js":21}],"js-2dmath":[function(require,module,exports){
 module.exports=require('Focm2+');
 },{}],3:[function(require,module,exports){
 var min = Math.min,
@@ -98,7 +100,7 @@ var min = Math.min,
 
 /**
  * BoundingBox2 is an array [left: Number, bottom: Number, right: Number, top: Number, nomalized: Boolean]
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function create(l, b, r, t) {
     var out = [l, b, r, t, false];
@@ -106,7 +108,29 @@ function create(l, b, r, t) {
     return out;
 }
 /**
- * @returns {AABB}
+ * @returns {Array<AABB2>}
+ */
+ function fromAABB2Division(aabb2, x, y) {
+    var out = [],
+        i,
+        j,
+        l = aabb2[0],
+        b = aabb2[1],
+        r = aabb2[2],
+        t = aabb2[3],
+        w = (r - l) / x,
+        h = (t - b) / y;
+
+    for (i = 0; i < x; ++i) {
+        for (j = 0; j < y; ++j) {
+            out.push([l + i * w, b + j *h, l + (i + 1) * w, b + (j + 1) * h]);
+        }
+    }
+
+    return out;
+ }
+/**
+ * @returns {AABB2}
  */
 function fromSegment2(seg2) {
     var out = [seg2[0], seg2[1], seg2[2], seg2[3], false];
@@ -114,7 +138,7 @@ function fromSegment2(seg2) {
     return out;
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function fromCircle(circle) {
     r = circle[1];
@@ -128,7 +152,7 @@ function fromCircle(circle) {
     );
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function fromRectangle(rect) {
     var out = [rect[0][0], rect[0][1], rect[1][0], rect[1][1], false];
@@ -138,7 +162,7 @@ function fromRectangle(rect) {
 /**
  * inspired on: http://jsfiddle.net/4VCVX/3/
  * @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves Timo answer
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function fromBeizer(beizer, npoints) {
     npoints = npoints || 40;
@@ -177,19 +201,19 @@ function fromBeizer(beizer, npoints) {
 }
 
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function zero() {
     return [0, 0, 0, 0, true];
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function clone(aabb2) {
     return [aabb2[0], aabb2[1], aabb2[2], aabb2[3], aabb2[4]];
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function copy(out, aabb2) {
     out[0] = aabb2[0];
@@ -201,7 +225,7 @@ function copy(out, aabb2) {
     return out;
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function expand(out, aabb2, margin) {
     out[0] = aabb2[0] - margin;
@@ -212,7 +236,7 @@ function expand(out, aabb2, margin) {
     return out;
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function merge(out, aabb2_1, aabb2_2) {
     out[0] = min(aabb2_1[0], aabb2_2[0]);
@@ -223,7 +247,7 @@ function merge(out, aabb2_1, aabb2_2) {
     return out;
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function offsetMerge(out, aabb2_1, aabb2_2, vec2_offset) {
     out[0] = min(aabb2_1[0], aabb2_2[0] + vec2_offset[0]);
@@ -235,7 +259,7 @@ function offsetMerge(out, aabb2_1, aabb2_2, vec2_offset) {
 }
 /**
  * offset & scale merge
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function osMerge(out, aabb2_1, aabb2_2, vec2_offset, vec2_scale) {
     out[0] = min(aabb2_1[0], (aabb2_2[0] * vec2_scale[0]) + vec2_offset[0]);
@@ -252,7 +276,7 @@ function area(aabb2) {
     return (aabb2.r - aabb2.l) * (aabb2.t - aabb2.b);
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function normalize(out, aabb2) {
     min_x = aabb2[0] > aabb2[2] ? aabb2[2] : aabb2[0];
@@ -270,7 +294,7 @@ function normalize(out, aabb2) {
 
 }
 /**
- * @returns {AABB}
+ * @returns {AABB2}
  */
 function translate(out, aabb2, vec2) {
     x = vec2[0];
@@ -387,6 +411,7 @@ var AABB2 =  {
     BOTTOMRIGHT: BOTTOMRIGHT,
 
     create: create,
+    fromAABB2Division: fromAABB2Division,
     fromSegment2: fromSegment2,
     fromCircle: fromCircle,
     fromRectangle: fromRectangle,
@@ -774,7 +799,7 @@ var Circle = {
 
 
 module.exports = Circle;
-},{"./rectangle.js":15,"./triangle.js":18,"./vec2.js":19}],6:[function(require,module,exports){
+},{"./rectangle.js":16,"./triangle.js":19,"./vec2.js":20}],6:[function(require,module,exports){
 /**
  * This need revision.
  * **inside:Boolean** param must be added to all functions
@@ -996,7 +1021,7 @@ console.log(vec2_line2([1, 1], [[0,0], 1]));
 console.log(vec2_line2([1, 2], [[0,0], 2]));
 
 */
-},{"./segment2.js":16,"./vec2.js":19}],7:[function(require,module,exports){
+},{"./segment2.js":17,"./vec2.js":20}],7:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     sqrt = Math.sqrt,
     abs = Math.abs,
@@ -1134,7 +1159,7 @@ var Distance = {
 
 
 module.exports = Distance;
-},{"./rectangle.js":15}],8:[function(require,module,exports){
+},{"./rectangle.js":16}],8:[function(require,module,exports){
 function rectangle(context2d, rect, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
@@ -1359,12 +1384,12 @@ function triangle(context2d, tri, style) {
     context2d.stroke();
 }
 
-function bb2(context2d, bb2, style) {
+function aabb2(context2d, aabb2, style) {
     if (style !== undefined) {
         context2d.strokeStyle = style;
     }
 
-    context2d.strokeRect(bb2[0], bb2[1], bb2[2] - bb2[0], bb2[3] - bb2[1]);
+    context2d.strokeRect(aabb2[0], aabb2[1], aabb2[2] - aabb2[0], aabb2[3] - aabb2[1]);
 }
 
 function text(context2d, text, vec2, font) {
@@ -1390,7 +1415,7 @@ var Draw = {
     triangle: triangle,
     angle: angle,
     segment2: segment2,
-    bb2: bb2,
+    aabb2: aabb2,
 
     applyMatrix2D: applyMatrix2D,
 
@@ -2042,7 +2067,7 @@ var Intersection = {
 
 
 module.exports = Intersection;
-},{"./aabb2.js":3,"./distance.js":7,"./rectangle.js":15,"./segment2.js":16,"./vec2.js":19}],10:[function(require,module,exports){
+},{"./aabb2.js":3,"./distance.js":7,"./rectangle.js":16,"./segment2.js":17,"./vec2.js":20}],10:[function(require,module,exports){
 var dx,
     dy,
     r,
@@ -3200,6 +3225,165 @@ var Matrix2D =  {
 
 module.exports = Matrix2D;
 },{}],13:[function(require,module,exports){
+var AABB2 = require("./aabb2.js"),
+    AABB2_fromAABB2Division = AABB2.fromAABB2Division,
+    AABB2_contains = AABB2.contains;
+
+/**
+ * ~Quadtree implementation that allow to override the number of subdivision for the first level
+ * This is specially useful for rectangular worlds
+ * @see http://en.wikipedia.org/wiki/Quadtree
+ */
+function NMtree(aabb2, maxObjects, maxLevels, subdivisions) {
+    this.objects = [];
+    this.bounds = aabb2;
+    this.maxObjects = maxObjects || 10;
+    this.maxLevels = maxLevels || 4;
+    this.subdivisions = subdivisions || [2, 2];
+}
+
+NMtree.prototype.level = 0;
+NMtree.prototype.maxLevels = 4;
+NMtree.prototype.maxObjects = 10;
+NMtree.prototype.subtrees = null;
+NMtree.prototype.bounds = null;
+NMtree.prototype.objects = [];
+NMtree.prototype.subdivisions = [2, 2];
+
+NMtree.prototype.divide = function () {
+    var objs = this.objects,
+        i,
+        j,
+        max,
+        bounds = AABB2_fromAABB2Division(this.bounds, this.subdivisions[0], this.subdivisions[1]),
+        qt;
+
+    this.subtrees = [];
+    this.objects = [];
+
+    for (j = 0, max = bounds.length; j < max; j++) {
+        qt = new NMtree(bounds[j]),// this.maxObjects, this.maxLevels);
+
+        qt.level = this.level + 1; // manually set
+        this.subtrees.push(qt);
+    }
+    for (i = 0, max = objs.length; i < max; i++) {
+        if (!this.subinsert(objs[i])) {
+            this.objects.push(objs[i]);
+        }
+    }
+};
+
+NMtree.prototype.subinsert = function (obj) {
+    if (!this.subtrees) {
+        return false;
+    }
+
+    var j = 0,
+        max = this.subtrees.length;
+    while (j < max && !this.subtrees[j].insert(obj.bounds, obj.userdata)) {
+        ++j;
+    }
+
+    return j !== max;
+};
+
+NMtree.prototype.insert = function (aabb2, userdata) {
+    if (AABB2_contains(this.bounds, aabb2)) {
+        var obj = {bounds: aabb2, userdata: userdata};
+
+        if (!this.subinsert(obj)) {
+            if (!this.subtrees && this.objects.length === this.maxObjects && this.level < this.maxLevels) {
+                this.divide();
+                if (this.subinsert(obj)) { //retry
+                    return true;
+                }
+            }
+            this.objects.push(obj);
+        }
+        return true;
+    }
+    return false;
+};
+
+
+NMtree.prototype.retrieve = function (userdata, out) {
+    out = out || [];
+
+    var i,
+        max,
+        objs = this.objects,
+        found;
+
+    if (objs && objs.length) {
+        for (i = 0, max = objs.length; i < max && !found; i++) {
+            if (objs[i].userdata === userdata) {
+                found = true;
+            }
+        }
+    }
+
+    if (found) {
+        this.iterate(function (qt) {
+            if (qt.objects) {
+                var i,
+                    max;
+                for (i = 0, max = qt.objects.length; i < max; ++i) {
+                    out.push(qt.objects[i]);
+                }
+            }
+        });
+
+        return out;
+    } else if (this.subtrees) {
+        for (i = 0, max = this.subtrees.length; i < max; i++) {
+            this.subtrees[i].retrieve(userdata, out);
+        }
+    }
+
+    return out;
+};
+
+NMtree.prototype.iterate = function (callback) {
+    var i,
+        max;
+
+    callback(this);
+
+    if (this.subtrees) {
+        for (i = 0, max = this.subtrees.length; i < max; ++i) {
+            this.subtrees[i].iterate(callback);
+        }
+    }
+};
+
+NMtree.prototype.remove = function (userdata) {
+    var i,
+        max,
+        objs = this.objects,
+        found;
+
+    if (objs && objs.length) {
+        for (i = 0, max = objs.length; i < max && !found; i++) {
+            if (objs[i].userdata === userdata) {
+                objs.splice(i, 1);
+                return true;
+            }
+        }
+    }
+
+    if (this.subtrees) {
+        for (i = 0, max = this.subtrees.length; i < max; i++) {
+            if (this.subtrees[i].remove(userdata)) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+module.exports = NMtree;
+},{"./aabb2.js":3}],14:[function(require,module,exports){
 var object = require("object-enhancements"),
     Xorshift = require("./xorshift.js"),
     GRAD3 = [
@@ -3502,7 +3686,7 @@ Noise = {
 };
 
 module.exports = Noise;
-},{"./xorshift.js":20,"object-enhancements":23}],14:[function(require,module,exports){
+},{"./xorshift.js":21,"object-enhancements":24}],15:[function(require,module,exports){
 var browser = "undefined" === typeof module,
     Vec2 = browser ? window.Vec2 : require("./vec2.js"),
     vec2_add = Vec2.add,
@@ -3527,10 +3711,10 @@ function create() {
     }
     return out;
 }
-function fromAABB(aabb) {
+function fromAABB(aabb2) {
     out = new Array(2);
-    out[0] = [aabb[0], aabb[1]];
-    out[1] = [aabb[2], aabb[3]];
+    out[0] = [aabb2[0], aabb2[1]];
+    out[1] = [aabb2[2], aabb2[3]];
 
     return out;
 }
@@ -3610,7 +3794,7 @@ var Polygon = {
 };
 
 module.exports = Polygon;
-},{"./vec2.js":19}],15:[function(require,module,exports){
+},{"./vec2.js":20}],16:[function(require,module,exports){
 var Vec2 = "undefined" === typeof exports ? window.Vec2 : require("./vec2.js"),
     vec2_distance = Vec2.distance,
     max = Math.max,
@@ -3762,7 +3946,7 @@ var Rectangle = {
 
 
 module.exports = Rectangle;
-},{"./vec2.js":19}],16:[function(require,module,exports){
+},{"./vec2.js":20}],17:[function(require,module,exports){
 /**
  * Segment2 is represented by a 4 coordinates array
  * [x1, y1, x2, y2] normalized so x1 < x2
@@ -4023,7 +4207,7 @@ var Segment2 =  {
 
 
 module.exports = Segment2;
-},{"./vec2.js":19}],17:[function(require,module,exports){
+},{"./vec2.js":20}],18:[function(require,module,exports){
 //
 // @TODO expand all function, do not generate with loops
 //
@@ -4419,7 +4603,7 @@ Transitions.linear = linear;
 Transitions.create = create;
 
 module.exports = Transitions;
-},{"array-enhancements":21}],18:[function(require,module,exports){
+},{"array-enhancements":22}],19:[function(require,module,exports){
 var Vec2 = require("./vec2.js"),
     vec2_midpoint = Vec2.midPoint,
     vec2_distance = Vec2.distance,
@@ -4605,7 +4789,7 @@ var Triangle = {
 };
 
 module.exports = Triangle;
-},{"./vec2.js":19}],19:[function(require,module,exports){
+},{"./vec2.js":20}],20:[function(require,module,exports){
 /**
  * Vec2 is represented as a two coordinates array
  * [x, y]
@@ -5396,7 +5580,7 @@ Vec2 = {
 };
 
 module.exports = Vec2;
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // from: http://jsdo.it/akm2/fhMC/js
 // don't know the author :)
 // I just lint the code... and adapt it to this lib philosophy
@@ -5483,14 +5667,14 @@ Xorshift = {
 };
 
 module.exports = Xorshift;
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/arrays.js");
 
 }());
-},{"./lib/arrays.js":22}],22:[function(require,module,exports){
+},{"./lib/arrays.js":23}],23:[function(require,module,exports){
 (function () {
     "use strict";
 
@@ -6030,14 +6214,14 @@ module.exports = Xorshift;
         next();
     };
 }());
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function () {
     "use strict";
 
     module.exports = require("./lib/objects.js");
 
 }());
-},{"./lib/objects.js":24}],24:[function(require,module,exports){
+},{"./lib/objects.js":25}],25:[function(require,module,exports){
 (function () {
     "use strict";
 

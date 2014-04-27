@@ -19,6 +19,8 @@ module.exports = {
     Xorshift: require("./lib/xorshift.js"),
     Noise: require("./lib/noise.js"),
     Draw: require("./lib/draw.js"),
+
+    NMtree: require("./lib/nmtree.js"),
     globalize: function(object) {
         var i;
         for (i in this) {
