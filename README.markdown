@@ -15,14 +15,15 @@ So the objective is "**Be fast**"
 
 ## Performance? HOW?/TIPS
 
-* avoid **new**
-* use arrays instead of objects, this is huge performance boost!
-* avoid creating unnecessary variables.
-* cache every function call to a single variable. example: Vec2.add -> vec2_add
-* avoid return *new* arrays (except for create/clone)
-* if you access two time an array, cache it
+* Avoid **new**
+* Use arrays instead of objects, this is huge performance boost!
+* Avoid creating unnecessary variables (reuse intermediate variables) only "create" & "clone" methods must instance new variables.
+* Cache every function call to a single variable. example: Vec2.add -> vec2_add
+* If access an multi-dimensional array in a loop, cache the array access. for(i...) carr=arr[i]; carr[X]
 
-I'm sure i miss some of my own performance tips, PR if you find any error or find a better way!
+I'm sure I miss some of my own performance tips, PR if you find any error or find a better way!
+
+See some [performance test](https://github.com/llafuente/js-2dmath/blob/master/js-performance-tests.markdown) that prove it.
 
 ## Browser
 

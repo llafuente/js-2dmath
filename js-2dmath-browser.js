@@ -1392,6 +1392,22 @@ function aabb2(context2d, aabb2, style) {
     context2d.strokeRect(aabb2[0], aabb2[1], aabb2[2] - aabb2[0], aabb2[3] - aabb2[1]);
 }
 
+function polygon(context2d, poly, style) {
+    if (style !== undefined) {
+        context2d.strokeStyle = style;
+    }
+
+    context2d.beginPath();
+    context2d.moveTo(poly[0][0], poly[0][1]);
+
+    for (i = 1, max = poly.length; i < max; ++i) {
+        context2d.lineTo(poly[i][0], poly[i][1]);
+    }
+
+    context2d.lineTo(poly[0][0], poly[0][1]);
+    context2d.stroke();
+}
+
 function text(context2d, text, vec2, font) {
     font = font || "10pt Consolas";
     context2d.font = font;
@@ -1416,6 +1432,7 @@ var Draw = {
     angle: angle,
     segment2: segment2,
     aabb2: aabb2,
+    polygon: polygon,
 
     applyMatrix2D: applyMatrix2D,
 
@@ -3701,7 +3718,12 @@ var browser = "undefined" === typeof module,
     cross = 0,
     len = 0,
     i = 0,
-    sqrt = Math.sqrt;
+    x,
+    y,
+    o,
+    p,
+    sqrt = Math.sqrt,
+    EPS = Math.EPS;
 /**
  * input are many Vec2(s)
  * @returns {Polygon}
@@ -3726,6 +3748,22 @@ function fromAABB(aabb2) {
 
     return out;
 }
+
+function translate(out, poly, vec2) {
+    len = poly.length - 1;
+    x = vec2[0];
+    y = vec2[1];
+
+    do {
+        p = poly[len];
+        o = out[len] = out[len] || [0, 0];
+        o[0] = p[0] + x;
+        o[1] = p[1] + y;
+    } while (len--);
+
+    return out;
+}
+
 var c_aux = [0, 0],
     c_aux2 = [0, 0];
 /**
@@ -3795,9 +3833,11 @@ function area(poly) {
 
     return value * 0.5;
 }
-
+/**
+ * find support point
+ */
 function furthestPoint(out_vec2, poly, vec2) {
-    var point_idx,
+    var vertex_idx,
         c_dot,
         max_dot;
     var i,
@@ -3808,13 +3848,13 @@ function furthestPoint(out_vec2, poly, vec2) {
     for (i = 0, max = poly.length; i < max; i++) {
         c_dot = vec2_dot(poly[i], vec2);
         if (c_dot > max_dot) {
-            point_idx = i;
+            vertex_idx = i; // do not copy or reference the vector here!!
             max_dot = c_dot;
         }
     }
 
-    out_vec2[0] = poly[point_idx][0];
-    out_vec2[1] = poly[point_idx][1];
+    out_vec2[0] = poly[vertex_idx][0];
+    out_vec2[1] = poly[vertex_idx][1];
 
     return out_vec2;
 }
@@ -3834,7 +3874,7 @@ function furthestMinkowski(out_vec2, poly, poly2, vec2_dir) {
 
 var bca = [0, 0],
     acb = [0, 0];
-function tripleProduct(out_vec2, A, B, C) {
+function _tripleProduct(out_vec2, A, B, C) {
     // (A x B) x C = B(C.A) - A(C.B)
     vec2_scale(bca, B, vec2_dot(C, A));
     vec2_scale(acb, A, vec2_dot(C, B));
@@ -3867,8 +3907,8 @@ function containsOrigin(simplex) {
         vec2_normalize(ac, vec2_sub(ac, c, a));
 
         // compute the normals
-        tripleProduct(abPerp, ac, ab, ab);
-        tripleProduct(acPerp, ab, ac, ac);
+        _tripleProduct(abPerp, ac, ab, ab);
+        _tripleProduct(acPerp, ab, ac, ac);
 
         // is the origin is outside of ab
         //if (abPerp.dot(ao) > 0) {
@@ -3900,7 +3940,7 @@ function containsOrigin(simplex) {
         ab = vec2_normalize(ab, vec2_sub(ab, b, a));
 
         // get perp to ab in the direction of the origin
-        tripleProduct(abPerp, ab, ao, ab);
+        _tripleProduct(abPerp, ab, ao, ab);
 
         // set the direction to abPerp
         GJK_direction[0] = abPerp[0];
@@ -3912,28 +3952,35 @@ function containsOrigin(simplex) {
 
 var GJK_direction;
 
-function GJK(A, B) {
-    var simplex = [];
+function GJK(A, B, simplex) {
+    // disallow segments
+    if (A.length < 2 || B.length < 2) {
+        return false;
+    }
 
     // Choose a direction
     GJK_direction = [0, 1];
 
     // get the first minkowski diff point
-    var vec2 = furthestMinkowski([], A, B, GJK_direction);
+    var vec2 = [0, 0];
+    furthestMinkowski(vec2, A, B, GJK_direction);
     simplex.push(vec2);
 
     vec2_negate(GJK_direction, GJK_direction);
 
     // start looping
     while (true) {
-        // add a new point to the simplex 
-        vec2 = furthestMinkowski([], A, B, GJK_direction);
+        console.log("GJK_direction", GJK_direction);
+        // add a new point to the simplex
+        vec2 = [0, 0];
+        furthestMinkowski(vec2, A, B, GJK_direction);
         simplex.push(vec2);
-        // make sure that the last point we added 
+        console.log(vec2, simplex);
+        // make sure that the last point we added
         // pass the origin
         if (vec2_dot(vec2, GJK_direction) <= 0) {
             // if the point added last was not past the origin in the direction of d
-            // then the Minkowski diff cannot possibly contain the origin since 
+            // then the Minkowski diff cannot possibly contain the origin since
             // the last point added is on the edge of the Minkowski diff
             return false;
         } else {
@@ -3952,6 +3999,7 @@ function GJK(A, B) {
 var Polygon = {
     create: create,
     fromAABB: fromAABB,
+    translate: translate,
     centroid: centroid,
     recenter: recenter,
     //circumcenter: circumcenter,
