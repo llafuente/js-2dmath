@@ -72,7 +72,16 @@ function example3() {
     gjk(poly1, poly2);
 }
 
-var current_test = example1;
+function example4() {
+    var poly1 = Polygon.create([50, -40], [0, -80], [-50, -40]),
+        poly2 = Polygon.create([50, -40], [0, -80], [-50, -40]);
+
+    Polygon.translate(poly2, poly1, [10, 10]);
+    Polygon.rotate(poly2, poly2, Math.DEG_TO_RAD * 15);
+    gjk(poly1, poly2);
+}
+
+var current_test = example3;
 
 function onKeyDown(ev) {
     if (!ev) {
@@ -91,10 +100,11 @@ function onKeyDown(ev) {
         if (!current_test) {
             current_test = example1;
         }
+
+        window.requestAnimFrame(update);
         break;
     }
 
-    window.requestAnimFrame(update);
 }
 document.addEventListener("keydown", onKeyDown, false);
 
