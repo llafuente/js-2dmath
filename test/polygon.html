@@ -42,6 +42,8 @@ function gjk(poly1, poly2) {
 
     var simplex = [];
     var collision = Polygon.GJK(poly1, poly2, simplex);
+    var epa = Polygon.EPA(poly1, poly2, simplex);
+    console.log(epa);
 
     Draw.text(ctx, collision ? "collide" : "no collision", [-320, 200])
 
