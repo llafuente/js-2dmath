@@ -1,0 +1,296 @@
+{
+  "docs": {
+    "arguments": {
+      "m2d":  "Matrix2D",
+      "circle": "Circle",
+      "line2": "Line2",
+      "vec2": "Vec2",
+      "out_vec2": "Vec2",
+      "seg2": "Segment2",
+      "rect": "Rectangle",
+      "tri": "Triangle",
+      "curve": "Beizer",
+      "beizer": "Beizer",
+      "aabb2": "AABB2",
+
+      "x1": "Number",
+      "x2": "Number",
+      "y1": "Number",
+      "y2": "Number",
+      "x3": "Number",
+      "y3": "Number",
+      "x4": "Number",
+      "y4": "Number"
+    }
+  },
+  "components": {
+      "Vec2": {
+        "filename": "./lib/vec2.js",
+        "debug_file": "./debug/vec2.js",
+        "doc_file": "./docs/vec2.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Vec2",
+          "x": "Number",
+          "y": "Number",
+          "v1": "Vec2",
+          "v2": "Vec2",
+          "v3": "Vec2",
+          "length": "Number",
+          "degrees": "Number (Degrees)",
+          "radians": "Number (Radians)",
+          "dist": "Number",
+          "t": "Number",
+          "d": "Number",
+          "angle": "Number",
+          "center": "Vec2",
+          "factor": "Number",
+          "px": "Number",
+          "py": "Number",
+          "qx": "Number",
+          "qy": "Number",
+          "rx": "Number",
+          "ry": "Number"
+        }
+      },
+      "Line2": {
+        "filename": "./lib/line2.js",
+        "debug_file": "./debug/line2.js",
+        "doc_file": "./docs/line2.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Line2",
+          "l2": "Line2",
+          "offset": "Number",
+          "x": "Number",
+          "y": "Number",
+          "m": "Number",
+          "seg2": "Segment2",
+          "v1": "Vec2",
+          "v2": "Vec2"
+        }
+      },
+      "Segment2": {
+        "filename": "./lib/segment2.js",
+        "debug_file": "./debug/segment2.js",
+        "doc_file": "./docs/segment2.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Segment2",
+          "seg2_2": "Segment2",
+          "cached_seg2_min_angle": "Number"
+        }
+      },
+      "Rectangle": {
+        "filename": "./lib/rectangle.js",
+        "debug_file": "./debug/rectangle.js",
+        "doc_file": "./docs/rectangle.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Rectangle",
+          "rect": "Rectangle",
+          "rect2": "Rectangle",
+          "force": "Boolean",
+          "bb2": "AABB2"
+        }
+      },
+      "AABB2": {
+        "filename": "./lib/aabb2.js",
+        "debug_file": "./debug/aabb2.js",
+        "doc_file": "./docs/aabb2.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "AABB2",
+          "aabb2_1": "AABB2",
+          "aabb2_2": "AABB2",
+          "l": "Number",
+          "b": "Number",
+          "r": "Number",
+          "t": "Number",
+          "vec2_offset": "Vec2",
+          "vec2_scale": "Vec2",
+          "alignament": "Number",
+          "npoints": "Number",
+          "margin": "Number"
+        }
+      },
+      "Circle": {
+        "filename": "./lib/circle.js",
+        "debug_file": "./debug/circle.js",
+        "doc_file": "./docs/circle.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Circle",
+          "circle_2": "Circle",
+          "x": "Number",
+          "y": "Number",
+          "radius": "Number",
+          "inside": "Boolean",
+          "circumcenter": "Boolean"
+        }
+      },
+      "Matrix2D": {
+        "filename": "./lib/matrix2d.js",
+        "debug_file": "./debug/matrix2d.js",
+        "doc_file": "./docs/matrix2d.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Matrix2D",
+          "m2d_2":  "Matrix2D",
+          "vec2_degrees": "Vec2 (Degrees)",
+          "degrees": "Number (Degrees)",
+          "radians": "Number (Radians)",
+          "factor": "Number",
+          "x": "Number",
+          "y": "Number"
+        }
+      },
+      "Polygon": {
+        "filename": "./lib/polygon.js",
+        "debug_file": "./debug/polygon.js",
+        "doc_file": "./docs/polygon.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Polygon",
+          "poly":  "Polygon",
+          "poly2":  "Polygon",
+          "vec2_dir":  "Vec2",
+          "simplex":  "Polygon",
+          "A":  "Polygon",
+          "B":  "Polygon",
+          "polygon1":  "Polygon",
+          "polygon2":  "Polygon"
+        }
+      },
+      "Beizer": {
+        "filename": "./lib/beizer.js",
+        "debug_file": "./debug/beizer.js",
+        "doc_file": "./docs/beizer.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Beizer",
+          "t": "Number",
+          "step": "Number",
+          "cp0x": "Number",
+          "cp0y": "Number",
+          "cp1x": "Number",
+          "cp1y": "Number",
+          "cp2x": "Number",
+          "cp2y": "Number",
+          "cp3x": "Number",
+          "cp3y": "Number"
+        }
+      },
+      "Triangle": {
+        "filename": "./lib/triangle.js",
+        "debug_file": "./debug/triangle.js",
+        "doc_file": "./docs/triangle.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Triangle",
+          "rect": "Rectangle"
+        }
+      },
+      "Intersection": {
+        "filename": "./lib/intersection.js",
+        "debug_file": "./debug/intersection.js",
+        "doc_file": "./docs/intersection.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "num": "Number",
+          "num2": "Number",
+          "collision": "Boolean",
+          "distance": "Boolean",
+          "cx": "Number",
+          "cy": "Number",
+          "r": "Number",
+          "line2_1": "Line2",
+          "line2_2": "Line2",
+          "seg2_1": "Segment2",
+          "seg2_2": "Segment2",
+          "circle_1": "Circle",
+          "circle_2": "Circle",
+          "bb2_1": "AABB2",
+          "bb2_2": "AABB2",
+          "rect1": "Rectangle",
+          "rect2": "Rectangle"
+        }
+      },
+      "Distance": {
+        "filename": "./lib/distance.js",
+        "debug_file": "./debug/distance.js",
+        "doc_file": "./docs/distance.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "bb2": "AABB2",
+          "rect": "Rectangle"
+        }
+      },
+      "Transitions": {
+        "filename": "./lib/transitions.js",
+        "debug_file": "./debug/transitions.js",
+        "doc_file": "./docs/transitions.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "pos": "Number",
+          "x": "Number",
+          "name": "String",
+          "transition": "Function",
+          "obj": "Object",
+          "prop": "String",
+          "values": "Mixed",
+          "ioptions": "Object",
+          "params": "Object",
+          "options": "Object"
+        }
+      },
+      "Xorshift": {
+        "filename": "./lib/xorshift.js",
+        "debug_file": "./debug/xorshift.js",
+        "doc_file": "./docs/xorshift.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "seeds": "[, Number...]"
+        }
+      },
+      "Noise": {
+        "filename": "./lib/noise.js",
+        "debug_file": "./debug/noise.js",
+        "doc_file": "./docs/noise.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "seed": "Number"
+        }
+      }
+  }
+}

@@ -28,7 +28,8 @@
   },
   "scripts": {
     "test": "tap test/*.js",
-    "browserify": "browserify -r ./index.js:js-2dmath -o js-2dmath-browser.js"
+    "browserify": "browserify -r ./index.js:js-2dmath -o js-2dmath-browser.js",
+    "postinstall": "grunt dist"
   },
   "repository": {
     "type": "git",
@@ -44,44 +45,46 @@
     "node": ">=0.4"
   },
   "dependencies": {
-    "array-enhancements" : "*",
-    "object-enhancements" : "*"
+    "array-enhancements": "*",
+    "object-enhancements": "*"
   },
   "devDependencies": {
-    "tap": "~0.4.4"
+    "tap": "~0.4.4",
+    "grunt-contrib-watch": "~0.5.3",
+    "browserify": "^3.44.2"
   },
   "jshintConfig": {
-      "white": true,
-      "curly": true,
-      "eqeqeq": true,
-      "indent": 4,
-      "asi": false,
-      "boss": false,
-      "browser": true,
-      "devel": true,
-      "maxdepth": 4,
-      "maxstatements": 25,
-      "maxcomplexity": 6,
-      "eqnull": true,
-      "es5": true,
-      "evil": false,
-      "immed": false,
-      "jquery": true,
-      "latedef": false,
-      "laxcomma": true,
-      "laxbreak": true,
-      "newcap": true,
-      "node": true,
-      "noempty": true,
-      "nonew": true,
-      "predef": [
-        "log"
-      ],
-      "quotmark": "double",
-      "smarttabs": false,
-      "strict": false,
-      "trailing": true,
-      "undef": true,
-      "unused": true
-    }
+    "white": true,
+    "curly": true,
+    "eqeqeq": true,
+    "indent": 4,
+    "asi": false,
+    "boss": false,
+    "browser": true,
+    "devel": true,
+    "maxdepth": 4,
+    "maxstatements": 25,
+    "maxcomplexity": 6,
+    "eqnull": true,
+    "es5": true,
+    "evil": false,
+    "immed": false,
+    "jquery": true,
+    "latedef": false,
+    "laxcomma": true,
+    "laxbreak": true,
+    "newcap": true,
+    "node": true,
+    "noempty": true,
+    "nonew": true,
+    "predef": [
+      "log"
+    ],
+    "quotmark": "double",
+    "smarttabs": false,
+    "strict": false,
+    "trailing": true,
+    "undef": true,
+    "unused": true
+  }
 }

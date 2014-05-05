@@ -25,15 +25,24 @@ I'm sure I miss some of my own performance tips, PR if you find any error or fin
 
 See some [performance test](https://github.com/llafuente/js-2dmath/blob/master/js-performance-tests.markdown) that prove it.
 
-## Browser
+## Browser & Debug distributions
 
 ```bash
-npm run-script browserify
+grunt dist
+# creates:
+# - dist/js-2dmath-browser.js
+# - debug/js-2dmath-browser-debug.js
+# - docs/*.markdown
 ```
 
-Will generate js-2dmath-browser.js that you can include in any browser.
+**Why there is a debug dist?**
 
-## What can you do ?
+Debug distribution use falafel to add assertions based on the documentation.
+
+Force to use valid sanitized inputs (Arrays, not NaN, not undefined, not null) to every function.
+
+
+## What can you do with js-2dmath?
 
 See some examples that we use as tests :)
 
@@ -48,6 +57,7 @@ See some examples that we use as tests :)
 * [Triangle](http://htmlpreview.github.io/?https://github.com/llafuente/js-2dmath/blob/master/test/triangle.html)
 * [Vec2 collisions](http://htmlpreview.github.io/?https://github.com/llafuente/js-2dmath/blob/master/test/vec2-collisions.html)
 * [Vec2](http://htmlpreview.github.io/?https://github.com/llafuente/js-2dmath/blob/master/test/vec2.html)
+
 
 ## API
 
