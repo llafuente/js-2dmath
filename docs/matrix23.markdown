@@ -2,7 +2,7 @@
 ## Matrix23
   2x3 Transformation matrix used in 2D represented as a 8 coordinates array
 
-  [m11:Number, m12:Number, m13:Number, m21:Number, m22:Number, m23:Number, **cache**, nomalize:boolean]
+  [m11:Number, m12:Number, m13:Number, m21:Number, m22:Number, m23:Number, **cache**:Array(5), nomalized:Boolean]
 
   cache = [xScale:Number, yScale:Number, xSkew:Number, yScale:Number, rotation:Number]
 

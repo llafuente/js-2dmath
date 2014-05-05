@@ -141,6 +141,23 @@
           "circumcenter": "Boolean"
         }
       },
+      "Matrix22": {
+        "filename": "./lib/matrix22.js",
+        "debug_file": "./debug/matrix22.js",
+        "doc_file": "./docs/matrix22.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+          "out": "Matrix22",
+          "mat22":  "Matrix22",
+
+          "m11":  "Number",
+          "m12":  "Number",
+          "m21":  "Number",
+          "m22":  "Number"
+        }
+      },
       "Matrix23": {
         "filename": "./lib/matrix23.js",
         "debug_file": "./debug/matrix23.js",

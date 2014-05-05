@@ -1,3 +1,5 @@
+// todo generator
+
 var js2math = require("./index.js");
 
 ["Triangle", "Rectangle", "Circle", "AABB2", "Polygon"].forEach(function(geom) {

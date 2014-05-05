@@ -13,6 +13,7 @@ module.exports = {
 
     Beizer: require("./debug/beizer.js"),
     Matrix23: require("./debug/matrix23.js"),
+    Matrix22: require("./debug/matrix22.js"),
     Collide: require("./lib/collide.js"),
     Intersection: require("./debug/intersection.js"),
     Transitions: require("./debug/transitions.js"),
