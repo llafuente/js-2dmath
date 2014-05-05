@@ -1,5 +1,3 @@
-
-
 <a name="Segment2"></a>
 ## Segment2
   Segment2 is represented by a 4 coordinates array

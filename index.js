@@ -12,7 +12,7 @@ module.exports = {
     Polygon: require("./lib/polygon.js"),
 
     Beizer: require("./lib/beizer.js"),
-    Matrix2D: require("./lib/matrix2d.js"),
+    Matrix23: require("./lib/matrix23.js"),
     Collide: require("./lib/collide.js"),
     Intersection: require("./lib/intersection.js"),
     Transitions: require("./lib/transitions.js"),

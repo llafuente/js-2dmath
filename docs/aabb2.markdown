@@ -1,5 +1,3 @@
-
-
 <a name="AABB2"></a>
 ## AABB2
 * **TOPLEFT** = 1

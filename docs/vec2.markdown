@@ -1,5 +1,3 @@
-
-
 <a name="Vec2"></a>
 ## Vec2
   Vec2 is represented as a two coordinates array
@@ -278,13 +276,13 @@
 * **sqrLength** (*v1*: Vec2): Number
 
 <a name="Vec2-within"></a>
-* **within** (*v1*: Vec2, *v2*: Vec2, *v3*: Vec2): Number
+* **within** (*v1*: Vec2, *v2*: Vec2, *v3*: Vec2): Boolean
 
   Return true if v2 is between v1 and v3(inclusive)
 
 
 <a name="Vec2-$within"></a>
-* **$within** (*px*: Number, *py*: Number, *qx*: Number, *qy*: Number, *rx*: Number, *ry*: Number): Number
+* **$within** (*px*: Number, *py*: Number, *qx*: Number, *qy*: Number, *rx*: Number, *ry*: Number): Boolean
 
   Return true if q is between p and r(inclusive)
 

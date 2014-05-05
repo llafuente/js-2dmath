@@ -1,5 +1,3 @@
-
-
 <a name="Transitions"></a>
 ## Transitions
 * **LINK_CHAIN** = 1

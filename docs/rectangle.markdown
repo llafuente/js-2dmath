@@ -1,5 +1,3 @@
-
-
 <a name="Rectangle"></a>
 ## Rectangle
 

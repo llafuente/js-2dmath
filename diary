@@ -1,0 +1,174 @@
+# llafuente developer diary, important things, links, notes...
+# don't worth reading ^.^
+
+* Algorithm
+  * Backtracking
+  * A*
+
+* IK
+  * FABRIK
+
+
+
+http://www.ryanjuckett.com/programming/constraint-relaxation-ik-in-2d/
+http://www.dhteumeuleu.com/dhtml/robot-arm-ik.html
+http://www.gvh.co.za/basic-inverse-kinematics/
+
+
+http://arifudin.com/view.php?id=andreasaristidou.com/publications/FABRIK.pdf&k=gmod%20rating
+https://github.com/RGBboy/fabrik-2d
+
+
+Input: The joint positions pi for i = 1,...,n, the target position t and the distances between each joint
+di = jpi+1 А
+pij for i = 1,...,n А 1.
+Output: The new joint positions pi for i = 1,...,n.
+
+
+% The distance between root and target
+dist = jp1 А tj
+% Check whether the target is within reach
+if dist > d1 + d2 +...+ dnА1 then
+  % The target is unreachable
+  for i = 1,...,n А 1 do
+  % Find the distance ri between the target t and the joint position pi
+  ri = jt А pij
+  ki = di/ri
+  % Find the new joint positions pi.
+  pi+1 = (1 А ki) pi + kit
+end
+else
+  % The target is reachable; thus, set as b the initial position of the joint p1
+  b = p1
+  % Check whether the distance between the end effector pn and the target t is greater than a tolerance.
+  difA = jpn А tj
+
+  while difA > tol do
+    % STAGE 1: FORWARD REACHING
+    % Set the end effector pn as target t
+    pn = t
+    for i = n А 1,...,1 do
+      % Find the distance ri between the new joint position pi+1 and the joint pi
+      ri = jpi+1 А pij
+      ki = di/ri
+      % Find the new joint positions pi.
+      pi = (1 А ki) pi+1 + kipi
+    end
+
+    % STAGE 2: BACKWARD REACHING
+    % Set the root p1 its initial position.
+    p1 = b
+    for i = 1,...,n А 1 do
+      % Find the distance ri between the new joint position pi and the joint pi+1
+      ri = jpi+1 А pij
+      ki = di/ri
+      % Find the new joint positions pi.
+      pi+1 = (1 А ki)pi + kipi+1
+    end
+  difA = jpn А tj
+  end
+end
+
+
+/**
+* closestPointToBezier Find the closest point on a quadratic or cubic Bezier curve to an arbitrary point
+*
+* @param _curve:Geometry reference that must be a quadratic or cubic Bezier3
+* @param _p:Point reference to <code>Point</code> to which the closest point on the Bezier curve is desired
+*
+* @return Number t-parameter of the closest point on the parametric curve. Returns 0 if inputs are <code>null</code> or not a valid reference to a Bezier curve.
+*
+* This code is derived from the Graphic Gem, "Solving the Nearest-Point-On-Curve Problem", by P.J. Schneider, published in 'Graphic Gems',
+* A.S. Glassner, ed., Academic Press, Boston, 1990, pp. 607-611.
+*
+* @since 1.0
+*
+*/
+function closestPoint (out_vec2, curve, vec2) {
+  // record distances from point to endpoints
+  var p:Point = _curve.pointAt(0);
+  var deltaX:Number = p.x-_p.x;
+  var deltaY:Number = p.y-_p.y;
+  var d0:Number = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+
+  p = _curve.pointAt(1);
+  deltaX = p.x-_p.x;
+  deltaY = p.y-_p.y;
+  var d1:Number = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+
+  var n:uint = (_curve is QuadraticBezier) ? 2 : 3; // degree of input Bezier curve
+
+  // array of control points
+  var v:Array = new Array();
+  if( n == 2 )
+  {
+    var quad:QuadraticBezier = _curve as QuadraticBezier;
+    v[0] = new Point(quad.x0, quad.y0);
+    v[1] = new Point(quad.cx, quad.cy);
+    v[2] = new Point(quad.x1, quad.y1);
+  }
+  else
+  {
+    var cubic:CubicBezier = _curve as CubicBezier;
+    v[0] = new Point(cubic.x0 , cubic.y0 );
+    v[1] = new Point(cubic.cx , cubic.cy );
+    v[2] = new Point(cubic.cx1, cubic.cy1);
+    v[3] = new Point(cubic.x1 , cubic.y1 );
+  }
+
+  // instaead of power form, convert the function whose zeros are required to Bezier form
+  var w:Array = toBezierForm(_p, v);
+
+  // Find roots of the Bezier curve with control points stored in 'w' (algorithm is recursive, this is root depth of 0)
+  var roots:Array = findRoots(w, 2*n-1, 0);
+
+  // compare the candidate distances to the endpoints and declare a winner :)
+  if( d0 < d1 )
+  {
+   var tMinimum:Number = 0;
+   __dMinimum = d0;
+  }
+  else
+  {
+   tMinimum = 1;
+   __dMinimum = d1;
+  }
+
+  // tbd - compare 2-norm squared
+  for( var i:uint=0; i<roots.length; ++i )
+  {
+   var t:Number = roots[i];
+   if( t >= 0 && t <= 1 )
+   {
+   p = _curve.pointAt(t);
+   deltaX = p.x - _p.x;
+   deltaY = p.y - _p.y;
+   var d:Number = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+
+   if( d < __dMinimum )
+   {
+   tMinimum = t;
+   __dMinimum = d;
+   }
+   }
+  }
+
+  // tbd - alternate optima.
+  return tMinimum;
+}
+
+
+* Posts and links you should have read
+  http://realtimecollisiondetection.net/blog/?p=80
+
+* How Valve Connects Art Direction to Gameplay
+  http://www.microsoft.com/en-us/download/details.aspx?id=18638
+
+* Bringing Characters to Life: Using Physics to Enhance Animation
+  http://www.microsoft.com/en-us/download/details.aspx?id=3507
+
+* Bit Twiddling Hacks
+  http://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+
+
+

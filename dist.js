@@ -123,11 +123,12 @@ function getNearestFunction(node) {
     return fn;
 }
 
-console.log(cls_list.join(", "));
-console.log("");
-console.log("");
 
 for (cls in files) {
+
+    console.log("* ["+cls+"](https://github.com/llafuente/js-2dmath/blob/master/" + files[cls].doc_file.replace("./", "") +")");
+    console.log("");
+
     description = null;
 
     methods = {};
@@ -232,9 +233,6 @@ for (cls in files) {
     }
 
     var contents = [];
-
-    contents.push("");
-    contents.push("");
     contents.push("<a name=\"" + cls + "\"></a>");
     contents.push("## " + cls);
 

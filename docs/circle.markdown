@@ -1,5 +1,3 @@
-
-
 <a name="Circle"></a>
 ## Circle
 

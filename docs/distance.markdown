@@ -1,5 +1,3 @@
-
-
 <a name="Distance"></a>
 ## Distance
 

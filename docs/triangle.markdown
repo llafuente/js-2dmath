@@ -1,5 +1,3 @@
-
-
 <a name="Triangle"></a>
 ## Triangle
 

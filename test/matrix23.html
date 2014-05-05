@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
-<title>js-2dmath: Interpolate Matrix2D using Transitions (linear)</title>
+<title>js-2dmath: Interpolate Matrix23 using Transitions (linear)</title>
 
 <script src="../js-2dmath-browser.js" type="text/javascript" ></script>
 
 </head>
 <body>
-<h1>js-2dmath: Interpolate Matrix2D using Transitions (linear)</h1>
+<h1>js-2dmath: Interpolate Matrix23 using Transitions (linear)</h1>
 <canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
 </body>
 </html>
@@ -19,20 +19,20 @@ var ctx = document.getElementById("canvas").getContext("2d");
 require("js-2dmath").globalize(window);
 
 
-var m2d_1 = Matrix2D.create(),
-    m2d_2 = Matrix2D.create(),
-    m2d_3 = Matrix2D.create();
+var m2d_1 = Matrix23.create(),
+    m2d_2 = Matrix23.create(),
+    m2d_3 = Matrix23.create();
 
 var rect = Rectangle.create(0,0,50,50);
 
 
-Matrix2D.translate(m2d_1, m2d_1, [50, 50]);
-Matrix2D.rotate(m2d_1, m2d_1, Math.HALF_PI * 0.5);
-Matrix2D.skewX(m2d_1, m2d_1, Math.HALF_PI * 0.5);
+Matrix23.translate(m2d_1, m2d_1, [50, 50]);
+Matrix23.rotate(m2d_1, m2d_1, Math.HALF_PI * 0.5);
+Matrix23.skewX(m2d_1, m2d_1, Math.HALF_PI * 0.5);
 
-Matrix2D.translate(m2d_2, m2d_2, [250, 250]);
-Matrix2D.rotate(m2d_2, m2d_2, -Math.HALF_PI * 0.5);
-Matrix2D.skewX(m2d_2, m2d_2, -Math.HALF_PI * 0.5);
+Matrix23.translate(m2d_2, m2d_2, [250, 250]);
+Matrix23.rotate(m2d_2, m2d_2, -Math.HALF_PI * 0.5);
+Matrix23.skewX(m2d_2, m2d_2, -Math.HALF_PI * 0.5);
 
 
 var acc = 0;
@@ -49,16 +49,16 @@ setInterval(function() {
     var factor = Transitions.linear(acc);
     console.log(Math.round(acc * 100) / 100, Math.round(factor * 100) / 100);
 
-    Draw.applyMatrix2D(ctx, m2d_1);
+    Draw.applyMatrix23(ctx, m2d_1);
     Draw.rectangle(ctx, rect, "red");
 
-    Draw.applyMatrix2D(ctx, m2d_2);
+    Draw.applyMatrix23(ctx, m2d_2);
 
     Draw.rectangle(ctx, rect, "blue");
 
 
-    Matrix2D.interpolate(m2d_3, m2d_1, m2d_2, factor);
-    Draw.applyMatrix2D(ctx, m2d_3);
+    Matrix23.interpolate(m2d_3, m2d_1, m2d_2, factor);
+    Draw.applyMatrix23(ctx, m2d_3);
     Draw.rectangle(ctx, rect, "purple");
     ctx.restore();
 }, 100);

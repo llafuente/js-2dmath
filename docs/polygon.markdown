@@ -1,5 +1,3 @@
-
-
 <a name="Polygon"></a>
 ## Polygon
 

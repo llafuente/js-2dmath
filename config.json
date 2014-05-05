@@ -1,7 +1,7 @@
 {
   "docs": {
     "arguments": {
-      "m2d":  "Matrix2D",
+      "m2d":  "Matrix23",
       "circle": "Circle",
       "line2": "Line2",
       "vec2": "Vec2",
@@ -141,16 +141,16 @@
           "circumcenter": "Boolean"
         }
       },
-      "Matrix2D": {
-        "filename": "./lib/matrix2d.js",
-        "debug_file": "./debug/matrix2d.js",
-        "doc_file": "./docs/matrix2d.markdown",
+      "Matrix23": {
+        "filename": "./lib/matrix23.js",
+        "debug_file": "./debug/matrix23.js",
+        "doc_file": "./docs/matrix23.markdown",
         "update_doc": true,
         "generate_debug": true,
 
         "valid_arguments": {
-          "out": "Matrix2D",
-          "m2d_2":  "Matrix2D",
+          "out": "Matrix23",
+          "m2d_2":  "Matrix23",
           "vec2_degrees": "Vec2 (Degrees)",
           "degrees": "Number (Degrees)",
           "radians": "Number (Radians)",

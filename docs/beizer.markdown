@@ -1,5 +1,3 @@
-
-
 <a name="Beizer"></a>
 ## Beizer
 

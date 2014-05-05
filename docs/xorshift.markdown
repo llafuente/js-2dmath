@@ -1,5 +1,3 @@
-
-
 <a name="Xorshift"></a>
 ## Xorshift
 

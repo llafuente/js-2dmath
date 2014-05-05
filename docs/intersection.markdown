@@ -1,5 +1,3 @@
-
-
 <a name="Intersection"></a>
 ## Intersection
 * **OUTSIDE** = 1

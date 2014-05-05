@@ -1,5 +1,3 @@
-
-
 <a name="Noise"></a>
 ## Noise
 
