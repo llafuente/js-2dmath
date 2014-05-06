@@ -10,10 +10,10 @@ var methods,
     src,
     mod_required;
 
-function isAssertCall(node){
-  return node.type === 'CallExpression' &&
-    node.callee.type === 'Identifier' &&
-    node.callee.name === 'assert';
+function isAssertCall(node) {
+    return node.type === "CallExpression" &&
+        node.callee.type === "Identifier" &&
+        node.callee.name === "assert";
 }
 
 function isComment(node) {
@@ -87,6 +87,37 @@ function parse_comments(list) {
     return comments.join("\n\n");
 }
 
+function create_number_validator(post_str) {
+    post_str = post_str || "";
+    return "if (%var%" + post_str + " == undefined) { console.log(%var%); throw new Error('%var%" + post_str + " is undefined/null'); }\n" +
+           "if (Number.isNaN(%var%" + post_str + ")) { console.log(%var%); throw new Error('%var%" + post_str + " is nan'); }\n";
+}
+
+
+var validators = {
+    "Number": create_number_validator()
+};
+
+validators.Vec2 = [0, 1].map(function (i) {return create_number_validator("[" + i + "]"); }).join("\n");
+
+validators.Matrix23 = [0, 1, 2, 3, 4, 5].map(function (i) {return create_number_validator("[" + i + "]"); }).join("\n");
+
+validators.Matrix22 = [0, 1, 2, 3].map(function (i) {return create_number_validator("[" + i + "]"); }).join("\n");
+
+validators.AABB2 = validators.Segment2 = validators.Matrix22;
+
+validators.Rectangle = [0, 1].map(function (i) {
+    return [0, 1].map(function (j) {
+        return create_number_validator("[" + i + "][" + j + "]");
+    }).join("\n");
+}).join("\n");
+
+validators.Triangle = [0, 1, 2].map(function (i) {
+    return [0, 1].map(function (j) {
+        return create_number_validator("[" + i + "][" + j + "]");
+    }).join("\n");
+}).join("\n");
+
 
 var cls_list = [],
     cls,
@@ -126,7 +157,7 @@ function getNearestFunction(node) {
 
 for (cls in files) {
 
-    console.log("* ["+cls+"](https://github.com/llafuente/js-2dmath/blob/master/" + files[cls].doc_file.replace("./", "") +")");
+    console.log("* [" + cls + "](https://github.com/llafuente/js-2dmath/blob/master/" + files[cls].doc_file.replace("./", "") + ")");
     console.log("");
 
     description = null;
@@ -158,39 +189,28 @@ for (cls in files) {
 
         if (isComment(node)) {
             if (isFileDesccription(node)) {
-                description = node.value.split("\n")
+                description = node.value.split("\n");
             } else {
 
                 var fn = getNearestFunction(node);
 
                 if (fn) {
                     methods[fn.id.name].comments = node.value.split("\n");
-
-}            }
+                }
+            }
         }
     });
-
-    var validators = {
-        "Number":
-            "if (%var% == undefined) { console.log(%var%); throw new Error('%var% is undefined/null'); }\n" +
-            "if (Number.isNaN(%var%)) { console.log(%var%); throw new Error('%var% is nan'); }\n"
-        , "Vec2":
-            "if (%var%[0] == undefined) { console.log(%var%); throw new Error('%var%[0] is undefined/null'); }\n" +
-            "if (%var%[1] == undefined) { console.log(%var%); throw new Error('%var%[1] is undefined/null'); }\n" +
-            "if (Number.isNaN(%var%[0])) { console.log(%var%); throw new Error('%var%[0] is nan'); }\n" +
-            "if (Number.isNaN(%var%[1])) { console.log(%var%); throw new Error('%var%[1] is nan'); }\n"
-    }
 
     //
     // - debug
     //
-    output = falafel(src, function (node) {
+    var output = falafel(src, function (node) {
         // anti-nan
         if (isFunction(node)) {
-            var args = getArguments(node, valid_arguments);
-
-            var fn_txt = node.body.source().trim().substring(1);
-            var validations = [];
+            var args = getArguments(node, valid_arguments),
+                fn_txt = node.body.source().trim().substring(1),
+                validations = [],
+                i;
 
             for (i in args) {
                 if (validators[args[i].type] && args[i].name.indexOf("out") !== 0) {
@@ -220,7 +240,7 @@ for (cls in files) {
 
                         isFunction(node);
                     });
-                } catch(e) {
+                } catch (e) {
                     methods[i] = {
                         arguments: [],
                         comments: [],
@@ -232,7 +252,8 @@ for (cls in files) {
         }
     }
 
-    var contents = [];
+    var contents = [],
+        i;
     contents.push("<a name=\"" + cls + "\"></a>");
     contents.push("## " + cls);
 
@@ -264,7 +285,7 @@ for (cls in files) {
             process.exit();
         }
 
-        var args_str = methods[i].arguments.map(function(a) {
+        var args_str = methods[i].arguments.map(function (a) {
             return "*" + a.name + "*: " + a.type;
         }).join(", ");
 

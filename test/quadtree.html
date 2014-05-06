@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>js-2dmath: Demostration of various Intersections</title>
 
-<script src="../js-2dmath-browser.js" type="text/javascript" ></script>
+<script src="../dist/js-2dmath-browser.js" type="text/javascript" ></script>
 
 </head>
 <body>
@@ -33,7 +33,7 @@ function randomAABB2() {
     //0.1 because must be inside, no colliding
     var x = Math.randRange(bounds[0] + 0.1, bounds[2] - 25.1),
     y = Math.randRange(bounds[1] + 0.1, bounds[3] - 25.1),
-    w = Math.randRange(25, 5), 
+    w = Math.randRange(25, 5),
     h = Math.randRange(25, 5);
 
     return [x, y, x + w, y + h];
@@ -116,7 +116,7 @@ function update() {
 
         Draw.aabb2(ctx, retrieved_box, "red");
 
-        
+
     }
 
 
