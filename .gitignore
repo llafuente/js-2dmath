@@ -1,3 +1,4 @@
 /node_modules
 /doc
 /debug/*
+/dist/js-2dmath-browser.js

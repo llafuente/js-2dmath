@@ -91,6 +91,9 @@
 <a name="Vec2-normalize"></a>
 * **normalize** (*out*: Vec2, *v1*: Vec2): Vec2
 
+<a name="Vec2-normalizeSq"></a>
+* **normalizeSq** (*out*: Vec2, *v1*: Vec2): Vec2
+
 <a name="Vec2-perpendicular"></a>
 * **perpendicular** (*out*: Vec2, *v1*: Vec2): Vec2
 

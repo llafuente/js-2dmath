@@ -29,7 +29,8 @@
   "scripts": {
     "test": "tap test/*.js",
     "browserify": "browserify -r ./index.js:js-2dmath -o js-2dmath-browser.js",
-    "postinstall": "grunt dist"
+    "postinstall": "grunt dist",
+    "dist": "grunt dist"
   },
   "repository": {
     "type": "git",
@@ -51,7 +52,9 @@
   "devDependencies": {
     "tap": "~0.4.4",
     "grunt-contrib-watch": "~0.5.3",
-    "browserify": "^3.44.2"
+    "browserify": "~3.46.0",
+    "falafel": "^0.3.1",
+    "grunt-contrib-uglify": "^0.4.0"
   },
   "jshintConfig": {
     "white": true,

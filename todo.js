@@ -4,10 +4,13 @@ var js2math = require("./index.js");
 
 ["Triangle", "Rectangle", "Circle", "AABB2", "Polygon"].forEach(function(geom) {
     ["isVec2Inside", "area", "perimeter", "contains"].forEach(function(fname) {
-        console.log(geom+"."+fname, js2math[geom][fname] ? "done" : "todo");
+        if (!js2math[geom][fname]) {
+            console.log(geom+"."+fname);
+        }
     });
 });
 
+exit();
 ["Triangle", "Rectangle", "Circle", "Polygon"].forEach(function(geom) {
     if (!js2math.AABB2["from" + geom]) {
         console.log("AABB2.from" + geom);

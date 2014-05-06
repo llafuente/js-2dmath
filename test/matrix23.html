@@ -4,12 +4,17 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>js-2dmath: Interpolate Matrix23 using Transitions (linear)</title>
 
-<script src="../dist/js-2dmath-browser.js" type="text/javascript" ></script>
+<script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
 
 </head>
 <body>
 <h1>js-2dmath: Interpolate Matrix23 using Transitions (linear)</h1>
 <canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
+<ul>
+    <li>Red: initial position</li>
+    <li>Blue: target position</li>
+    <li>purple: transformation matrix applied to canvas</li>
+    <li>green: rectangle to polygon applied matrix to polygon</li>
 </body>
 </html>
 
@@ -49,6 +54,7 @@ setInterval(function() {
     var factor = Transitions.linear(acc);
     console.log(Math.round(acc * 100) / 100, Math.round(factor * 100) / 100);
 
+    ctx.save();
     Draw.applyMatrix23(ctx, m2d_1);
     Draw.rectangle(ctx, rect, "red");
 
@@ -60,6 +66,14 @@ setInterval(function() {
     Matrix23.interpolate(m2d_3, m2d_1, m2d_2, factor);
     Draw.applyMatrix23(ctx, m2d_3);
     Draw.rectangle(ctx, rect, "purple");
+    ctx.restore();
+
+
+    var in_poly = Polygon.fromRectangle(rect);
+    Matrix23.translate(m2d_3, m2d_3, [10, 10])
+    var out_poly = Polygon.transform([], in_poly, m2d_3);
+    Draw.polygon(ctx, out_poly, "green")
+
     ctx.restore();
 }, 100);
 

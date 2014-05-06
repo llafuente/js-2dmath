@@ -45,8 +45,11 @@
   **source**: [http://mathcentral.uregina.ca/QQ/database/QQ.09.04/carly1.html](http://mathcentral.uregina.ca/QQ/database/QQ.09.04/carly1.html)
 
 
-<a name="Line2-reflection"></a>
-* **reflection** ()
+<a name="Line2-isVec2Inside"></a>
+* **isVec2Inside** (*line2*: Line2, *vec2*: Vec2): Boolean
+
+  Over the line, has near check to avoid floating point errors.
+
 
 <a name="Line2-translate"></a>
 * **translate** (*out*: Line2, *line2*: Line2, *v1*: Vec2)

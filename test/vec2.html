@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>js-2dmath: Some Vec2 functions in action</title>
 
-<script src="../dist/js-2dmath-browser.js" type="text/javascript" ></script>
+<script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
 
 </head>
 <body>
@@ -46,13 +46,16 @@ var v = Vec2.create(50, 50),
 
 Draw.vec2(ctx, v, "red");
 Draw.text(ctx, "vec2", Vec2.add([], v, [7,7]));
+console.log(v);
 
 Vec2.perp(aux, v);
-Draw.vec2(ctx, aux, "red");
+console.log(aux);
+Draw.vec2(ctx, aux, "blue");
 Draw.text(ctx, "prep", Vec2.add([], aux, [7,7]));
 
-Vec2.rerp(aux, v);
-Draw.vec2(ctx, aux, "red");
+Vec2.rperp(aux, v);
+console.log(aux);
+Draw.vec2(ctx, aux, "green");
 Draw.text(ctx, "rperp", Vec2.add([], aux, [7,7]));
 
 

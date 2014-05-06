@@ -46,6 +46,9 @@
 <a name="Triangle-translate"></a>
 * **translate** (*out*: Triangle, *tri*: Triangle, *vec2*: Vec2): Triangle
 
+<a name="Triangle-isVec2Inside"></a>
+* **isVec2Inside** (*tri*: Triangle, *vec2*: Vec2): Boolean
+
 <a name="Triangle-center"></a>
 * **center** (*out_vec2*: Vec2, *tri*: Triangle)
 

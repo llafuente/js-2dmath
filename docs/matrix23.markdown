@@ -2,11 +2,13 @@
 ## Matrix23
   2x3 Transformation matrix used in 2D represented as a 8 coordinates array
 
-  [m11:Number, m12:Number, m13:Number, m21:Number, m22:Number, m23:Number, **cache**:Array(5), nomalized:Boolean]
+  [m11:Number, m12:Number, m13:Number, m21:Number, m22:Number, m23:Number, **cache**:Array(5), dirty:Boolean]
 
   cache = [xScale:Number, yScale:Number, xSkew:Number, yScale:Number, rotation:Number]
 
-  why cache? to speed up many operations avoiding tan/atan2/sqrt
+  why cache? Speed improvements in exchange of memory to avoid tan/atan2/sqrt.
+
+  why dirty? Matrix.transform could be expensive with large polygons, keep track of this variable to transform only when necessary.
 
 <a name="Matrix23-create"></a>
 * **create** (): Matrix23
@@ -319,6 +321,9 @@
 
   For completeness because it's not need in the current implementation m2d[6][4]
 
+
+<a name="Matrix23-transform"></a>
+* **transform** (*out_vec2*: Vec2, *m2d*: Matrix23, *vec2*: Vec2)
 
 <a name="Matrix23-dSetRotation"></a>
 * **dSetRotation** (*out*: Matrix23, *m2d*: Matrix23, *degrees*: Number (Degrees))

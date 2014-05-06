@@ -10,6 +10,12 @@
 <a name="Polygon-fromAABB"></a>
 * **fromAABB** (*aabb2*: AABB2)
 
+<a name="Polygon-fromRectangle"></a>
+* **fromRectangle** (*rect*: Rectangle)
+
+<a name="Polygon-fromBeizer"></a>
+* **fromBeizer** (*curve*: Beizer, *npoints*: Number)
+
 <a name="Polygon-translate"></a>
 * **translate** (*out*: Polygon, *poly*: Polygon, *vec2*: Vec2)
 
@@ -24,6 +30,12 @@
 
 <a name="Polygon-area"></a>
 * **area** (*poly*: Polygon): Number
+
+<a name="Polygon-transform"></a>
+* **transform** (*out*: Polygon, *poly*: Polygon, *m2d*: Matrix23)
+
+<a name="Polygon-isVec2Inside"></a>
+* **isVec2Inside** (*poly*: Polygon, *vec2*: Vec2)
 
 <a name="Polygon-furthestPoint"></a>
 * **furthestPoint** (*out_vec2*: Vec2, *poly*: Polygon, *vec2*: Vec2)

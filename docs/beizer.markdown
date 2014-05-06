@@ -38,6 +38,9 @@
 <a name="Beizer-getPoints"></a>
 * **getPoints** (*curve*: Beizer, *npoints*: Number): Array
 
+  **see**: [Polygon.fromBeizer](#Beizer-Polygon.fromBeizer)
+
+
 <a name="Beizer-length"></a>
 * **length** (*curve*: Beizer, *step*: Number): Number
 

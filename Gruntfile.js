@@ -3,6 +3,7 @@ module.exports = function (grunt) {
     var falafel = require("falafel");
 
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Print a timestamp (useful for when watching)
     grunt.registerTask('timestamp', function() {
@@ -22,6 +23,17 @@ module.exports = function (grunt) {
             src_js: ['lib/*.js'],
             test_js: ['test/test-*.js'],
             demos: ['test/*.html']
+        },
+
+        /**
+         * JS Uglify
+         */
+        uglify: {
+            dist: {
+                files: {
+                    './dist/js-2dmath-browser.min.js': ['./dist/js-2dmath-browser.js']
+                }
+            }
         },
 
         watch: {
@@ -47,5 +59,5 @@ module.exports = function (grunt) {
         require("child_process").exec("browserify -r ./index.js:js-2dmath -o ./dist/js-2dmath-browser.js");
     });
 
-    grunt.registerTask('dist', ['debug', 'browserify:dist', 'browserify:debug']);
+    grunt.registerTask('dist', ['debug', 'browserify:dist', 'browserify:debug', "uglify:dist"]);
 };
