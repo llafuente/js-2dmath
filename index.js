@@ -29,3 +29,6 @@ module.exports = {
         }
     }
 };
+
+module.exports.Polygon.GJK = require("./lib/gjk.js");
+module.exports.Polygon.EPA = require("./lib/epa.js");

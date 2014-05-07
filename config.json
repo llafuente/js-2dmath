@@ -192,7 +192,11 @@
           "A":  "Polygon",
           "B":  "Polygon",
           "polygon1":  "Polygon",
-          "polygon2":  "Polygon"
+          "polygon2":  "Polygon",
+          "edges":  "Polygon",
+          "normals":  "Polygon",
+          "npoints": "Number",
+          "start_radians": "Number"
         }
       },
       "Beizer": {

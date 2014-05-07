@@ -302,6 +302,23 @@
 <a name="Vec2-$dot"></a>
 * **$dot** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number)
 
+<a name="Vec2-swap"></a>
+* **swap** (*v1*: Vec2, *v2*: Vec2): Undefined
+
+  Swap vectors, both will be modified.
+
+
+<a name="Vec2-tripleProduct"></a>
+* **tripleProduct** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *v3*: Vec2)
+
+  (A x B) x C = B(C · A) - A(C · B)
+
+  (A x B) x C = B(A.dot(C)) - A(B.dot(C))
+
+
+<a name="Vec2-toString"></a>
+* **toString** (*v1*: Vec2)
+
 <a name="Vec2-perp"></a>
 * **perp** (*out*: Vec2, *v1*: Vec2)
 

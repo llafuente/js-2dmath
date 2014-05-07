@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>js-2dmath: Polygon</title>
 
-<script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
+<!-- <script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script> -->
+<script src="../debug/js-2dmath-browser-debug.js" type="text/javascript" ></script>
 
 </head>
 <body>
@@ -40,30 +41,119 @@ function gjk(poly1, poly2) {
     Draw.polygon(ctx, poly1, "cyan");
     Draw.polygon(ctx, poly2, "blue");
 
-    var simplex = [];
-    var collision = Polygon.GJK(poly1, poly2, simplex);
-    var epa = Polygon.EPA(poly1, poly2, simplex);
-    console.log(epa);
+    var result,
+        history = [];
+    result = Polygon.GJK(poly1, poly2, history);
+    console.log("GJK", JSON.stringify(result));
 
-    Draw.text(ctx, collision ? "collide" : "no collision", [-320, 200])
+    Draw.text(ctx, result.overlap ? "collide" : "no collision", [-320, 200])
 
-    Draw.polygon(ctx, simplex, "purple");
-    Draw.polygon(ctx, simplex, "red");
+    Draw.polygon(ctx, result.simplex, "rgba(0,125,0, 0.25)", true);
+    Draw.polygon(ctx, result.simplex, "rgba(0,125,0, 0.25)");
+
+
+    // EPA!
+    if (result.overlap) {
+        var epa = Polygon.EPA(poly1, poly2, result.simplex);
+        console.log("EPA", JSON.stringify(epa));
+    }
 }
 
 function example1 () {
     var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
-        poly2 = Polygon.create([5, 5], [50, 0], [50, 50], [0, 50]);
+        poly2 = [];
+
+    Polygon.translate(poly2, poly1, [15, 15]);
+
+    gjk(poly1, poly2);
+}
+
+function example2 () {
+    var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
+        poly2 = [];
+    var mat23 = Matrix23.create();
+
+    Matrix23.translate(mat23, mat23, [25, 15]);
+    Matrix23.rotate(mat23, mat23, Math.HALF_PI * 0.5);
+
+    Polygon.transform(poly2, poly1, mat23);
+
+    console.log(poly2);
+
+    gjk(poly1, poly2);
+}
+
+function example3 () {
+    var poly1 = Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0),
+        poly2 = [];
+
+
+    console.log(poly1);
+
+    Draw.polygon(ctx, poly1, "red");
+
+    var mat23 = Matrix23.create();
+
+    Matrix23.translate(mat23, mat23, [25, 25]);
+
+    Polygon.transform(poly2, poly1, mat23);
+
+    console.log(poly2);
+
+    gjk(poly1, poly2);
+}
+
+function example4 () {
+    var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
+        poly2 = [];
+
+    Polygon.translate(poly2, poly1, [75, 75]);
+
+    gjk(poly1, poly2);
+}
+
+function example5 () {
+    var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
+        poly2 = [];
+    var mat23 = Matrix23.create();
+
+    Matrix23.translate(mat23, mat23, [75, 75]);
+    Matrix23.rotate(mat23, mat23, Math.HALF_PI * 0.5);
+
+    Polygon.transform(poly2, poly1, mat23);
+
+    console.log(poly2);
+
+    gjk(poly1, poly2);
+}
+
+function example6 () {
+    var poly1 = Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0),
+        poly2 = [];
+
+
+    console.log(poly1);
+
+    Draw.polygon(ctx, poly1, "red");
+
+    var mat23 = Matrix23.create();
+
+    Matrix23.translate(mat23, mat23, [75, 75]);
+
+    Polygon.transform(poly2, poly1, mat23);
+
+    console.log(poly2);
 
     gjk(poly1, poly2);
 }
 
 
+/*
 function example2() {
     var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
         poly2 = Polygon.create();
 
-    Polygon.translate(poly2, poly1, [100, 100]);
+    Polygon.translate(poly2, poly1, [75, 100]);
     gjk(poly1, poly2);
 }
 
@@ -73,7 +163,6 @@ function example3() {
 
     gjk(poly1, poly2);
 }
-
 function example4() {
     var poly1 = Polygon.create([50, -40], [0, -80], [-50, -40]),
         poly2 = Polygon.create([50, -40], [0, -80], [-50, -40]);
@@ -82,8 +171,9 @@ function example4() {
     Polygon.rotate(poly2, poly2, Math.DEG_TO_RAD * 15);
     gjk(poly1, poly2);
 }
+*/
 
-var current_test = example3;
+var current_test = example6;
 
 function onKeyDown(ev) {
     if (!ev) {
@@ -98,6 +188,8 @@ function onKeyDown(ev) {
     case 53: // '5'
     case 54: // '6'
     case 55: // '7'
+    case 56: // '8'
+    case 57: // '9'
         current_test = window["example" + (ev.keyCode - 48)]
         if (!current_test) {
             current_test = example1;
