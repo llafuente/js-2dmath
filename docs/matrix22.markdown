@@ -1,5 +1,7 @@
 <a name="Matrix22"></a>
 ## Matrix22
+  Stability: 0 (Anything could happen)
+
   2x2 matrix used for rotations 2D represented as a 5 coordinates array
 
   [m11:Number, m12:Number, m21:Number, m22:Number, angle:Number]

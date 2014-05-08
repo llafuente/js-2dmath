@@ -1,5 +1,8 @@
 <a name="Transitions"></a>
 ## Transitions
+  Stability: 2 (fixes / performance improvements)
+
+  @TODO expand all function, do not generate with loops
 * **LINK_CHAIN** = 1
 * **LINK_STOP** = 2
 * **LINK_IGNORE** = 3

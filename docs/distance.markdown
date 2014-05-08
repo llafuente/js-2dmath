@@ -1,5 +1,6 @@
 <a name="Distance"></a>
 ## Distance
+  Stability: 0 (Anything could happen)
 
 <a name="Distance-fourPoints"></a>
 * **fourPoints** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number)

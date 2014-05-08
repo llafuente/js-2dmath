@@ -1,10 +1,15 @@
 <a name="Triangle"></a>
 ## Triangle
+  Stability: 2 (fixes / performance improvements)
+
+  Triangle is represented as a three coordinates array
+
+  [A:Vec2, B:Vec2, C:Vec2]
 
 <a name="Triangle-create"></a>
 * **create** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number, *x3*: Number, *y3*: Number): Triangle
 
-  A, B, C
+  A(x1, y1), B(x2, y2), C(x3, y3)
 
 
 <a name="Triangle-abMidPoint"></a>

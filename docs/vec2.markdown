@@ -1,8 +1,10 @@
 <a name="Vec2"></a>
 ## Vec2
+  Stability: 2 (fixes / performance improvements)
+
   Vec2 is represented as a two coordinates array
 
-  [x, y]
+  [x:Number, y:Number]
 
 <a name="Vec2-create"></a>
 * **create** (*x*: Number, *y*: Number): Vec2

@@ -52,6 +52,13 @@ function gjk(poly1, poly2) {
     Draw.polygon(ctx, result.simplex, "rgba(0,125,0, 0.25)");
 
 
+    console.log(Polygon.toString(Polygon.MinkowskiDifference(poly1, poly2)));
+
+    Draw.polygon(ctx,
+        Polygon.MinkowskiDifference(poly1, poly2),
+        "rgba(0,0,255, 0.33)", true);
+
+
     // EPA!
     if (result.overlap) {
         var epa = Polygon.EPA(poly1, poly2, result.simplex);

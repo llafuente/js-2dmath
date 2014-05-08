@@ -1,5 +1,10 @@
 <a name="Circle"></a>
 ## Circle
+  Stability: 1 (Only additions & fixes)
+
+  Circle is represented as a two coordinates array
+
+  [c:Vec2, r:Number]
 
 <a name="Circle-create"></a>
 * **create** (*x*: Number, *y*: Number, *radius*: Number): Circle

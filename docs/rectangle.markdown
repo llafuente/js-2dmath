@@ -1,11 +1,13 @@
 <a name="Rectangle"></a>
 ## Rectangle
+  Stability: 1 (Only additions & fixes)
+
+  Rectangle is represented as a three coordinates array
+
+  [a: Vec2, b: Vec2, normalized: Boolean]
 
 <a name="Rectangle-create"></a>
 * **create** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number): Rectangle
-
-  Rectangle is an array with [a: Vec2, b: Vec2, normalized: Boolean]
-
 
 <a name="Rectangle-fromBB"></a>
 * **fromBB** (*bb2*: AABB2): Rectangle

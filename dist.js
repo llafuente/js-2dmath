@@ -74,6 +74,10 @@ function parse_comments(list) {
             line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
             line = line.substring(8);
             comments.push("  **source**: [" + line + "](" + line + ")");
+        } else if (c.indexOf("@reference") !== -1) {
+            line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
+            line = line.substring(11);
+            comments.push("  **reference**: [" + line + "](" + line + ")");
         } else if (c.indexOf("@param") !== -1) {
             //ignore
         } else {

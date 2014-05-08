@@ -1,11 +1,11 @@
 <a name="Line2"></a>
 ## Line2
-
-<a name="Line2-create"></a>
-* **create** (*x*: Number, *y*: Number, *m*: Number): Line2
+  Stability: 1 (Only additions & fixes)
 
   Point-Slope Equation of a Line: y - y1 = m(x - x1)
 
+<a name="Line2-create"></a>
+* **create** (*x*: Number, *y*: Number, *m*: Number): Line2
 
 <a name="Line2-zero"></a>
 * **zero** (): Line2

@@ -6,6 +6,10 @@
       "line2": "Line2",
       "vec2": "Vec2",
       "out_vec2": "Vec2",
+      "v1": "Vec2",
+      "v2": "Vec2",
+      "v3": "Vec2",
+      "vec2_list": "Array(&lt;Vec2&gt;)",
       "seg2": "Segment2",
       "rect": "Rectangle",
       "tri": "Triangle",
@@ -35,9 +39,6 @@
           "out": "Vec2",
           "x": "Number",
           "y": "Number",
-          "v1": "Vec2",
-          "v2": "Vec2",
-          "v3": "Vec2",
           "length": "Number",
           "degrees": "Number (Degrees)",
           "radians": "Number (Radians)",
@@ -69,9 +70,7 @@
           "x": "Number",
           "y": "Number",
           "m": "Number",
-          "seg2": "Segment2",
-          "v1": "Vec2",
-          "v2": "Vec2"
+          "seg2": "Segment2"
         }
       },
       "Segment2": {

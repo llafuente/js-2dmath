@@ -2,7 +2,7 @@
 ## Segment2
   Segment2 is represented by a 4 coordinates array
 
-  [x1, y1, x2, y2] normalized so x1 < x2
+  [x1:Number, y1:Number, x2:Number, y2:Number] normalized so x1 < x2
 
 <a name="Segment2-create"></a>
 * **create** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number): Segment2

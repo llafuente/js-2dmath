@@ -1,5 +1,18 @@
 <a name="Beizer"></a>
 ## Beizer
+  Stability: 1 (Only additions & fixes)
+
+  Documentation
+
+  * http://pomax.github.io/bezierinfo/
+
+  * https://github.com/jackcviers/Degrafa/blob/master/Degrafa/com/degrafa/geometry/utilities/BezierUtils.as
+
+  * http://cagd.cs.byu.edu/~557/text/ch7.pdf
+
+  * http://algorithmist.wordpress.com/2009/02/02/degrafa-closest-point-on-quad-bezier/
+
+  * http://algorithmist.wordpress.com/2009/01/26/degrafa-bezierutils-class/
 
 <a name="Beizer-cubic"></a>
 * **cubic** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number, *cp3x*: Number, *cp3y*: Number): Beizer
@@ -13,12 +26,14 @@
   cp3 - end
 
 
-<a name="Beizer-cubicFrom3Points"></a>
-* **cubicFrom3Points** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number)
+<a name="Beizer-from3Points"></a>
+* **from3Points** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number)
 
   Figure 21.2
 
   http://pomax.github.io/bezierinfo/
+
+  @todo DO IT!
 
 
 <a name="Beizer-quadric"></a>
@@ -29,11 +44,16 @@
 
   Figure 21.1
 
-  http://pomax.github.io/bezierinfo/
+  **reference**: [http://pomax.github.io/bezierinfo/](http://pomax.github.io/bezierinfo/)
 
 
-<a name="Beizer-get"></a>
-* **get** (*out_vec2*: Vec2, *curve*: Beizer, *t*: Number): Vec2
+<a name="Beizer-solve"></a>
+* **solve** (*out_vec2*: Vec2, *curve*: Beizer, *t*: Number): Vec2
+
+  Solves the curve (quadric or cubic) for any given parameter t.
+
+  **source**: [https://github.com/hyperandroid/CAAT/blob/master/src/Math/Bezier.js](https://github.com/hyperandroid/CAAT/blob/master/src/Math/Bezier.js)
+
 
 <a name="Beizer-getPoints"></a>
 * **getPoints** (*curve*: Beizer, *npoints*: Number): Array

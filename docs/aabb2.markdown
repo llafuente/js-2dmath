@@ -1,5 +1,10 @@
 <a name="AABB2"></a>
 ## AABB2
+  Stability: 1 (Only additions & fixes)
+
+  BoundingBox2 is represented as a 5 coordinates array
+
+  [left: Number, bottom: Number, right: Number, top: Number, normalized: Boolean]
 * **TOPLEFT** = 1
 * **TOPMIDDLE** = 2
 * **TOPRIGHT** = 3
@@ -12,9 +17,6 @@
 
 <a name="AABB2-create"></a>
 * **create** (*l*: Number, *b*: Number, *r*: Number, *t*: Number): AABB2
-
-  BoundingBox2 is an array [left: Number, bottom: Number, right: Number, top: Number, nomalized: Boolean]
-
 
 <a name="AABB2-fromAABB2Division"></a>
 * **fromAABB2Division** (*aabb2*: AABB2, *x*: Number, *y*: Number): Array<AABB2>
@@ -31,9 +33,9 @@
 <a name="AABB2-fromBeizer"></a>
 * **fromBeizer** (*beizer*: Beizer, *npoints*: Number): AABB2
 
-  inspired on: http://jsfiddle.net/4VCVX/3/
+  @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves (Timo answer)
 
-  @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves Timo answer
+  **reference**: [http://jsfiddle.net/4VCVX/3/](http://jsfiddle.net/4VCVX/3/)
 
 
 <a name="AABB2-zero"></a>
