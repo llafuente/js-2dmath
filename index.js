@@ -26,15 +26,17 @@ module.exports = {
     Collision : {
         GJK: require("./lib/collision/gjk.js"),
         EPA: require("./lib/collision/epa.js"),
-        EdgeClipping: require("./lib/collision/edge-clipping.js"),
-        SAT: require("./lib/collision/sat.js")
+        Manifold: require("./lib/collision/manifold.js"),
+        SAT: require("./lib/collision/sat.js"),
+        elastic: require("./lib/collision/elastic.js"),
+        Resolve: require("./lib/collision/resolve.js")
     },
 
     NumericalIntegration: {
         RK4: require("./lib/numerical-integration/rk4.js")
     },
 
-    globalize: function(object) {
+    globalize: function (object) {
         var i;
         for (i in this) {
             object[i] = this[i];

@@ -55,14 +55,15 @@ World.prototype._update = function(dt) {
         //apply gravity only to movable objects
         if (b.imass !== 0) {
             b.update();
-            //disable to test: Vec2.add(b.velocity, b.velocity, gravity);
+            Vec2.add(b.velocity, b.velocity, gravity);
         }
     });
+
     // collisions
     this.forEachBodyPair(function (a, b) {
-        
+
         var result = new Collision.SAT.Response();
-        
+
         var aEdges = [];
         var aNormals = [];
         Polygon.edges(aEdges, a.wbody);
@@ -75,7 +76,7 @@ World.prototype._update = function(dt) {
 
         Collision.SAT.getPolygonPolygon(a.wbody, aNormals, [0, 0], b.wbody, bNormals, [0, 0], result);
         console.log("SAT", JSON.stringify(result));
-        
+
         if (result.overlap) {
             //self.stop = true;
 
@@ -84,14 +85,29 @@ World.prototype._update = function(dt) {
             //var epa = Polygon.EPA(a.wbody, b.wbody, result.simplex);
             //console.log("EPA", JSON.stringify(epa));
 
-            var ec = Collision.EdgeClipping(a.wbody, b.wbody, result.overlapN);
+            var ec = Collision.Manifold.EdgeClipping(a.wbody, b.wbody, result.overlapN);
             console.log("EC", JSON.stringify(ec));
 
             if (ec) {
+                ctx.lineWidth = 3;
                 Draw.segment2(ctx,
-                    [ec.incidentEdge.v1[0], ec.incidentEdge.v1[1], ec.incidentEdge.v2[0], ec.incidentEdge.v2[1]], "yellow");
+                    [ec.incidentEdge.v1[0], ec.incidentEdge.v1[1], ec.incidentEdge.v2[0], ec.incidentEdge.v2[1]], "green");
                 Draw.segment2(ctx,
-                    [ec.referenceEdge.v1[0], ec.referenceEdge.v1[1], ec.referenceEdge.v2[0], ec.referenceEdge.v2[1]], "purple");
+                    [ec.referenceEdge.v1[0], ec.referenceEdge.v1[1], ec.referenceEdge.v2[0], ec.referenceEdge.v2[1]], "yellow");
+                ctx.lineWidth = 1;
+
+                var aPos = Vec2.midPoint([0, 0], ec.incidentEdge.v1, ec.incidentEdge.v2);
+                var bPos = Vec2.midPoint([0, 0], ec.referenceEdge.v1, ec.referenceEdge.v2);
+
+                Draw.vec2(ctx, aPos, "orange");
+                Draw.vec2(ctx, bPos, "orange");
+                /*
+                // two dynamics use elastic
+                // aPos, aVelocity, aMass, afVelocity, bPos, bVelocity, bMass, bfVelocity
+                Collision.elastic(aPos, a.velocity, a.mass, bPos, b.velocity, b.mass);
+                */
+
+                Collision.Resolve.basic(a.velocity, a.restitution, a.imass, b.velocity, b.restitution, b.imass, result.overlapN)
             }
         }
     });
@@ -101,8 +117,6 @@ World.prototype._update = function(dt) {
     var hdt = dt * 0.5,
         dt6 = dt * 0.166666667;
     this.forEachBody(function (b) {
-        self.stop = true;
-        return ;
         //apply gravity only to movable objects
         if (b.imass !== 0) {
             var stateX = NumericalIntegration.RK4(b.position[0], b.velocity[0], b.nimass, 1, 0, dt, hdt, dt6);
@@ -145,11 +159,14 @@ World.prototype.forEachBodyPair = function(fn) {
     }
 }
 
+var BodyUID = 0;
 function Body(body, mass, restitution) {
+    this.uid = ++BodyUID;
     this.body = body;
     this.type = "polygon";
+    //this.hash = 1;
     this.restitution = restitution || 0;
-    
+
     this.matrix = Matrix23.create();
     this.matrix[7] = true;
     this.wbody = new Array(body.length);
@@ -163,6 +180,9 @@ function Body(body, mass, restitution) {
         this.imass = 1 / this.mass;
         this.nimass = -(1 / this.mass);
     }
+    // arrays must be instanced again
+    this.velocity = [0, 0];
+    this.position = [0, 0];
 
     //this.moi = Polygon.area(body) *
 }
@@ -182,6 +202,7 @@ Body.prototype.update = function () {
 Body.prototype.position = [0, 0];
 Body.prototype.velocity = [0, 0];
 Body.prototype.avelocity = 0;
+Body.prototype.hash = 1;
 
 Body.prototype.torque = 0;
 Body.prototype.orientation = 0;
@@ -197,10 +218,10 @@ Body.prototype.moi = 0;
 
 var world = new World();
 
-var b1 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0), 0);
+var b1 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0), 0, 1);
 world.addBody(b1);
 
-var b2 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, Math.PI / 16));
+var b2 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, Math.PI / 16), 1, 1);
 b2.translate2(50, 82);
 world.addBody(b2);
 
@@ -208,12 +229,12 @@ function update() {
     // do not clear canvas we dont see debug information
     if (world.stop) return ;
 
+    window.requestAnimFrame(update);
+
     ctx.save();
     canvas.width = canvas.width;
     Draw.invertAxis(canvas, ctx); // y-up
     ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
-
-    window.requestAnimFrame(update);
 
     world.update(0.2);
 

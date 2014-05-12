@@ -10,6 +10,13 @@ So the objective is "**Be fast**"
 
 * API completeness
 * Testing
+* use falafel to create an asm.js build
+* Numerical integrators
+* AI: Path-finding, Steer, Backtracking
+* IK: FABRIK
+* Minkowski distance, euclidean, Manhattan
+* Beizer math
+* Serialization / De-serialization
 * did I miss anything useful?
 
 
@@ -17,11 +24,12 @@ So the objective is "**Be fast**"
 
 * Avoid **new**
 * Use arrays instead of objects, this is huge performance boost!
-* Avoid creating unnecessary variables (reuse intermediate variables) only "create" & "clone" methods must instance new variables.
-* Cache every function call to a single variable. example: Vec2.add -> vec2_add
+* Avoid creating unnecessary variables (reuse intermediate variables) only "create" & "clone" methods should create new variables.
+* Cache every function call to a single variable. example: Vec2.add -> vec2_add, even Math.*
 * If access an multi-dimensional array in a loop, cache the array access. for(i...) carr=arr[i]; carr[X]
+* Do not use forEach, map, every etc. or other looping method that require apply/call, both are costly.
 
-I'm sure I miss some of my own performance tips, PR if you find any error or find a better way!
+I'm sure I miss/ignore some of my own performance tips, **PR if you find any error or find a better way!**
 
 See some [performance test](https://github.com/llafuente/js-2dmath/blob/master/js-performance-tests.markdown) that prove it.
 
@@ -40,6 +48,15 @@ grunt dist
 Debug distribution use falafel to add assertions based on the documentation.
 
 Force to use valid sanitized inputs (Arrays, not NaN, not undefined, not null) to every function.
+
+
+## Developing
+
+```bash
+grunt watch
+```
+
+This will "dist" on any .js file change
 
 
 ## What can you do with js-2dmath?
