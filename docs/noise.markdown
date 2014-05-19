@@ -4,15 +4,10 @@
 <a name="Noise-ClassicNoise"></a>
 * **ClassicNoise** (*seed*: Number)
 
-  @class ClassicNoise
-
-
 <a name="Noise-SimplexNoise"></a>
 * **SimplexNoise** (*seed*: Number)
 
   SimplexNoise
-
-  @super ClassicNoise
 
 
 <a name="Noise-createClassic"></a>

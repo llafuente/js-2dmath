@@ -64,7 +64,7 @@
 * **vec2_circle** (*vec2*: Vec2, *circle*: Circle, *collision*: Boolean, *distance*: Boolean)
 
 <a name="Intersection-circle_circle"></a>
-* **circle_circle** (*circle_1*: Circle, *circle_2*: Circle, *collision*: Boolean, *distance*: Boolean)
+* **circle_circle** (*a_circle*: Circle, *b_circle*: Circle, *collision*: Boolean, *distance*: Boolean)
 
 <a name="Intersection-circle_bb2"></a>
 * **circle_bb2** (*circle*: Circle, *bb2*: AABB2, *collision*: Boolean, *distance*: Boolean)

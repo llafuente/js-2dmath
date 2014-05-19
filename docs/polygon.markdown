@@ -30,7 +30,7 @@
 
   Create a polygon, the polygon is a line
 
-  @todo extrude this line
+  *todo*: extrude this line
 
 
 <a name="Polygon-fromCircle"></a>
@@ -86,6 +86,14 @@
 * **MinkowskiDifference** (*poly_a*: Polygon, *poly_b*: Polygon): Polygon
 
   Calculate Minkowski Difference
+
+
+<a name="Polygon-momentOfInertia"></a>
+* **momentOfInertia** (*poly*: Polygon, *mass*: Number)
+
+  **source**: [http://www.gamedev.net/topic/342822-moment-of-inertia-of-a-polygon-2d/](http://www.gamedev.net/topic/342822-moment-of-inertia-of-a-polygon-2d/)
+
+  **source**: [http://www.physicsforums.com/showthread.php?t=25293&page=2&pp=15](http://www.physicsforums.com/showthread.php?t=25293&page=2&pp=15)
 
 
 <a name="Polygon-toString"></a>

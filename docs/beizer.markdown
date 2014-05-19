@@ -33,7 +33,7 @@
 
   http://pomax.github.io/bezierinfo/
 
-  @todo DO IT!
+  *todo*: DO IT!
 
 
 <a name="Beizer-quadric"></a>
@@ -62,10 +62,10 @@
 
 
 <a name="Beizer-length"></a>
-* **length** (*curve*: Beizer, *step*: Number): Number
+* **length** (*curve*: Beizer, *step*: Number)
 
   Calculate the curve length by incrementally solving the curve every substep=CAAT.Curve.k. This value defaults
 
   to .05 so at least 20 iterations will be performed.
 
-  @todo some kind of cache maybe it's needed!
+  *todo*: some kind of cache maybe it's needed!

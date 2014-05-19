@@ -14,8 +14,8 @@
 
   * fract53()
 
-  **link**: [http://baagoe.com/en/RandomMusings/javascript/](http://baagoe.com/en/RandomMusings/javascript/)
+  **see**: [http://baagoe.com/en/RandomMusings/javascript/](#Xorshift-http://baagoe.com/en/RandomMusings/javascript/)
 
-  **link**: [http://en.wikipedia.org/wiki/Xorshift](http://en.wikipedia.org/wiki/Xorshift)
+  **see**: [http://en.wikipedia.org/wiki/Xorshift](#Xorshift-http://en.wikipedia.org/wiki/Xorshift)
 
   **source**: [http://jsdo.it/akm2/fhMC/js](http://jsdo.it/akm2/fhMC/js)

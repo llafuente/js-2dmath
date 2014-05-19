@@ -24,8 +24,6 @@
 
   http://pomax.github.io/bezierinfo/
 
-  @todo
-
 
 <a name="Distance-fourPointsSq"></a>
 * **fourPointsSq** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number)

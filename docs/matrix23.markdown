@@ -23,9 +23,7 @@
 
   Creates a new matrix given 4 points(a Rectangle)
 
-  @todo
-
-  **link**: [http://jsfiddle.net/dFrHS/1/](http://jsfiddle.net/dFrHS/1/)
+  **see**: [http://jsfiddle.net/dFrHS/1/](#Matrix23-http://jsfiddle.net/dFrHS/1/)
 
 
 <a name="Matrix23-fromAngle"></a>
@@ -33,9 +31,7 @@
 
   Creates a new matrix given 4 points(a Rectangle)
 
-  @todo
-
-  **link**: [http://jsfiddle.net/dFrHS/1/](http://jsfiddle.net/dFrHS/1/)
+  **see**: [http://jsfiddle.net/dFrHS/1/](#Matrix23-http://jsfiddle.net/dFrHS/1/)
 
 
 <a name="Matrix23-copy"></a>
@@ -55,7 +51,9 @@
 
   Rotates a Matrix23 by the given angle in degrees(increment rotation)
 
-  @note increment rotation
+  *note*: increment rotation
+
+  *todo*: increment rotation
 
 
 <a name="Matrix23-rotate"></a>
@@ -63,7 +61,9 @@
 
   Rotates a Matrix23 by the given angle in radians(increment rotation)
 
-  @note increment rotation
+  *note*: increment rotation
+
+  *todo*: increment rotation
 
 
 <a name="Matrix23-dRotation"></a>
@@ -71,7 +71,9 @@
 
   Set rotation of a Matrix23 by the given angle in degrees(set rotation)
 
-  @note set rotation
+  *note*: set rotation
+
+  *todo*: set rotation
 
 
 <a name="Matrix23-rotation"></a>
@@ -79,7 +81,9 @@
 
   Set rotation of a Matrix23 by the given angle in radians(set rotation)
 
-  @note set rotation
+  *note*: set rotation
+
+  *todo*: set rotation
 
 
 <a name="Matrix23-translate"></a>
@@ -87,9 +91,13 @@
 
   Translates given Matrix23 by the dimensions in the given vec2
 
-  @note This translation is affected by rotation/skew
+  *note*: This translation is affected by rotation/skew
 
-  @note increment position
+  *todo*: This translation is affected by rotation/skew
+
+  *note*: increment position
+
+  *todo*: increment position
 
   **see**: [gTranslate](#Matrix23-gTranslate)
 
@@ -99,9 +107,13 @@
 
   Translates given Matrix23 by the dimensions in the given vec2
 
-  @note This translation is NOT affected by rotation/skew
+  *note*: This translation is NOT affected by rotation/skew
 
-  @note increment position
+  *todo*: This translation is NOT affected by rotation/skew
+
+  *note*: increment position
+
+  *todo*: increment position
 
   **see**: [translate](#Matrix23-translate)
 
@@ -111,9 +123,13 @@
 
   Set Matrix23 position
 
-  @note This translation is NOT affected by rotation/skew
+  *note*: This translation is NOT affected by rotation/skew
 
-  @note set position
+  *todo*: This translation is NOT affected by rotation/skew
+
+  *note*: set position
+
+  *todo*: set position
 
   **see**: [gTranslate](#Matrix23-gTranslate)
 
@@ -125,9 +141,13 @@
 
   Scales the Matrix23 by the dimensions in the given vec2
 
-  @note incremental scale
+  *note*: incremental scale
 
-  @note do not affect position
+  *todo*: incremental scale
+
+  *note*: do not affect position
+
+  *todo*: do not affect position
 
   **see**: [scalation](#Matrix23-scalation)
 
@@ -137,9 +157,13 @@
 
   Set the Matrix23 scale by the dimensions in the given vec2
 
-  @note set scale
+  *note*: set scale
 
-  @note do not affect position
+  *todo*: set scale
+
+  *note*: do not affect position
+
+  *todo*: do not affect position
 
   **see**: [scale](#Matrix23-scale)
 
@@ -149,7 +173,9 @@
 
   Increment the Matrix23 x-skew by given degrees
 
-  @note increment skewX
+  *note*: increment skewX
+
+  *todo*: increment skewX
 
   **see**: [skewX](#Matrix23-skewX)
 
@@ -159,7 +185,9 @@
 
   Increment the Matrix23 x-skew by given radians
 
-  @note increment skewX
+  *note*: increment skewX
+
+  *todo*: increment skewX
 
 
 <a name="Matrix23-dSkewY"></a>
@@ -167,7 +195,9 @@
 
   Increment the Matrix23 y-skew by given degrees
 
-  @note increment skewY
+  *note*: increment skewY
+
+  *todo*: increment skewY
 
 
 <a name="Matrix23-skewY"></a>
@@ -175,7 +205,9 @@
 
   Increment the Matrix23 y-skew by given radians
 
-  @note increment skewY
+  *note*: increment skewY
+
+  *todo*: increment skewY
 
 
 <a name="Matrix23-dSkew"></a>
@@ -183,7 +215,9 @@
 
   Increment the Matrix23 skew y by given degrees in vec2_degrees
 
-  @note increment skew
+  *note*: increment skew
+
+  *todo*: increment skew
 
   **see**: [dSetSkew](#Matrix23-dSetSkew)
 
@@ -193,7 +227,9 @@
 
   Increment the Matrix23 skew y by given radians in vec2
 
-  @note increment skew
+  *note*: increment skew
+
+  *todo*: increment skew
 
 
 <a name="Matrix23-dSetSkew"></a>
@@ -201,7 +237,9 @@
 
   Set the Matrix23 skew y by given degrees in vec2_degrees
 
-  @note set skew
+  *note*: set skew
+
+  *todo*: set skew
 
   **see**: [setSkew](#Matrix23-setSkew)
 
@@ -211,7 +249,9 @@
 
   Set the Matrix23 skew y by given radians in vec2
 
-  @note set skew
+  *note*: set skew
+
+  *todo*: set skew
 
 
 <a name="Matrix23-multiply"></a>
@@ -253,19 +293,19 @@
 <a name="Matrix23-inverse"></a>
 * **inverse** (*out*: Matrix23, *m2d*: Matrix23)
 
-  @TODO this a transformation matrix, what inverse means for us, mirror ?
+  *todo*: this a transformation matrix, what inverse means for us, mirror ?
 
 
 <a name="Matrix23-transpose"></a>
 * **transpose** (*out*: Matrix23, *m2d*: Matrix23)
 
-  @TODO needed ?
+  *todo*: needed ?
 
 
 <a name="Matrix23-determinant"></a>
 * **determinant** (*out*: Matrix23, *m2d*: Matrix23)
 
-  @TODO review & test
+  *todo*: review & test
 
 
 <a name="Matrix23-translationMatrix"></a>

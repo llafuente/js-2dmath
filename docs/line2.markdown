@@ -40,8 +40,6 @@
 <a name="Line2-closetPoint"></a>
 * **closetPoint** (*out_vec2*: Vec2, *line2*: Line2, *vec2*: Vec2)
 
-  @todo
-
   **source**: [http://mathcentral.uregina.ca/QQ/database/QQ.09.04/carly1.html](http://mathcentral.uregina.ca/QQ/database/QQ.09.04/carly1.html)
 
 

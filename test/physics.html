@@ -76,10 +76,10 @@ World.prototype._update = function(dt) {
         Polygon.edges(bEdges, b.wbody);
         Polygon.normals(bNormals, bEdges);
 
-        Collision.SAT.getPolygonPolygon(a.wbody, aNormals, [0, 0], b.wbody, bNormals, [0, 0], result);
+        Collision.SAT.getPolygonPolygon(result, a.wbody, aNormals, [0, 0], b.wbody, bNormals, [0, 0]);
         console.log("SAT", JSON.stringify(result));
 
-        if (result.overlap) {
+        if (result.penetration) {
             //self.stop = true;
 
             //Draw.polygon(ctx, result.simplex, "rgba(0,255,0,0.25)", true);
@@ -87,7 +87,7 @@ World.prototype._update = function(dt) {
             //var epa = Polygon.EPA(a.wbody, b.wbody, result.simplex);
             //console.log("EPA", JSON.stringify(epa));
 
-            var ec = Collision.Manifold.EdgeClipping(a.wbody, b.wbody, result.overlapN);
+            var ec = Collision.Manifold.EdgeClipping(a.wbody, b.wbody, result.penetrationN);
             console.log("EC", JSON.stringify(ec));
 
             if (ec) {
@@ -109,7 +109,7 @@ World.prototype._update = function(dt) {
                 Collision.elastic(aPos, a.velocity, a.mass, bPos, b.velocity, b.mass);
                 */
 
-                Collision.Resolve.linear(a.velocity, a.restitution, a.imass, aPos, b.velocity, b.restitution, b.imass, bPos, result.overlapN);
+                Collision.Resolve.linear(a.velocity, a.restitution, a.imass, aPos, b.velocity, b.restitution, b.imass, bPos, result.penetrationN);
             }
         }
     });

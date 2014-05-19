@@ -24,7 +24,7 @@
 <a name="Circle-fromTriangle"></a>
 * **fromTriangle** (*tri*: Triangle, *inside*: Boolean, *circumcenter*: Boolean): Circle
 
-  @todo review inside cases
+  *todo*: review inside cases
 
 
 <a name="Circle-clone"></a>
@@ -53,6 +53,9 @@
 
 <a name="Circle-closestPoint"></a>
 * **closestPoint** (*out_vec2*: Vec2, *circle*: Circle, *vec2*: Vec2): Vec2
+
+<a name="Circle-momentOfInertia"></a>
+* **momentOfInertia** (*circle*: Circle, *mass*: Number)
 
 <a name="Circle-perimeter"></a>
 * **perimeter** (*circle*: Circle)

@@ -46,3 +46,6 @@
 
 <a name="Rectangle-perimeter"></a>
 * **perimeter** (*rect*: Rectangle): Number
+
+<a name="Rectangle-momentOfInertia"></a>
+* **momentOfInertia** (*rect*: Rectangle, *mass*: Number)

@@ -43,7 +43,7 @@
 <a name="Segment2-isParallel"></a>
 * **isParallel** (*seg2*: Segment2, *seg2_2*: Segment2): Boolean
 
-  @todo do it!
+  *todo*: do it!
 
 
 <a name="Segment2-isVec2Inside"></a>
@@ -64,7 +64,7 @@
 <a name="Segment2-$closestPoint"></a>
 * **$closestPoint** (*out_vec2*: Vec2, *x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number, *x3*: Number, *y3*: Number): Vec2
 
-  @todo optimize, "inline the if/else"
+  *todo*: optimize, "inline the if/else"
 
 
 <a name="Segment2-$collinear"></a>

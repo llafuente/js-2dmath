@@ -33,7 +33,7 @@
 <a name="AABB2-fromBeizer"></a>
 * **fromBeizer** (*beizer*: Beizer, *npoints*: Number): AABB2
 
-  @todo implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves (Timo answer)
+  *todo*: implement a more robust / fast algorithm http://stackoverflow.com/questions/2587751/an-algorithm-to-find-bounding-box-of-closed-bezier-curves (Timo answer)
 
   **reference**: [http://jsfiddle.net/4VCVX/3/](http://jsfiddle.net/4VCVX/3/)
 
@@ -84,16 +84,10 @@
 
 
 <a name="AABB2-isVec2Inside"></a>
-* **isVec2Inside** (*aabb2*: AABB2, *vec2*: Vec2)
-
-  @return {Boolean}
-
+* **isVec2Inside** (*aabb2*: AABB2, *vec2*: Vec2): Boolean
 
 <a name="AABB2-isAABB2Inside"></a>
-* **isAABB2Inside** (*aabb2*: AABB2, *aabb2_2*: AABB2)
-
-  @return {Boolean}
-
+* **isAABB2Inside** (*aabb2*: AABB2, *aabb2_2*: AABB2): Boolean
 
 <a name="AABB2-perimeter"></a>
 * **perimeter** (*aabb2*: AABB2): Number

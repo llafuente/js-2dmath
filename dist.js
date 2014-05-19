@@ -52,34 +52,46 @@ function getArguments(node, white_list) {
     return args;
 }
 
+function attr_parse(attr, line, comments, full_line) {
+    switch(attr.toLowerCase()) {
+    case "returns":
+    case "return":
+        var line = line.substring(line.indexOf("{"));
+        line = line.substring(1, line.indexOf("}"));
+        methods[i].returns = line;
+        break;
+    case "see":
+    case "alias":
+        comments.push("  **see**: [" + line + "](#" + cls + "-" + line + ")");
+        break;
+    case "http":
+        comments.push("  **link**: [" + line + "](" + line + ")");
+        break;
+    case "source":
+        comments.push("  **source**: [" + line + "](" + line + ")");
+        break;
+    case "reference":
+        comments.push("  **reference**: [" + line + "](" + line + ")");
+        break;
+    case "note":
+        comments.push("  *note*: " + line);
+    case "todo":
+        comments.push("  *todo*: " + line);
+    }
+}
+
 function parse_comments(list) {
     var comments = [];
 
     list.forEach(function (c) {
-        var line;
+        var line,
+        attr;
 
-        if (c.indexOf("@returns") !== -1) {
-            c = c.substring(c.indexOf("{"));
-            c = c.substring(1, c.indexOf("}"));
-            methods[i].returns = c;
-        } else if (c.indexOf("@see") !== -1) {
-            line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
-            line = line.substring(5);
-            if (line.indexOf("http") === 0) {
-                comments.push("  **link**: [" + line + "](" + line + ")");
-            } else {
-                comments.push("  **see**: [" + line + "](#" + cls + "-" + line + ")");
-            }
-        } else if (c.indexOf("@source") !== -1) {
-            line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
-            line = line.substring(8);
-            comments.push("  **source**: [" + line + "](" + line + ")");
-        } else if (c.indexOf("@reference") !== -1) {
-            line = c.trim().replace(/^\*(\s+)/, "").replace(/^\*$/, "");
-            line = line.substring(11);
-            comments.push("  **reference**: [" + line + "](" + line + ")");
-        } else if (c.indexOf("@param") !== -1) {
-            //ignore
+        if (c.indexOf("@") !== -1) {
+            line = c.substring(c.indexOf("@") + 1);
+            attr = line.substring(0, line.indexOf(" "));
+            line = line.substring(line.indexOf(" ") + 1);
+            attr_parse(attr, line, comments, c);
         } else {
             line = c.trim().replace(/^\*(\s{0,1})/, "").replace(/^\*$/, "");
             if (line.length) {
@@ -162,7 +174,6 @@ function getNearestFunction(node) {
 for (cls in files) {
 
     console.log("* [" + cls + "](https://github.com/llafuente/js-2dmath/blob/master/" + files[cls].doc_file.replace("./", "") + ")");
-    console.log("");
 
     description = null;
 
@@ -198,7 +209,7 @@ for (cls in files) {
 
                 var fn = getNearestFunction(node);
 
-                if (fn) {
+                if (fn && methods[fn.id.name]) {
                     methods[fn.id.name].comments = node.value.split("\n");
                 }
             }
@@ -235,7 +246,7 @@ for (cls in files) {
             if (methods[mod_required[i].name]) {
                 //alias!
                 methods[i] = object.clone(methods[mod_required[i].name]);
-                methods[i].comments = ["@see " + mod_required[i].name];
+                methods[i].comments = ["@alias " + mod_required[i].name];
             } else {
                 // this is for complex cases - generated code
                 try {

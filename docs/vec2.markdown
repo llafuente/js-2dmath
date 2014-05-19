@@ -242,7 +242,7 @@
 
    Cross product between a vector and the Z component of a vector
 
-  @todo test use rprependicular ?
+  *todo*: test use rprependicular ?
 
 
 <a name="Vec2-cossZV"></a>
@@ -250,7 +250,7 @@
 
   Cross product between a vector and the Z component of a vector
 
-  @todo test use prependicular ?
+  *todo*: test use prependicular ?
 
 
 <a name="Vec2-toAngle"></a>

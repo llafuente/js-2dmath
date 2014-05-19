@@ -2,7 +2,11 @@
   "docs": {
     "arguments": {
       "m2d":  "Matrix23",
+
       "circle": "Circle",
+      "a_circle": "Circle",
+      "b_circle": "Circle",
+
       "line2": "Line2",
       "vec2": "Vec2",
       "out_vec2": "Vec2",
@@ -250,8 +254,6 @@
           "line2_2": "Line2",
           "seg2_1": "Segment2",
           "seg2_2": "Segment2",
-          "circle_1": "Circle",
-          "circle_2": "Circle",
           "bb2_1": "AABB2",
           "bb2_2": "AABB2",
           "rect1": "Rectangle",
@@ -310,6 +312,82 @@
 
         "valid_arguments": {
           "seed": "Number"
+        }
+      },
+      "Collision.SAT": {
+        "filename": "./lib/collision/sat.js",
+        "debug_file": "./debug/collision-sat.js",
+        "doc_file": "./docs/collision-sat.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+            "out_response" : "Collision.Response",
+
+            "a_points": "Polygon",
+            "b_points": "Polygon",
+            "poly_points": "Polygon",
+
+            "a_normals": "Polygon<Normals>",
+            "b_normals": "Polygon<Normals>",
+
+            "poly_edges": "Polygon<Edges>",
+            "a_edges": "Polygon<Edges>",
+            "b_edges": "Polygon<Edges>",
+
+            "poly_pos": "Vec2",
+            "a_pos": "Vec2",
+            "b_pos": "Vec2"
+        }
+      },
+      "Collision.GJK": {
+        "filename": "./lib/collision/gjk.js",
+        "debug_file": "./debug/collision-gjk.js",
+        "doc_file": "./docs/collision-gjk.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+            "a_points": "Polygon",
+            "b_points": "Polygon"
+        }
+      },
+      "Collision.Resolve": {
+        "filename": "./lib/collision/resolve.js",
+        "debug_file": "./debug/collision-resolve.js",
+        "doc_file": "./docs/collision-resolve.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+            "a_point": "Vec2",
+            "b_point": "Vec2",
+            "out_position": "Vec2",
+            "out_velocity": "Vec2",
+            "out_a_velocity": "Vec2",
+            "out_b_velocity": "Vec2",
+            "normal": "Vec2",
+            "vector": "Vec2",
+            "penetration": "Number",
+            "a_restitution": "Number",
+            "b_restitution": "Number",
+            "a_imass": "Number",
+            "b_imass": "Number",
+            "a_mass": "Number",
+            "b_mass": "Number"
+        }
+      },
+      "Collision.Manifold": {
+        "filename": "./lib/collision/manifold.js",
+        "debug_file": "./debug/collision-manifold.js",
+        "doc_file": "./docs/collision-manifold.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+            "a_points": "Polygon",
+            "b_points": "Polygon",
+            "n": "Vec2"
         }
       }
   }
