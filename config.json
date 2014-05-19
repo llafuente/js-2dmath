@@ -17,6 +17,8 @@
       "beizer": "Beizer",
       "aabb2": "AABB2",
 
+      "mass": "Number",
+
       "x1": "Number",
       "x2": "Number",
       "y1": "Number",

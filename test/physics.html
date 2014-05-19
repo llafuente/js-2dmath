@@ -55,7 +55,9 @@ World.prototype._update = function(dt) {
         //apply gravity only to movable objects
         if (b.imass !== 0) {
             b.update();
-            Vec2.add(b.velocity, b.velocity, gravity);
+            //Vec2.add(b.velocity, b.velocity, gravity);
+            b.velocity[0] = b.velocity[0] + gravity[0] * b.mass;
+            b.velocity[1] = b.velocity[1] + gravity[1] * b.mass;
         }
     });
 
@@ -107,7 +109,7 @@ World.prototype._update = function(dt) {
                 Collision.elastic(aPos, a.velocity, a.mass, bPos, b.velocity, b.mass);
                 */
 
-                Collision.Resolve.linear(a.velocity, a.restitution, a.imass, b.velocity, b.restitution, b.imass, result.overlapN);
+                Collision.Resolve.linear(a.velocity, a.restitution, a.imass, aPos, b.velocity, b.restitution, b.imass, bPos, result.overlapN);
             }
         }
     });
@@ -222,8 +224,16 @@ var b1 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0), 0, 1);
 world.addBody(b1);
 
 var b2 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, Math.PI / 16), 1, 1);
-b2.translate2(50, 82);
+b2.translate2(50, 100);
 world.addBody(b2);
+
+var b3 = new Body (Polygon.fromCircle(Circle.create(0, 0, 25), 10, Math.PI / 16), 5, 1);
+b3.translate2(-40, 80);
+world.addBody(b3);
+
+var b4 = new Body (Polygon.fromCircle(Circle.create(0, 0, 10), 10, Math.PI / 16), 50, 1);
+b4.translate2(0, 150);
+world.addBody(b4);
 
 function update() {
     // do not clear canvas we dont see debug information
@@ -236,13 +246,15 @@ function update() {
     Draw.invertAxis(canvas, ctx); // y-up
     ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
 
-    world.update(0.2);
+    world.update(0.05);
 
     b1.update();
     b2.update();
 
     Draw.polygon(ctx, b1.wbody, "red");
     Draw.polygon(ctx, b2.wbody, "blue");
+    Draw.polygon(ctx, b3.wbody, "blue");
+    Draw.polygon(ctx, b4.wbody, "blue");
 
     ctx.restore();
 };
