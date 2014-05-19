@@ -28,12 +28,13 @@ module.exports = {
         EPA: require("./lib/collision/epa.js"),
         Manifold: require("./lib/collision/manifold.js"),
         SAT: require("./lib/collision/sat.js"),
-        elastic: require("./lib/collision/elastic.js"),
         Resolve: require("./lib/collision/resolve.js")
     },
 
     NumericalIntegration: {
-        RK4: require("./lib/numerical-integration/rk4.js")
+        RK4: require("./lib/numerical-integration/rk4.js"),
+        Verlet: require("./lib/numerical-integration/verlet.js"),
+        Euler: require("./lib/numerical-integration/euler.js")
     },
 
     globalize: function (object) {
