@@ -7,6 +7,9 @@
       "a_circle": "Circle",
       "b_circle": "Circle",
 
+      "a_poly": "Polygon",
+      "b_poly": "Polygon",
+
       "line2": "Line2",
       "vec2": "Vec2",
       "out_vec2": "Vec2",

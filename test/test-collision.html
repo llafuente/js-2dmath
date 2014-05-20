@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
+<title>js-2dmath: Demostration of various Intersections</title>
+
+<script src="../debug/js-2dmath-browser-debug.js" type="text/javascript" ></script>
+
+</head>
+<body>
+<h1>js-2dmath: Demostration of various Intersections</h1>
+<canvas id="canvas" width="640" height="480" style="border: 1px solid red;"></canvas>
+</body>
+</html>
+
+<script>
+//
+// --- INIT ---
+//
+//expose js-2dmath globally, I'm lazy!
+require("js-2dmath").globalize(window);
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+Draw.invertAxis(canvas, ctx); // y-up
+ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
+ctx.scale(3, 3); // center
+Draw.cartesianAxis(ctx, 640, 16); // coordinates
+
+//
+// --- CODE ---
+//
+/*
+var Vec2 = require("../index.js").Vec2,
+    Intersection = require("../index.js").Intersection,
+    Circle = require("../index.js").Circle,
+    Polygon = require("../index.js").Polygon,
+    GJK = require("../index.js").Collision.GJK.getPolygonPolygon,
+    EPA = require("../index.js").Collision.EPA,
+    SAT = require("../index.js").Collision.SAT.getPolygonPolygon,
+    Response = require("../index.js").Collision.Response;
+*/
+
+function cPoly(circle, npoints, initial_angle) {
+    if (circle) {
+        this.points = Polygon.fromCircle(circle, npoints, initial_angle);
+        this.calc();
+    }
+}
+
+cPoly.prototype.calc = function () {
+    this.edges = Polygon.edges([], this.points);
+    this.normals = Polygon.normals([], this.edges);
+}
+cPoly.prototype.translate = function (vec2) {
+    Polygon.translate(this.points, this.points, vec2);
+    Polygon.translate(this.edges, this.edges, vec2);
+}
+
+//setup
+
+var A = new cPoly(Circle.create(0, 0, 25), 4, Math.HALF_PI * 0.5),
+    B = new cPoly(Circle.create(0, 0, 25), 4, 0),
+    positions = [
+        [-5, 5],
+        //[-5, -5],
+        //[5, -5],
+        //[5, -5]
+    ];
+
+
+
+positions.forEach(function(pos) {
+    B.translate(pos);
+
+    var intersection = Intersection.polygon_polygon(A.points, B.points);
+
+    Draw.polygon(ctx, A.points, "blue");
+    Draw.polygon(ctx, B.points, "green");
+    intersection.points.forEach(function(p) {
+        Draw.vec2(ctx, p, "red");
+    });
+
+    var out_response = Collision.Response.create();
+
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log(pos);
+    console.log("");
+
+    var gjk_result = Collision.GJK.getPolygonPolygon(A.points, B.points);
+    //console.log("GJK", gjk_result);
+
+    Collision.EPA(out_response, A.points, B.points, gjk_result.simplex);
+    console.log("EPA", out_response);
+
+    Draw.vec2dir(ctx, intersection.points[1], out_response.mtv, out_response.depth, "cyan");
+
+    console.log(Collision.SAT.getPolygonPolygon(out_response, A.points, A.normals, [0, 0], B.points, B.normals, [0, 0]));
+    console.log("SAT", out_response);
+
+    Draw.vec2dir(ctx, intersection.points[0], out_response.mtv, out_response.depth, "blue");
+
+    //A.translate(Vec2.scale([], out_response.mtv, -out_response.depth));
+    //Draw.polygon(ctx, A.points, "yellow");
+
+    B.translate(Vec2.negate(pos, pos));
+});
+
+</script>
