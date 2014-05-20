@@ -24,6 +24,7 @@ module.exports = {
     NMtree: require("./lib/nmtree.js"),
 
     Collision : {
+        Response: require("./lib/collision/response.js"),
         GJK: require("./lib/collision/gjk.js"),
         EPA: require("./lib/collision/epa.js"),
         Manifold: require("./lib/collision/manifold.js"),
