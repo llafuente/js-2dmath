@@ -98,3 +98,8 @@
 
 <a name="Intersection-vec2_segment2"></a>
 * **vec2_segment2** (*vec2*: Vec2, *seg2*: Segment2)
+
+<a name="Intersection-polygon_polygon"></a>
+* **polygon_polygon** (*a_poly*: Polygon, *b_poly*: Polygon)
+
+  *todo*: this is just a fast version, no optimization no for real-time

@@ -89,5 +89,18 @@ console.log(Vec2.angleTo([100, 0], aux));
 console.log(angle);
 Draw.text(ctx2, "angleTo=" + angle.toFixed(2), Vec2.add([], aux, [7,7]))
 
+var v1 = [25, 25];
+var v2 = [0, 1];
+var rotv = Vec2.rotateVec([0, 0], v1, v2);
+Draw.vec2(ctx2, v1, "blue");
+Draw.vec2(ctx2, v2, "blue");
+Draw.vec2(ctx2, rotv, "blue");
+Draw.text(ctx2, "rotateVec()", rotv)
+console.log(rotv);
+
+
+var refv = Vec2.reflect([0, 0], v1, v2);
+Draw.text(ctx2, "reflect()", refv)
+console.log(refv);
 
 </script>

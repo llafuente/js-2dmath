@@ -96,5 +96,11 @@
   **source**: [http://www.physicsforums.com/showthread.php?t=25293&page=2&pp=15](http://www.physicsforums.com/showthread.php?t=25293&page=2&pp=15)
 
 
+<a name="Polygon-isConvex"></a>
+* **isConvex** (*poly*: Polygon)
+
+  **source**: [http://paulbourke.net/geometry/polygonmesh/](http://paulbourke.net/geometry/polygonmesh/)
+
+
 <a name="Polygon-toString"></a>
 * **toString** (*poly*: Polygon)

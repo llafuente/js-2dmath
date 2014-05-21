@@ -26,37 +26,35 @@ So the objective is "**Be fast**"
 * Use arrays instead of objects, this is huge performance boost!
 * Avoid creating unnecessary variables (reuse intermediate variables) only "create" & "clone" methods should create new variables.
 * Cache every function call to a single variable. example: Vec2.add -> vec2_add, even Math.*
-* If access an multi-dimensional array in a loop, cache the array access. for(i...) carr=arr[i]; carr[X]
+* If access a multi-dimensional array in a loop, cache the array access. for(i...) carr=arr[i]; carr[X]
 * Do not use forEach, map, every etc. or other looping method that require apply/call, both are costly.
 
-I'm sure I miss/ignore some of my own performance tips, **PR if you find any error or find a better way!**
+I'm sure I miss/ignore some of my own performance tips, **PR if you find any error or a better way!**
 
 See some [performance test](https://github.com/llafuente/js-2dmath/blob/master/js-performance-tests.markdown) that prove it.
 
-## Browser & Debug distributions
+## Grunt
 
 ```bash
-grunt dist
-# creates:
-# - dist/js-2dmath-browser.js
-# - debug/js-2dmath-browser-debug.js
-# - docs/*.markdown
+npm install -g grunt
+npm install -g grunt-cli
 ```
 
-**Why there is a debug dist?**
+### grunt dist
 
-Debug distribution use falafel to add assertions based on the documentation.
+Build debug (*debug/js-2dmath-browser-debug.js*), browser (*dist/js-2dmath-browser.js*), uglify and documentation (*docs/.markdown*) in one step.
 
-Force to use valid sanitized inputs (Arrays, not NaN, not undefined, not null) to every function.
+All three builds are connected that's why are connected in this build step.
 
+js-2dmath has a friendly debug build using falafel so you can debug properly your app.
+Based on the documentation information build a new JS with many assertions.
+Force you to use valid sanitized inputs (Arrays, not NaN, not undefined, not null) to every function.
 
-## Developing
+** TODO ** include tests!
 
-```bash
-grunt watch
-```
+### grunt watch
 
-This will "dist" on any .js file change
+Watch every change and rebuild the distribution code.
 
 
 ## What can you do with js-2dmath?

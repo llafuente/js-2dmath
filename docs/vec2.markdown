@@ -75,89 +75,94 @@
 <a name="Vec2-isNaN"></a>
 * **isNaN** (*v1*: Vec2): Boolean
 
-  Any coordinate is NaN
+  Any coordinate is NaN? -> true
 
 
 <a name="Vec2-copy"></a>
-* **copy** (*out*: Vec2, *v1*: Vec2): Vec2
+* **copy** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
 
-  Copy v1 into out
+  Copy v1 into out_vec2
 
 
 <a name="Vec2-negate"></a>
-* **negate** (*out*: Vec2, *v1*: Vec2): Vec2
+* **negate** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
 
-  Negate v1 and return it into out
+  Negate v1 into out_vec2
 
 
 <a name="Vec2-normalize"></a>
-* **normalize** (*out*: Vec2, *v1*: Vec2): Vec2
+* **normalize** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
 
 <a name="Vec2-normalizeSq"></a>
-* **normalizeSq** (*out*: Vec2, *v1*: Vec2): Vec2
+* **normalizeSq** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
+
+  Normalize v1 but squared no use sqrt, for performance.
+
 
 <a name="Vec2-perpendicular"></a>
-* **perpendicular** (*out*: Vec2, *v1*: Vec2): Vec2
+* **perpendicular** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
 
   Rotate the vector clockwise
 
 
 <a name="Vec2-rperpendicular"></a>
-* **rperpendicular** (*out*: Vec2, *v1*: Vec2): Vec2
+* **rperpendicular** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
 
   Rotate the vector counterclockwise
 
 
 <a name="Vec2-lerp"></a>
-* **lerp** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *t*: Number): Vec2
+* **lerp** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *t*: Number): Vec2
 
   Linearly interpolate between a and b.
 
 
 <a name="Vec2-lerpconst"></a>
-* **lerpconst** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *d*: Number): Vec2
+* **lerpconst** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *d*: Number): Vec2
 
   Linearly interpolate between v1 towards v2 by distance d.
 
 
 <a name="Vec2-slerp"></a>
-* **slerp** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *t*: Number): Vec2
+* **slerp** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *t*: Number): Vec2
 
   Spherical linearly interpolate between v1 and v2.
 
 
 <a name="Vec2-slerpconst"></a>
-* **slerpconst** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *radians*: Number (Radians)): Vec2
+* **slerpconst** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *radians*: Number (Radians)): Vec2
 
   Spherical linearly interpolate between v1 towards v2 by no more than angle a in radians.
 
 
 <a name="Vec2-forAngle"></a>
-* **forAngle** (*v1*: Vec2, *radians*: Number (Radians)): Vec2
+* **forAngle** (*out_vec2*: Vec2, *radians*: Number (Radians)): Vec2
 
-  Returns the unit length vector for the given angle(in radians).
+  Returns the unit length vector for the given angle (in radians).
 
 
 <a name="Vec2-project"></a>
-* **project** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **project** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
   Returns the vector projection of v1 onto v2.
 
 
 <a name="Vec2-rotate"></a>
-* **rotate** (*out*: Vec2, *v1*: Vec2, *radians*: Number (Radians)): Vec2
+* **rotate** (*out_vec2*: Vec2, *v1*: Vec2, *radians*: Number (Radians)): Vec2
 
   Rotates the point by the given angle
 
 
 <a name="Vec2-rotateFrom"></a>
-* **rotateFrom** (*out*: Vec2, *v1*: Vec2, *radians*: Number (Radians), *center*: Vec2): Vec2
+* **rotateFrom** (*out_vec2*: Vec2, *v1*: Vec2, *radians*: Number (Radians), *center*: Vec2): Vec2
 
   Rotates the point by the given angle around an optional center point.
 
+  note, center cannot be out_vec2
+
 
 <a name="Vec2-rotateVec"></a>
-* **rotateVec** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **rotateVec** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-unrotateVec"></a>
 * **unrotateVec** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
@@ -322,31 +327,31 @@
 * **toString** (*v1*: Vec2)
 
 <a name="Vec2-perp"></a>
-* **perp** (*out*: Vec2, *v1*: Vec2)
+* **perp** (*out_vec2*: Vec2, *v1*: Vec2)
 
   **see**: [perpendicular](#Vec2-perpendicular)
 
 
 <a name="Vec2-rotateCW"></a>
-* **rotateCW** (*out*: Vec2, *v1*: Vec2)
+* **rotateCW** (*out_vec2*: Vec2, *v1*: Vec2)
 
   **see**: [perpendicular](#Vec2-perpendicular)
 
 
 <a name="Vec2-rperp"></a>
-* **rperp** (*out*: Vec2, *v1*: Vec2)
+* **rperp** (*out_vec2*: Vec2, *v1*: Vec2)
 
   **see**: [rperpendicular](#Vec2-rperpendicular)
 
 
 <a name="Vec2-rotateCCW"></a>
-* **rotateCCW** (*out*: Vec2, *v1*: Vec2)
+* **rotateCCW** (*out_vec2*: Vec2, *v1*: Vec2)
 
   **see**: [rperpendicular](#Vec2-rperpendicular)
 
 
 <a name="Vec2-interpolate"></a>
-* **interpolate** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *t*: Number)
+* **interpolate** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *t*: Number)
 
   **see**: [lerp](#Vec2-lerp)
 

@@ -10,20 +10,6 @@
 
   A simple library for determining intersections of circles and polygons using the Separating Axis Theorem.
 
-<a name="Collision.SAT-Response"></a>
-* **Response** ()
-
-  ## Response
-
-  An object representing the result of an intersection. Contains:
-
-   * The two objects participating in the intersection
-
-   * The Vec2 representing the minimum change necessary to extract the first object from the second one (as well as a unit Vec2 in that direction and the magnitude of the overlap)
-
-   * Whether the first object is entirely inside the second, and vice versa.
-
-
 <a name="Collision.SAT-getPointInCircle"></a>
 * **getPointInCircle** (*vec2*: Vec2, *circle*: Circle): Boolean
 
