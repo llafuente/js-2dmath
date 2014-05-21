@@ -45,7 +45,7 @@
         "generate_debug": true,
 
         "valid_arguments": {
-          "out": "Vec2",
+          "v2_n": "Vec2",
           "x": "Number",
           "y": "Number",
           "length": "Number",
@@ -370,8 +370,9 @@
             "out_a_velocity": "Vec2",
             "out_b_velocity": "Vec2",
             "normal": "Vec2",
+            "mtv": "Vec2",
             "vector": "Vec2",
-            "penetration": "Number",
+            "penetration_depth": "Number",
             "a_restitution": "Number",
             "b_restitution": "Number",
             "a_imass": "Number",
