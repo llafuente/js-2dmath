@@ -40,12 +40,12 @@ Matrix23.rotate(m2d_2, m2d_2, -Math.HALF_PI * 0.5);
 Matrix23.skewX(m2d_2, m2d_2, -Math.HALF_PI * 0.5);
 
 
-var acc = 0;
+var acc = 0.7;
 setInterval(function() {
     ctx.save();
     ctx.clearRect (0 ,0 ,640 ,480);
 
-    acc+=0.05;
+    acc+=0.01;
     if (acc > 1) {
         acc = 0;
     }
@@ -70,12 +70,13 @@ setInterval(function() {
 
 
     var in_poly = Polygon.fromRectangle(rect);
+    console.log(JSON.stringify(in_poly));
     Matrix23.translate(m2d_3, m2d_3, [10, 10])
     var out_poly = Polygon.transform([], in_poly, m2d_3);
     Draw.polygon(ctx, out_poly, "green")
 
     ctx.restore();
-}, 100);
+}, 50);
 
 
 </script>
