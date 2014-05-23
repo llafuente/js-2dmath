@@ -19,7 +19,10 @@
       "vec2_list": "Array(&lt;Vec2&gt;)",
       "seg2": "Segment2",
       "rect": "Rectangle",
+
       "tri": "Triangle",
+      "out_tri": "Triangle",
+
       "curve": "Beizer",
       "beizer": "Beizer",
       "aabb2": "AABB2",
@@ -234,7 +237,6 @@
         "generate_debug": true,
 
         "valid_arguments": {
-          "out": "Triangle",
           "rect": "Rectangle"
         }
       },
@@ -392,6 +394,18 @@
             "a_points": "Polygon",
             "b_points": "Polygon",
             "n": "Vec2"
+        }
+      },
+      "Collision.Response": {
+        "filename": "./lib/collision/response.js",
+        "debug_file": "./debug/collision-response.js",
+        "doc_file": "./docs/collision-response.markdown",
+        "update_doc": true,
+        "generate_debug": true,
+
+        "valid_arguments": {
+            "response": "Collision.Response"
+
         }
       }
   }

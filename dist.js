@@ -81,26 +81,30 @@ function attr_parse(attr, line, comments, full_line) {
 }
 
 function parse_comments(list) {
-    var comments = [];
+    var description = [],
+        extra = [];
 
     list.forEach(function (c) {
         var line,
-        attr;
+            attr,
+            at_pos = c.indexOf("@");
 
-        if (c.indexOf("@") !== -1) {
+        if (at_pos > -1 && at_pos < 5) {
             line = c.substring(c.indexOf("@") + 1);
             attr = line.substring(0, line.indexOf(" "));
             line = line.substring(line.indexOf(" ") + 1);
-            attr_parse(attr, line, comments, c);
+            attr_parse(attr, line, extra, c);
         } else {
             line = c.trim().replace(/^\*(\s{0,1})/, "").replace(/^\*$/, "");
-            if (line.length) {
-                comments.push("  " + line);
+            if (line.length && line != "!") {
+                description.push("  " + line);
             }
         }
     });
 
-    return comments.join("\n\n");
+    description = description.concat(extra);
+
+    return description.join("\n\n");
 }
 
 function create_number_validator(post_str) {
