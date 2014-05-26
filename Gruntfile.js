@@ -53,14 +53,14 @@ module.exports = function (grunt) {
 
     grunt.task.registerTask('browserify:debug', 'Generate debug files', function(arg1, arg2) {
         var done = this.async();
-        require("child_process").exec("browserify -r ./debug_index.js:js-2dmath -o ./debug/js-2dmath-browser-debug.js < /dev/tty", function(error, stdout, stderr) {
+        require("child_process").exec("node node_modules/browserify/bin/cmd.js -r ./debug_index.js:js-2dmath -o ./debug/js-2dmath-browser-debug.js < /dev/tty", function(error, stdout, stderr) {
             done();
         });
     });
 
     grunt.task.registerTask('browserify:dist', 'Generate debug files', function(arg1, arg2) {
         var done = this.async();
-        require("child_process").exec("browserify -r ./index.js:js-2dmath -o ./dist/js-2dmath-browser.js < /dev/tty", function(error, stdout, stderr) {
+        require("child_process").exec("node node_modules/browserify/bin/cmd.js -r ./index.js:js-2dmath -o ./dist/js-2dmath-browser.js < /dev/tty", function(error, stdout, stderr) {
             done();
         });
     });

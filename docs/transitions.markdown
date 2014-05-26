@@ -8,6 +8,12 @@
 * **LINK_IGNORE** = 3
 * **LINK_CANCEL** = 4
 
+<a name="Transitions-createCubic"></a>
+* **createCubic** (*cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number)
+
+<a name="Transitions-createQuadric"></a>
+* **createQuadric** (*cp1x*: Number, *cp1y*: Number)
+
 <a name="Transitions-Pow"></a>
 * **Pow** (*pos*: Number, *x*: Number)
 

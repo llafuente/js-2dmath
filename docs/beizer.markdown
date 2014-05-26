@@ -2,17 +2,15 @@
 ## Beizer
   Stability: 1 (Only additions & fixes)
 
-  Documentation
+  **reference**: [http://pomax.github.io/bezierinfo/](http://pomax.github.io/bezierinfo/)
 
-  * http://pomax.github.io/bezierinfo/
+  **reference**: [https://github.com/jackcviers/Degrafa/blob/master/Degrafa/com/degrafa/geometry/utilities/BezierUtils.as](https://github.com/jackcviers/Degrafa/blob/master/Degrafa/com/degrafa/geometry/utilities/BezierUtils.as)
 
-  * https://github.com/jackcviers/Degrafa/blob/master/Degrafa/com/degrafa/geometry/utilities/BezierUtils.as
+  **reference**: [http://cagd.cs.byu.edu/~557/text/ch7.pdf](http://cagd.cs.byu.edu/~557/text/ch7.pdf)
 
-  * http://cagd.cs.byu.edu/~557/text/ch7.pdf
+  **reference**: [http://algorithmist.wordpress.com/2009/02/02/degrafa-closest-point-on-quad-bezier/](http://algorithmist.wordpress.com/2009/02/02/degrafa-closest-point-on-quad-bezier/)
 
-  * http://algorithmist.wordpress.com/2009/02/02/degrafa-closest-point-on-quad-bezier/
-
-  * http://algorithmist.wordpress.com/2009/01/26/degrafa-bezierutils-class/
+  **reference**: [http://algorithmist.wordpress.com/2009/01/26/degrafa-bezierutils-class/](http://algorithmist.wordpress.com/2009/01/26/degrafa-bezierutils-class/)
 
 <a name="Beizer-cubic"></a>
 * **cubic** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number, *cp3x*: Number, *cp3y*: Number): Beizer
