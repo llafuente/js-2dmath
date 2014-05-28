@@ -36,12 +36,14 @@ module.exports = {
         RK4: require("./lib/numerical-integration/rk4.js"),
         Verlet: require("./lib/numerical-integration/verlet.js"),
         Euler: require("./lib/numerical-integration/euler.js")
-    },
+    }
+};
 
-    globalize: function (object) {
-        var i;
-        for (i in this) {
-            object[i] = this[i];
+module.exports.globalize = function (object) {
+    var i;
+    for (i in module.exports) {
+        if ("globalize" !== i) {
+            object[i] = module.exports[i];
         }
     }
 };
