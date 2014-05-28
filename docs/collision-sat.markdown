@@ -1,14 +1,16 @@
 <a name="Collision.SAT"></a>
 ## Collision.SAT
-  !
+  Version 0.4.1 - Copyright 2014 -  Jim Riecken <jimr@jimr.ca>
+
+  Released under the MIT License
+
+  Adapted to js-2dmath by Luis Lafuente <llafuente@noboxout.com>
+
+  A simple library for determining intersections of circles and polygons using the Separating Axis Theorem.
 
   **source**: [https://github.com/jriecken/sat-js](https://github.com/jriecken/sat-js)
 
   **reference**: [http://physics2d.com/content/separation-axis](http://physics2d.com/content/separation-axis)
-
-  Released under the MIT License
-
-  A simple library for determining intersections of circles and polygons using the Separating Axis Theorem.
 
 <a name="Collision.SAT-getPointInCircle"></a>
 * **getPointInCircle** (*vec2*: Vec2, *circle*: Circle): Boolean
@@ -39,11 +41,9 @@
 
   Check if a circle and a polygon collide.
 
-  *NOTE:** This is slightly less efficient than polygonCircle as it just
+  *note*: This is slightly less efficient than polygonCircle as it just runs polygonCircle and reverses everything at the end.
 
-  runs polygonCircle and reverses everything at the end.
-
-    they interset.
+  *todo*: This is slightly less efficient than polygonCircle as it just runs polygonCircle and reverses everything at the end.
 
 
 <a name="Collision.SAT-getPolygonPolygon"></a>

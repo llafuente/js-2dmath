@@ -26,6 +26,9 @@ var t,
     sx,
     sy;
 
+Transitions["cubic"] = Transitions.createCubic(0.25, 0.25, 0.5, 0.5);
+Transitions["quadric"] = Transitions.createQuadric(0.25, 0.25, 0.5, 0.5);
+
 for (t in Transitions) {
     if (
         t === "create" ||
@@ -34,6 +37,8 @@ for (t in Transitions) {
         t === "LINK_IGNORE" ||
         t === "LINK_CANCEL" ||
         t === "animate" ||
+        t === "createCubic" ||
+        t === "createQuadric" ||
         t === "tween"
     ) {
         continue;

@@ -66,6 +66,28 @@
   Returns true if the distance between v1 and v2 is less than dist.
 
 
+<a name="Vec2-compare"></a>
+* **compare** (*v1*: Vec2, *v2*: Vec2): Number
+
+  * 0 equal
+
+  * 1 top
+
+  * 2 top-right
+
+  * 3 right
+
+  * 4 bottom right
+
+  * 5 bottom
+
+  * 6 bottom-left
+
+  * 7 left
+
+  * 8 top-left
+
+
 <a name="Vec2-isValid"></a>
 * **isValid** (*v1*: Vec2): Boolean
 
@@ -158,77 +180,119 @@
 
   Rotates the point by the given angle around an optional center point.
 
-  note, center cannot be out_vec2
+  *note*: center cannot be out_vec2
+
+  *todo*: center cannot be out_vec2
 
 
 <a name="Vec2-rotateVec"></a>
-* **rotateVec** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **rotateVec** (*out_vec2*: Vec2, *v1*: Vec2, *v2_n*: Vec2): Vec2
+
+  Rotate a vector given "angle" by a normalized vector v2_n
+
 
 <a name="Vec2-unrotateVec"></a>
-* **unrotateVec** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **unrotateVec** (*out_vec2*: Vec2, *v1*: Vec2, *v2_n*: Vec2): Vec2
+
+  Un-rotate a vector given "angle" by a normalized vector v2_n
+
 
 <a name="Vec2-midPoint"></a>
-* **midPoint** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **midPoint** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-reflect"></a>
-* **reflect** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **reflect** (*out_vec2*: Vec2, *v1*: Vec2, *v2_n*: Vec2): Vec2
+
+  Reflect v1 by the imaginary line v2_n
+
 
 <a name="Vec2-subtract"></a>
-* **subtract** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **subtract** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-subtract2"></a>
-* **subtract2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
+* **subtract2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
 
 <a name="Vec2-add"></a>
-* **add** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **add** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-add2"></a>
-* **add2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
+* **add2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
 
 <a name="Vec2-multiply"></a>
-* **multiply** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **multiply** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+
+  **see**: [scale](#Vec2-scale)
+
 
 <a name="Vec2-multiply2"></a>
-* **multiply2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
+* **multiply2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
 
 <a name="Vec2-divide"></a>
-* **divide** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **divide** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-divide2"></a>
-* **divide2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
+* **divide2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number): Vec2
 
 <a name="Vec2-scale"></a>
-* **scale** (*out*: Vec2, *v1*: Vec2, *factor*: Number): Vec2
+* **scale** (*out_vec2*: Vec2, *v1*: Vec2, *factor*: Number): Vec2
+
+  **see**: [multiply](#Vec2-multiply)
+
 
 <a name="Vec2-pow"></a>
-* **pow** (*out*: Vec2, *v1*: Vec2, *factor*: Number): Vec2
+* **pow** (*out_vec2*: Vec2, *v1*: Vec2, *y*: Number): Vec2
+
+  (x1^y, y1^y)
+
 
 <a name="Vec2-max"></a>
-* **max** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **max** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-min"></a>
-* **min** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
+* **min** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2): Vec2
 
 <a name="Vec2-abs"></a>
-* **abs** (*out*: Vec2, *v1*: Vec2): Vec2
+* **abs** (*out_vec2*: Vec2, *v1*: Vec2): Vec2
 
 <a name="Vec2-scaleAndAdd"></a>
-* **scaleAndAdd** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *factor*: Number): Vec2
+* **scaleAndAdd** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *factor*: Number): Vec2
 
 <a name="Vec2-clamp"></a>
-* **clamp** (*out*: Vec2, *v1*: Vec2, *length*: Number): Vec2
+* **clamp** (*out_vec2*: Vec2, *v1*: Vec2, *length*: Number): Vec2
 
 <a name="Vec2-truncate"></a>
-* **truncate** (*out*: Vec2, *v1*: Vec2, *length*: Number)
+* **truncate** (*out_vec2*: Vec2, *v1*: Vec2, *length*: Number)
+
+<a name="Vec2-crossVZ"></a>
+* **crossVZ** (*out_vec2*: Vec2, *vec2*: Vec2, *factor*: Number): Number
+
+  Cross product between a vector and the Z component of a vector
+
+  AKA Rotate CW and scale
+
+  *todo*: test use rprependicular ?
+
+
+<a name="Vec2-crossZV"></a>
+* **crossZV** (*out_vec2*: Vec2, *factor*: Number, *vec2*: Vec2): Vec2
+
+  Cross product between a vector and the Z component of a vector
+
+  AKA Rotate CCW and scale
+
+  *todo*: test use prependicular ?
+
+
+<a name="Vec2-tripleProduct"></a>
+* **tripleProduct** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2, *v3*: Vec2)
+
+  (A x B) x C = B(C · A) - A(C · B)
+
+  (A x B) x C = B(A.dot(C)) - A(B.dot(C))
+
 
 <a name="Vec2-magnitude"></a>
 * **magnitude** (*v1*: Vec2, *v2*: Vec2): Number
-
-<a name="Vec2-compare"></a>
-* **compare** (*v1*: Vec2, *v2*: Vec2): Number
-
-  0 equal, 1 top, 2 top-right, 3 right, 4 bottom right, 5 bottom, 6 bottom-left, 7 left, 8 top-left
-
 
 <a name="Vec2-dot"></a>
 * **dot** (*v1*: Vec2, *v2*: Vec2): Number
@@ -240,22 +304,6 @@
 * **cross** (*v1*: Vec2, *v2*: Vec2): Number
 
   v1 × v2 = |a| * |b| * sin θ
-
-
-<a name="Vec2-cossVZ"></a>
-* **cossVZ** (*out*: Vec2, *vec2*: Vec2, *factor*: Number)
-
-   Cross product between a vector and the Z component of a vector
-
-  *todo*: test use rprependicular ?
-
-
-<a name="Vec2-cossZV"></a>
-* **cossZV** (*out*: Vec2, *factor*: Number, *vec2*: Vec2)
-
-  Cross product between a vector and the Z component of a vector
-
-  *todo*: test use prependicular ?
 
 
 <a name="Vec2-toAngle"></a>
@@ -273,17 +321,20 @@
 <a name="Vec2-sqrDistance"></a>
 * **sqrDistance** (*v1*: Vec2, *v2*: Vec2): Number
 
-  you length only need to compare lengths.
+  Distance without using sqrt (squared distance)
 
 
 <a name="Vec2-length"></a>
 * **length** (*v1*: Vec2): Number
 
-  Returns the length.
+  Return vector the length.
 
 
 <a name="Vec2-sqrLength"></a>
 * **sqrLength** (*v1*: Vec2): Number
+
+  Squared length (no sqrt)
+
 
 <a name="Vec2-within"></a>
 * **within** (*v1*: Vec2, *v2*: Vec2, *v3*: Vec2): Boolean
@@ -304,27 +355,24 @@
 
 
 <a name="Vec2-$cross"></a>
-* **$cross** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number)
+* **$cross** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number): Number
 
 <a name="Vec2-$dot"></a>
-* **$dot** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number)
+* **$dot** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number): Number
 
 <a name="Vec2-swap"></a>
 * **swap** (*v1*: Vec2, *v2*: Vec2): Undefined
 
   Swap vectors, both will be modified.
 
-
-<a name="Vec2-tripleProduct"></a>
-* **tripleProduct** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2, *v3*: Vec2)
-
-  (A x B) x C = B(C · A) - A(C · B)
-
-  (A x B) x C = B(A.dot(C)) - A(B.dot(C))
+  for lazy people
 
 
 <a name="Vec2-toString"></a>
 * **toString** (*v1*: Vec2)
+
+  (x, y) with only two decimals, for readability
+
 
 <a name="Vec2-perp"></a>
 * **perp** (*out_vec2*: Vec2, *v1*: Vec2)
@@ -369,37 +417,37 @@
 
 
 <a name="Vec2-sub"></a>
-* **sub** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2)
+* **sub** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2)
 
   **see**: [subtract](#Vec2-subtract)
 
 
 <a name="Vec2-sub2"></a>
-* **sub2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number)
+* **sub2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number)
 
   **see**: [subtract2](#Vec2-subtract2)
 
 
 <a name="Vec2-mul"></a>
-* **mul** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2)
+* **mul** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2)
 
   **see**: [multiply](#Vec2-multiply)
 
 
 <a name="Vec2-mul2"></a>
-* **mul2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number)
+* **mul2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number)
 
   **see**: [multiply2](#Vec2-multiply2)
 
 
 <a name="Vec2-div"></a>
-* **div** (*out*: Vec2, *v1*: Vec2, *v2*: Vec2)
+* **div** (*out_vec2*: Vec2, *v1*: Vec2, *v2*: Vec2)
 
   **see**: [divide](#Vec2-divide)
 
 
 <a name="Vec2-div2"></a>
-* **div2** (*out*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number)
+* **div2** (*out_vec2*: Vec2, *v1*: Vec2, *x*: Number, *y*: Number)
 
   **see**: [divide2](#Vec2-divide2)
 

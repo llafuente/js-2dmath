@@ -2,7 +2,10 @@
 ## Collision.Resolve
 
 <a name="Collision.Resolve-outside"></a>
-* **outside** (*out_position*: Vec2, *out_velocity*: Vec2, *penetration*: Number, *normal*: Vec2, *vector*: Vec2)
+* **outside** (*out_position*: Vec2, *out_velocity*: Vec2, *penetration_depth*: Number, *mtv*: Vec2)
+
+  Keep your object outside the other
+
 
 <a name="Collision.Resolve-linear"></a>
 * **linear** (*out_a_velocity*: Vec2, *a_restitution*: Number, *a_imass*: Number, *a_point*: Vec2, *out_b_velocity*: Vec2, *b_restitution*: Number, *b_imass*: Number, *b_point*: Vec2, *normal*: Vec2): Boolean
