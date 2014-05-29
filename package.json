@@ -27,10 +27,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap test/*.js",
+    "test": "tap test/test-*.js",
     "browserify": "browserify -r ./index.js:js-2dmath -o js-2dmath-browser.js",
-    "postinstall": "grunt dist",
-    "dist": "grunt dist"
+    "postinstall": "grunt dist"
   },
   "repository": {
     "type": "git",
@@ -50,11 +49,13 @@
     "object-enhancements": "*"
   },
   "devDependencies": {
-    "tap": "0.4.*",
-    "grunt-contrib-watch": "0.5.*",
-    "browserify": "3.46.*",
-    "falafel": "0.3.*",
-    "grunt-contrib-uglify": "0.4.*"
+    "tap": "0.4.9",
+    "grunt-contrib-watch": "0.6.1",
+    "browserify": "4.1.6",
+    "falafel": "0.3.1",
+    "grunt-contrib-uglify": "0.4.0",
+    "grunt-cli": "0.1.13",
+    "grunt": "0.4.5"
   },
   "jshintConfig": {
     "white": true,
