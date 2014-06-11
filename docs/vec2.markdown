@@ -88,14 +88,14 @@
   Negate v1 and return it into out
 
 
+<a name="Vec2-normalize"></a>
+* **normalize** (*out*: Vec2, *v1*: Vec2): Vec2
+
 <a name="Vec2-perpendicular"></a>
 * **perpendicular** (*out*: Vec2, *v1*: Vec2): Vec2
 
   Rotate the vector clockwise
 
-
-<a name="Vec2-normalize"></a>
-* **normalize** (*out*: Vec2, *v1*: Vec2): Vec2
 
 <a name="Vec2-rperpendicular"></a>
 * **rperpendicular** (*out*: Vec2, *v1*: Vec2): Vec2
@@ -140,15 +140,15 @@
 
 
 <a name="Vec2-rotate"></a>
-* **rotate** (*out*: Vec2, *v1*: Vec2, *radians*: Number (Radians), *center*: Vec2): Vec2
+* **rotate** (*out*: Vec2, *v1*: Vec2, *radians*: Number (Radians)): Vec2
+
+  Rotates the point by the given angle
+
+
+<a name="Vec2-rotateFrom"></a>
+* **rotateFrom** (*out*: Vec2, *v1*: Vec2, *radians*: Number (Radians), *center*: Vec2): Vec2
 
   Rotates the point by the given angle around an optional center point.
-
-  The object itself is not modified.
-
-  Read more about angle units and orientation in the description of the
-
-  {@link #angle} property.
 
 
 <a name="Vec2-rotateVec"></a>
