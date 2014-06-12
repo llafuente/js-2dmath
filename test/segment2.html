@@ -5,6 +5,9 @@
 <title>Untitled Document</title>
 
 <script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
+<!--
+<script src="../debug/js-2dmath-browser-debug.js" type="text/javascript" ></script>
+-->
 
 
 </head>
@@ -32,8 +35,8 @@ var seg2 = Segment2.create(-60, -50, 40, 50),
     a = Vec2.create(60, 20),
     b = Vec2.create(100, 0),
     circle = Circle.create(-50, 50, 20),
-    aux = [],
-    seg2_normal = [],
+    aux = [0, 0],
+    seg2_normal = [0, 0],
     offset = [canvas.width * 0.5, canvas.height * 0.5],
     mouse = [0, 0];
 
@@ -52,14 +55,14 @@ function render() {
     Draw.text(ctx, "seg2.angle", [175, 15]);
 
     Draw.vec2(ctx, a, "red", 4);
-    Draw.text(ctx, "point", Vec2.add([], a, [0,-15]));
+    Draw.text(ctx, "point", Vec2.add([0, 0], a, [0,-15]));
 
     Draw.vec2(ctx, aux, "blue", 4);
-    Draw.text(ctx, "closest", Vec2.add([], aux, [-55,10]));
+    Draw.text(ctx, "closest", Vec2.add([0, 0], aux, [-55,10]));
 
     Draw.angle(ctx, v1, Vec2.angle(seg2_normal), "blue", 50);
 
-    var prep = Vec2.perpendicular([], [seg2[2] - seg2[0], seg2[3] - seg2[1]]);
+    var prep = Vec2.perpendicular([0, 0], [seg2[2] - seg2[0], seg2[3] - seg2[1]]);
 
     Draw.circle(ctx, circle, "green");
     Draw.vec2(ctx, prep, "blue", 4);
@@ -88,7 +91,7 @@ canvas.addEventListener("mousemove", function(event) {
 /*
 seg2 = Segment2.create(-50, 50, 50, -50),
 Draw.segment2(ctx, seg2, "yellow");
-prep = Vec2.perpendicular([], [seg2[2] - seg2[0], seg2[3] - seg2[1]]);
+prep = Vec2.perpendicular([0, 0], [seg2[2] - seg2[0], seg2[3] - seg2[1]]);
 Draw.vec2(ctx, prep, "yellow", 4);
 */
 </script>

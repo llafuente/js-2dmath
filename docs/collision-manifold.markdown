@@ -1,8 +1,9 @@
 <a name="Collision.Manifold"></a>
 ## Collision.Manifold
+  *todo*: NORMALIZE OUTPUT
 
 <a name="Collision.Manifold-EdgeClipping"></a>
-* **EdgeClipping** (*a_points*: Polygon, *b_points*: Polygon, *n*: Vec2)
+* **EdgeClipping** (*a_points*: Polygon, *b_points*: Polygon, *n*: Vec2): Object
 
   **source**: [https://github.com/juhl/collision-detection-2d](https://github.com/juhl/collision-detection-2d)
 

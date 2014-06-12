@@ -4,7 +4,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>js-2dmath: Beizer solve</title>
 
+<script src="../debug/js-2dmath-browser-debug.js" type="text/javascript" ></script>
+<!--
 <script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
+-->
 
 </head>
 <body>
@@ -219,7 +222,7 @@ function render() {
     gBezierPath.draw(gBackCtx);
     var codeBox = document.getElementById('putJS');
     //edit
-    console.log(gBezierPath.toJSString());
+    //console.log(gBezierPath.toJSString());
 
 
     // add
@@ -230,9 +233,9 @@ function render() {
         current.next.ctrlPt2.x(), current.next.ctrlPt2.y(),
         current.next.pt.x(), current.next.pt.y()
     );
-    console.log(bz);
+    //console.log(bz);
 
-    Draw.circle(gCtx, Circle.fromVec2(Beizer.get([], bz, solve_step), 5), "red");
+    Draw.circle(gCtx, Circle.fromVec2(Beizer.solve([0, 0], bz, solve_step), 5), "red");
     // end - add
 
     var plist = Beizer.getPoints(bz, 15);

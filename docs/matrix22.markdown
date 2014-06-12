@@ -8,6 +8,8 @@
 
   Can be used to solve 2x2 matrices problems.
 
+  *todo*: this need more work and testing...
+
 <a name="Matrix22-create"></a>
 * **create** (*angle*: Number): Matrix22
 
@@ -36,7 +38,7 @@
 * **determinant** (*mat22*: Matrix22): Number
 
 <a name="Matrix22-setRotation"></a>
-* **setRotation** (*out*: Matrix22, *angle*: Number): Matrix22
+* **setRotation** (*out*: Matrix22, *radians*: Number (Radians)): Matrix22
 
 <a name="Matrix22-rotate"></a>
 * **rotate** (*out_vec2*: Vec2, *mat22*: Matrix22, *vec2*: Vec2): Vec2

@@ -369,7 +369,7 @@
 
 
 <a name="Vec2-toString"></a>
-* **toString** (*v1*: Vec2)
+* **toString** (*v1*: Vec2): String
 
   (x, y) with only two decimals, for readability
 

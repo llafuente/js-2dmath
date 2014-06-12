@@ -8,7 +8,7 @@
 
 
 <a name="Polygon-createConvexHull"></a>
-* **createConvexHull** (*vec2_list*: Array(&lt;Vec2&gt;))
+* **createConvexHull** (*vec2_list*: Array(&lt;Vec2&gt;)): Polygon
 
   Create the convex hull using the Gift wrapping algorithm
 
@@ -20,13 +20,13 @@
 
 
 <a name="Polygon-fromAABB"></a>
-* **fromAABB** (*aabb2*: AABB2)
+* **fromAABB** (*aabb2*: AABB2): Polygon
 
 <a name="Polygon-fromRectangle"></a>
-* **fromRectangle** (*rect*: Rectangle)
+* **fromRectangle** (*rect*: Rectangle): Polygon
 
 <a name="Polygon-fromBeizer"></a>
-* **fromBeizer** (*curve*: Beizer, *npoints*: Number)
+* **fromBeizer** (*curve*: Beizer, *npoints*: Number): Polygon
 
   Create a polygon, the polygon is a line
 
@@ -34,7 +34,7 @@
 
 
 <a name="Polygon-fromCircle"></a>
-* **fromCircle** (*circle*: Circle, *npoints*: Number, *start_radians*: Number)
+* **fromCircle** (*circle*: Circle, *npoints*: Number, *start_radians*: Number): Polygon
 
   Create a polygon from a circle
 
@@ -42,16 +42,16 @@
 
 
 <a name="Polygon-translate"></a>
-* **translate** (*out*: Polygon, *poly*: Polygon, *vec2*: Vec2)
+* **translate** (*out*: Polygon, *poly*: Polygon, *vec2*: Vec2): Polygon
 
 <a name="Polygon-rotate"></a>
-* **rotate** (*out*: Polygon, *poly*: Polygon, *radians*: Number (Radians))
+* **rotate** (*out*: Polygon, *poly*: Polygon, *radians*: Number (Radians)): Polygon
 
 <a name="Polygon-edges"></a>
-* **edges** (*out*: Polygon, *poly*: Polygon)
+* **edges** (*out*: Polygon, *poly*: Polygon): Polygon
 
 <a name="Polygon-normals"></a>
-* **normals** (*out*: Polygon, *edges*: Polygon)
+* **normals** (*out*: Polygon, *edges*: Polygon): Polygon
 
 <a name="Polygon-centroid"></a>
 * **centroid** (*out_vec2*: Vec2, *poly*: Polygon): Vec2
@@ -63,10 +63,10 @@
 * **area** (*poly*: Polygon): Number
 
 <a name="Polygon-transform"></a>
-* **transform** (*out*: Polygon, *poly*: Polygon, *m2d*: Matrix23)
+* **transform** (*out*: Polygon, *poly*: Polygon, *m2d*: Matrix23): Polygon
 
 <a name="Polygon-isVec2Inside"></a>
-* **isVec2Inside** (*poly*: Polygon, *vec2*: Vec2)
+* **isVec2Inside** (*poly*: Polygon, *vec2*: Vec2): Boolean
 
 <a name="Polygon-furthestPoint"></a>
 * **furthestPoint** (*out_vec2*: Vec2, *poly*: Polygon, *vec2_dir*: Vec2): Number
@@ -79,7 +79,7 @@
 <a name="Polygon-furthestMinkowski"></a>
 * **furthestMinkowski** (*out_vec2*: Vec2, *poly_a*: Polygon, *poly_b*: Polygon, *vec2_dir*: Vec2): Vec2
 
-  furthest Point in the Minkowski diff between poly_A and poly_B for a direction
+  furthest Point in the Minkowski diff between A and B polygons for a given direction
 
 
 <a name="Polygon-MinkowskiDifference"></a>

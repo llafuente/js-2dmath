@@ -4,17 +4,24 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" ></script>
 <title>js-2dmath: Polygon</title>
 
-<!-- <script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script> -->
+<script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
+<!--
 <script src="../debug/js-2dmath-browser-debug.js" type="text/javascript" ></script>
+-->
 
 </head>
 <body>
 <h1>js-2dmath: Polygon</h1>
 <canvas id="canvas" width="680" height="680" style="border: 1px solid red;"></canvas>
-<p>Press keys to run tests</p>
+<p>Press keys (1-7) to run tests</p>
 <ul>
     <li>1 - boxes collide</li>
-    <li>2 - boxes no collisions</li>
+    <li>2 - boxes collide</li>
+    <li>3 - circles-polygon collide</li>
+    <li>4 - boxes no collide</li>
+    <li>5 - boxes no collide</li>
+    <li>6 - circles-polygon no collide</li>
+    <li>7 - triangles collide</li>
 </ul>
 </body>
 </html>
@@ -43,7 +50,7 @@ function gjk(poly1, poly2) {
 
     var result,
         history = [];
-    result = Polygon.GJK(poly1, poly2, history);
+    result = Collision.GJK.getPolygonPolygon(poly1, poly2, history);
     console.log("GJK", JSON.stringify(result));
 
     Draw.text(ctx, result.overlap ? "collide" : "no collision", [-320, 200])
@@ -59,10 +66,11 @@ function gjk(poly1, poly2) {
 
     // EPA!
     if (result.overlap) {
-        var epa = Polygon.EPA(poly1, poly2, result.simplex);
+        var epa = Collision.Response.create();
+        Collision.EPA(epa, poly1, poly2, result.simplex);
         console.log("EPA", JSON.stringify(epa));
 
-        var ec = Polygon.edgeClipping(poly1, poly2, epa.normal);
+        var ec = Collision.Manifold.EdgeClipping(poly1, poly2, epa.mtv);
         console.log("EC", JSON.stringify(ec));
 
         if (ec) {
@@ -212,8 +220,8 @@ function onKeyDown(ev) {
     case 53: // '5'
     case 54: // '6'
     case 55: // '7'
-    case 56: // '8'
-    case 57: // '9'
+    //case 56: // '8'
+    //case 57: // '9'
         current_test = window["example" + (ev.keyCode - 48)]
         if (!current_test) {
             current_test = example1;

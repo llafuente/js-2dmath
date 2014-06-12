@@ -5,6 +5,9 @@
 <title>js-2dmath: Some Vec2 functions in action</title>
 
 <script src="../dist/js-2dmath-browser.min.js" type="text/javascript" ></script>
+<!--
+<script src="../debug/js-2dmath-browser-debug.js" type="text/javascript" ></script>
+-->
 
 </head>
 <body>
@@ -41,45 +44,45 @@ console.log(ctx2);
 var v = Vec2.create(50, 50),
     a = Vec2.create(100, 75),
     b = Vec2.create(100, 0),
-    aux = [];
+    aux = [0, 0];
 
 
 Draw.vec2(ctx, v, "red");
-Draw.text(ctx, "vec2", Vec2.add([], v, [7,7]));
+Draw.text(ctx, "vec2", Vec2.add([0, 0], v, [7,7]));
 console.log(v);
 
 Vec2.perp(aux, v);
 console.log(aux);
 Draw.vec2(ctx, aux, "blue");
-Draw.text(ctx, "prep", Vec2.add([], aux, [7,7]));
+Draw.text(ctx, "prep", Vec2.add([0, 0], aux, [7,7]));
 
 Vec2.rperp(aux, v);
 console.log(aux);
 Draw.vec2(ctx, aux, "green");
-Draw.text(ctx, "rperp", Vec2.add([], aux, [7,7]));
+Draw.text(ctx, "rperp", Vec2.add([0, 0], aux, [7,7]));
 
 
 Draw.vec2(ctx, a, "red");
-Draw.text(ctx, "a", Vec2.add([], a, [7,7]));
+Draw.text(ctx, "a", Vec2.add([0, 0], a, [7,7]));
 
 Draw.vec2(ctx, b, "red");
-Draw.text(ctx, "b", Vec2.add([], b, [7,7]));
+Draw.text(ctx, "b", Vec2.add([0, 0], b, [7,7]));
 
 Vec2.interpolate(aux, a, b, 2)
 console.log(aux);
 Draw.vec2(ctx, aux, "red");
-Draw.text(ctx, "interpolate(a,b,2)", Vec2.add([], aux, [7,7]))
+Draw.text(ctx, "interpolate(a,b,2)", Vec2.add([0, 0], aux, [7,7]))
 
 
 Vec2.interpolate(aux, a, b, 3)
 console.log(aux);
 Draw.vec2(ctx, aux, "red");
-Draw.text(ctx, "interpolate(a,b,3)", Vec2.add([], aux, [7,7]))
+Draw.text(ctx, "interpolate(a,b,3)", Vec2.add([0, 0], aux, [7,7]))
 
 Vec2.interpolate(aux, b, a, 2)
 console.log(aux);
 Draw.vec2(ctx, aux, "red");
-Draw.text(ctx, "interpolate(b,a,2)", Vec2.add([], aux, [7,7]))
+Draw.text(ctx, "interpolate(b,a,2)", Vec2.add([0, 0], aux, [7,7]))
 
 aux = [50, 50];
 Draw.vec2(ctx2, aux, "red");
@@ -87,7 +90,7 @@ var angle = Vec2.angleTo([0, 0], aux) * Math.RAD_TO_DEG;
 console.log(Math.RAD_TO_DEG);
 console.log(Vec2.angleTo([100, 0], aux));
 console.log(angle);
-Draw.text(ctx2, "angleTo=" + angle.toFixed(2), Vec2.add([], aux, [7,7]))
+Draw.text(ctx2, "angleTo=" + angle.toFixed(2), Vec2.add([0, 0], aux, [7,7]))
 
 var v1 = [25, 25];
 var v2 = [0, 1];

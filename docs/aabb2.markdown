@@ -65,6 +65,9 @@
 <a name="AABB2-area"></a>
 * **area** (*aabb2*: AABB2): Number
 
+  offset & scale merge
+
+
 <a name="AABB2-normalize"></a>
 * **normalize** (*out*: AABB2, *aabb2*: AABB2): AABB2
 
@@ -78,9 +81,9 @@
 * **center** (*out_vec2*: Vec2, *aabb2*: AABB2)
 
 <a name="AABB2-align"></a>
-* **align** (*out_vec2*: Vec2, *aabb2*: AABB2, *alignament*: Number): Vec2
+* **align** (*out_vec2*: Vec2, *aabb2*: AABB2, *alignment*: Number): Vec2
 
-  alignament values: AABB2.TOPLEFT, AABB2.TOPMIDDLE, AABB2.TOPRIGHT, AABB2.CENTERLEFT, AABB2.CENTER, AABB2.CENTERRIGHT, AABB2.BOTTOMLEFT, AABB2.BOTTOM, AABB2.BOTTOMRIGH
+  alignment values: AABB2.TOPLEFT, AABB2.TOPMIDDLE, AABB2.TOPRIGHT, AABB2.CENTERLEFT, AABB2.CENTER, AABB2.CENTERRIGHT, AABB2.BOTTOMLEFT, AABB2.BOTTOM, AABB2.BOTTOMRIGH
 
 
 <a name="AABB2-isVec2Inside"></a>

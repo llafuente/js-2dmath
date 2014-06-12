@@ -130,7 +130,7 @@
           "t": "Number",
           "vec2_offset": "Vec2",
           "vec2_scale": "Vec2",
-          "alignament": "Number",
+          "alignment": "Number",
           "npoints": "Number",
           "margin": "Number"
         }
@@ -180,6 +180,7 @@
           "out": "Matrix23",
           "m2d_2":  "Matrix23",
           "vec2_degrees": "Vec2 (Degrees)",
+          "vec2_radians": "Vec2 (Radians)",
           "degrees": "Number (Degrees)",
           "radians": "Number (Radians)",
           "factor": "Number",

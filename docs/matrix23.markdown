@@ -2,15 +2,17 @@
 ## Matrix23
   Stability: 1 (Only additions & fixes)
 
-  2x3 Transformation matrix used in 2D represented as a 8 coordinates array
+  2x3 Transformation matrix used in 2D (column-major) represented as a 8 coordinates array
 
   [m11:Number, m12:Number, m13:Number, m21:Number, m22:Number, m23:Number, **cache**:Array(5), dirty:Boolean]
 
   cache = [xScale:Number, yScale:Number, xSkew:Number, yScale:Number, rotation:Number]
 
-  why cache? Speed improvements in exchange of memory to avoid tan/atan2/sqrt.
+  * why cache? Speed improvements in exchange of memory to avoid tan/atan2/sqrt.
 
-  why dirty? Matrix.transform could be expensive with large polygons, keep track of this variable to transform only when necessary.
+  * why dirty? Matrix.transform could be expensive with large polygons, keep track of this variable to transform only when necessary.
+
+  *todo*: dSetSkewX / dSetSkewY
 
 <a name="Matrix23-create"></a>
 * **create** (): Matrix23
@@ -223,7 +225,7 @@
 
 
 <a name="Matrix23-skew"></a>
-* **skew** (*out*: Matrix23, *m2d*: Matrix23, *vec2*: Vec2): Matrix23
+* **skew** (*out*: Matrix23, *m2d*: Matrix23, *vec2_radians*: Vec2 (Radians)): Matrix23
 
   Increment the Matrix23 skew y by given radians in vec2
 
@@ -245,7 +247,7 @@
 
 
 <a name="Matrix23-setSkew"></a>
-* **setSkew** (*out*: Matrix23, *m2d*: Matrix23, *vec2*: Vec2): Matrix23
+* **setSkew** (*out*: Matrix23, *m2d*: Matrix23, *vec2_radians*: Vec2 (Radians)): Matrix23
 
   Set the Matrix23 skew y by given radians in vec2
 
@@ -290,12 +292,6 @@
   Alias of rotate 180º(PI)
 
 
-<a name="Matrix23-inverse"></a>
-* **inverse** (*out*: Matrix23, *m2d*: Matrix23)
-
-  *todo*: this a transformation matrix, what inverse means for us, mirror ?
-
-
 <a name="Matrix23-transpose"></a>
 * **transpose** (*out*: Matrix23, *m2d*: Matrix23)
 
@@ -303,7 +299,7 @@
 
 
 <a name="Matrix23-determinant"></a>
-* **determinant** (*out*: Matrix23, *m2d*: Matrix23)
+* **determinant** (*m2d*: Matrix23): Number
 
   *todo*: review & test
 
@@ -347,11 +343,11 @@
 <a name="Matrix23-scalingMatrix"></a>
 * **scalingMatrix** (*x*: Number, *y*: Number)
 
-  Returns a 3x2 2D column-major scaling matrix for sx and sy.
+  Returns a 3x2 2D column-major scaling matrix for x and y.
 
 
 <a name="Matrix23-interpolate"></a>
-* **interpolate** (*out*: Matrix23, *m2d*: Matrix23, *m2d_2*: Matrix23, *factor*: Number)
+* **interpolate** (*out*: Matrix23, *m2d*: Matrix23, *m2d_2*: Matrix23, *factor*: Number): Matrix23
 
   Interpolate two matrixes by given factor.
 
@@ -361,11 +357,14 @@
 <a name="Matrix23-toAngle"></a>
 * **toAngle** (*m2d*: Matrix23)
 
-  For completeness because it's not need in the current implementation m2d[6][4]
+  For completeness because it's not need in the current implementation just get: m2d[6][4]
 
 
 <a name="Matrix23-transform"></a>
-* **transform** (*out_vec2*: Vec2, *m2d*: Matrix23, *vec2*: Vec2)
+* **transform** (*out_vec2*: Vec2, *m2d*: Matrix23, *vec2*: Vec2): Vec2
+
+  Transform a vector by given matrix
+
 
 <a name="Matrix23-dSetRotation"></a>
 * **dSetRotation** (*out*: Matrix23, *m2d*: Matrix23, *degrees*: Number (Degrees))

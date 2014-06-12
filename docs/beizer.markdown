@@ -21,15 +21,15 @@
 
   cp2 - end control point
 
-  cp3 - end
+  cp3 - end point
 
 
 <a name="Beizer-from3Points"></a>
-* **from3Points** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number)
+* **from3Points** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number): Beizer
 
-  Figure 21.2
+  For implementation see Figure 21.2
 
-  http://pomax.github.io/bezierinfo/
+  **reference**: [http://pomax.github.io/bezierinfo/](http://pomax.github.io/bezierinfo/)
 
   *todo*: DO IT!
 
@@ -40,7 +40,7 @@
 <a name="Beizer-quadricFrom3Points"></a>
 * **quadricFrom3Points** (*cp0x*: Number, *cp0y*: Number, *cp1x*: Number, *cp1y*: Number, *cp2x*: Number, *cp2y*: Number)
 
-  Figure 21.1
+  For implementation see Figure 21.1
 
   **reference**: [http://pomax.github.io/bezierinfo/](http://pomax.github.io/bezierinfo/)
 
@@ -54,13 +54,15 @@
 
 
 <a name="Beizer-getPoints"></a>
-* **getPoints** (*curve*: Beizer, *npoints*: Number): Array
+* **getPoints** (*curve*: Beizer, *npoints*: Number): Vec2[]
+
+  Solve the curve npoints times and return the solution array.
 
   **see**: [Polygon.fromBeizer](#Beizer-Polygon.fromBeizer)
 
 
 <a name="Beizer-length"></a>
-* **length** (*curve*: Beizer, *step*: Number)
+* **length** (*curve*: Beizer, *step*: Number): Number
 
   Calculate the curve length by incrementally solving the curve every substep=CAAT.Curve.k. This value defaults
 

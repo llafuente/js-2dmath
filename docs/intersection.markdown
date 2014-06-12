@@ -8,10 +8,17 @@
 * **TANGENT** = 32
 
 <a name="Intersection-near"></a>
-* **near** (*num*: Number, *num2*: Number)
+* **near** (*num*: Number, *num2*: Number): Boolean
 
 <a name="Intersection-$rectangle_rectangle"></a>
 * **$rectangle_rectangle** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number, *x3*: Number, *y3*: Number, *x4*: Number, *y4*: Number, *collision*: Boolean, *distance*: Boolean)
+
+  x1 < x3
+
+  *todo*: distance
+
+  *todo*: segment collision, maybe using segment-segment collision, this could slow down things!
+
 
 <a name="Intersection-$rectangle_vec2"></a>
 * **$rectangle_vec2** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number, *x3*: Number, *y3*: Number, *collision*: Boolean, *distance*: Boolean)
@@ -21,11 +28,6 @@
 
 <a name="Intersection-$circle_rectangle"></a>
 * **$circle_rectangle** (*cx*: Number, *cy*: Number, *r*: Number, *x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number, *collision*: Boolean, *distance*: Boolean)
-
-  Use LineP1 instead of LocalP1 because we want our answer in global
-
-  space, not the circle's local space
-
 
 <a name="Intersection-bb2_bb2"></a>
 * **bb2_bb2** (*bb2_1*: AABB2, *bb2_2*: AABB2, *collision*: Boolean, *distance*: Boolean)
@@ -39,13 +41,13 @@
 <a name="Intersection-rectangle_rectangle"></a>
 * **rectangle_rectangle** (*rect1*: Rectangle, *rect2*: Rectangle, *collision*: Boolean, *distance*: Boolean)
 
-  TODO segments of collision
+  *todo*: segments of collision
 
 
 <a name="Intersection-bb2_rectangle"></a>
 * **bb2_rectangle** (*bb2*: AABB2, *rect*: Rectangle, *collision*: Boolean, *distance*: Boolean)
 
-  TODO segments of collision
+  *todo*: segments of collision
 
 
 <a name="Intersection-rectangle_bb2"></a>
@@ -93,13 +95,10 @@
 <a name="Intersection-segment2_vec2"></a>
 * **segment2_vec2** (*seg2*: Segment2, *vec2*: Vec2)
 
-  Is the intersection along the the segments
-
-
 <a name="Intersection-vec2_segment2"></a>
 * **vec2_segment2** (*vec2*: Vec2, *seg2*: Segment2)
 
 <a name="Intersection-polygon_polygon"></a>
 * **polygon_polygon** (*a_poly*: Polygon, *b_poly*: Polygon)
 
-  *todo*: this is just a fast version, no optimization no for real-time
+  *todo*: this is just a fast-code-version, no optimization no for real-time

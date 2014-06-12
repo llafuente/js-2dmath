@@ -2,7 +2,7 @@
 ## Xorshift
 
 <a name="Xorshift-create"></a>
-* **create** (*seeds*: [, Number...])
+* **create** (*seeds*: [, Number...]): Object
 
   Random numbers generator
 

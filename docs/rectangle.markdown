@@ -10,7 +10,7 @@
 * **create** (*x1*: Number, *y1*: Number, *x2*: Number, *y2*: Number): Rectangle
 
 <a name="Rectangle-fromBB"></a>
-* **fromBB** (*bb2*: AABB2): Rectangle
+* **fromBB** (*aabb2*: AABB2): Rectangle
 
 <a name="Rectangle-zero"></a>
 * **zero** (): Rectangle
