@@ -56,6 +56,10 @@ function gjk(poly1, poly2) {
     if (result.overlap) {
         var epa = Polygon.EPA(poly1, poly2, result.simplex);
         console.log("EPA", JSON.stringify(epa));
+
+        var ec = Polygon.edgeClipping(poly1, poly2, epa.normal);
+        console.log("EC", JSON.stringify(ec));
+
     }
 }
 
@@ -173,7 +177,7 @@ function example4() {
 }
 */
 
-var current_test = example6;
+var current_test = example1;
 
 function onKeyDown(ev) {
     if (!ev) {

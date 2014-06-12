@@ -46,5 +46,19 @@
 <a name="Polygon-isVec2Inside"></a>
 * **isVec2Inside** (*poly*: Polygon, *vec2*: Vec2)
 
+<a name="Polygon-furthestPoint"></a>
+* **furthestPoint** (*out_vec2*: Vec2, *poly*: Polygon, *vec2_dir*: Vec2): Number
+
+  Compute farthest polygon point in particular direction.
+
+  return the index in the polygon and a clone in out_vec2
+
+
+<a name="Polygon-furthestMinkowski"></a>
+* **furthestMinkowski** (*out_vec2*: Vec2, *poly_a*: Polygon, *poly_b*: Polygon, *vec2_dir*: Vec2)
+
+  furthest Point in the Minkowski diff between poly_A and poly_B for a direction
+
+
 <a name="Polygon-toString"></a>
 * **toString** (*poly*: Polygon)

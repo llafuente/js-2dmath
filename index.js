@@ -32,3 +32,4 @@ module.exports = {
 
 module.exports.Polygon.GJK = require("./lib/gjk.js");
 module.exports.Polygon.EPA = require("./lib/epa.js");
+module.exports.Polygon.edgeClipping = require("./lib/edge-clipping.js");
