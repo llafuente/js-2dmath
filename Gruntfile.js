@@ -44,7 +44,7 @@ module.exports = function (grunt) {
               debounceDelay: 250
             },
           },
-        },
+        }
     }); // end config
 
     grunt.task.registerTask('debug', 'Generate debug files', function(arg1, arg2) {

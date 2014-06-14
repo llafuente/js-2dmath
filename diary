@@ -8,7 +8,8 @@
 * IK
   * FABRIK
 
-
+vec2 distances (minkowski distance, euclidean, Manhattan)
+https://github.com/abeja-inc/vector-algebra/blob/master/lib/vectorAlgebra.js
 
 http://www.ryanjuckett.com/programming/constraint-relaxation-ik-in-2d/
 http://www.dhteumeuleu.com/dhtml/robot-arm-ik.html

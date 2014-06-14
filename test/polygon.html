@@ -38,7 +38,7 @@ var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
     poly3 = [];
 
 function gjk(poly1, poly2) {
-    Draw.polygon(ctx, poly1, "cyan");
+    Draw.polygon(ctx, poly1, "red");
     Draw.polygon(ctx, poly2, "blue");
 
     var result,
@@ -48,15 +48,13 @@ function gjk(poly1, poly2) {
 
     Draw.text(ctx, result.overlap ? "collide" : "no collision", [-320, 200])
 
-    Draw.polygon(ctx, result.simplex, "rgba(0,125,0, 0.25)", true);
-    Draw.polygon(ctx, result.simplex, "rgba(0,125,0, 0.25)");
+    Draw.polygon(ctx, result.simplex, "rgba(0,255,0, 0.25)", true);
+    Draw.polygon(ctx, result.simplex, "rgba(0,255,0, 0.5)");
 
-
-    console.log(Polygon.toString(Polygon.MinkowskiDifference(poly1, poly2)));
 
     Draw.polygon(ctx,
         Polygon.MinkowskiDifference(poly1, poly2),
-        "rgba(0,0,255, 0.33)", true);
+        "rgba(0,0,255, 0.10)", true);
 
 
     // EPA!
@@ -67,7 +65,15 @@ function gjk(poly1, poly2) {
         var ec = Polygon.edgeClipping(poly1, poly2, epa.normal);
         console.log("EC", JSON.stringify(ec));
 
+        if (ec) {
+            ec.cp && ec.cp.forEach(function(cp) {
+                Draw.vec2(ctx, cp.p, "green", 5);
+            });
+            Draw.polygon(ctx, [ec.incidentEdge.v1, ec.incidentEdge.v2], "yellow");
+            Draw.polygon(ctx, [ec.referenceEdge.v1, ec.referenceEdge.v2], "yellow");
+        }
     }
+
 }
 
 function example1 () {
@@ -159,6 +165,13 @@ function example6 () {
 }
 
 
+function example7 () {
+    var poly1 = Polygon.create([100, 0], [0, 100], [0, -100]),
+        poly2 = Polygon.create([0, 0], [100, 100], [100, -100]);
+
+    gjk(poly1, poly2);
+}
+
 /*
 function example2() {
     var poly1 = Polygon.create([0, 0], [50, 0], [50, 50], [0, 50]),
@@ -184,7 +197,7 @@ function example4() {
 }
 */
 
-var current_test = example1;
+var current_test = example4;
 
 function onKeyDown(ev) {
     if (!ev) {
