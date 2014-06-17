@@ -220,29 +220,6 @@ for (cls in files) {
         }
     });
 
-    //
-    // - debug
-    //
-    var output = falafel(src, function (node) {
-        // anti-nan
-        if (isFunction(node)) {
-            var args = getArguments(node, valid_arguments),
-                fn_txt = node.body.source().trim().substring(1),
-                validations = [],
-                i;
-
-            for (i in args) {
-                if (validators[args[i].type] && args[i].name.indexOf("out") !== 0) {
-                    validations.push(validators[args[i].type].replace(/\%var\%/g, args[i].name));
-                }
-            }
-
-            node.body.update("{\n" + validations.join("\n") + fn_txt);
-        }
-    });
-
-    fs.writeFileSync(files[cls].debug_file, output, "utf-8");
-
     // DEFINES
     for (i in mod_required) {
         if ("function" === typeof mod_required[i] && !methods[i]) {
