@@ -24,29 +24,103 @@
 
 require("js-2dmath").globalize(window);
 
+window.requestAnimFrame = function (callback) {
+    window.setTimeout(callback, 1000);
+};
+
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
 var canvas_axis = document.getElementById("canvas-axis");
 var ctx_axis = canvas_axis.getContext("2d");
 
-function World(maxdt, max_iterations gravity) {
+function World(maxdt, max_iterations, gravity) {
     this.gravity = gravity || [0, -9.8];
     this.maxdt = maxdt;
     this.max_iterations = max_iterations || 10;
 }
 World.prototype.bodies = [];
-World.prototype.maxdt = maxdt;
+World.prototype.maxdt = 0;
 World.prototype.gravity = [0, -9.8];
+
+World.prototype.addBody = function(body) {
+    this.bodies.push(body);
+};
+
 World.prototype._update = function(dt) {
-    // fix dt
-}
-World.prototype.update = function(dt) {
-    // gravity
+    var self = this;
+    // update world position & gravity
+    var gravity = Vec2.scale([0, 0], this.gravity, dt);
+    this.forEachBody(function (b) {
+        //apply gravity only to movable objects
+        if (b.imass !== 0) {
+            b.update();
+            //disable to test: Vec2.add(b.velocity, b.velocity, gravity);
+        }
+    });
     // collisions
+    this.forEachBodyPair(function (a, b) {
+        
+        var result = new Collision.SAT.Response();
+        
+        var aEdges = [];
+        var aNormals = [];
+        Polygon.edges(aEdges, a.wbody);
+        Polygon.normals(aNormals, aEdges);
+
+        var bEdges = [];
+        var bNormals = [];
+        Polygon.edges(bEdges, b.wbody);
+        Polygon.normals(bNormals, bEdges);
+
+        Collision.SAT.getPolygonPolygon(a.wbody, aNormals, [0, 0], b.wbody, bNormals, [0, 0], result);
+        console.log("SAT", JSON.stringify(result));
+        
+        if (result.overlap) {
+            //self.stop = true;
+
+            //Draw.polygon(ctx, result.simplex, "rgba(0,255,0,0.25)", true);
+            //console.log("GJK", JSON.stringify(result));
+            //var epa = Polygon.EPA(a.wbody, b.wbody, result.simplex);
+            //console.log("EPA", JSON.stringify(epa));
+
+            var ec = Collision.EdgeClipping(a.wbody, b.wbody, result.overlapN);
+            console.log("EC", JSON.stringify(ec));
+
+            if (ec) {
+                Draw.segment2(ctx,
+                    [ec.incidentEdge.v1[0], ec.incidentEdge.v1[1], ec.incidentEdge.v2[0], ec.incidentEdge.v2[1]], "yellow");
+                Draw.segment2(ctx,
+                    [ec.referenceEdge.v1[0], ec.referenceEdge.v1[1], ec.referenceEdge.v2[0], ec.referenceEdge.v2[1]], "purple");
+            }
+        }
+    });
     // - air friction
     // - ground friction
     // integrate
+    var hdt = dt * 0.5,
+        dt6 = dt * 0.166666667;
+    this.forEachBody(function (b) {
+        self.stop = true;
+        return ;
+        //apply gravity only to movable objects
+        if (b.imass !== 0) {
+            var stateX = NumericalIntegration.RK4(b.position[0], b.velocity[0], b.nimass, 1, 0, dt, hdt, dt6);
+            var stateY = NumericalIntegration.RK4(b.position[1], b.velocity[1], b.nimass, 1, 0, dt, hdt, dt6);
+
+            b.velocity[0] = stateX[1];
+            b.velocity[1] = stateY[1];
+
+            b.translate2(stateX[0] - b.position[0], stateY[0] - b.position[1]);
+            console.log(b.position);
+        }
+    });
+}
+World.prototype.update = function(dt) {
+    if (this.stop) return;
+
+    // fix dt
+    this._update(dt);
 }
 
 World.prototype.forEachBody = function(fn) {
@@ -55,7 +129,19 @@ World.prototype.forEachBody = function(fn) {
         max = bs.length
 
     for (i = 0; i < max; ++i) {
+        fn(bs[i]);
+    }
+}
 
+World.prototype.forEachBodyPair = function(fn) {
+    var i = 0,
+        bs = this.bodies,
+        max = bs.length
+
+    for (i = 0; i < max; ++i) {
+        for (j = i + 1; j < max; ++j) {
+            fn(bs[i], bs[j]);
+        }
     }
 }
 
@@ -63,25 +149,28 @@ function Body(body, mass, restitution) {
     this.body = body;
     this.type = "polygon";
     this.restitution = restitution || 0;
+    
+    this.matrix = Matrix23.create();
+    this.matrix[7] = true;
+    this.wbody = new Array(body.length);
+
     this.mass = mass || 1;
     if (mass === 0) {
         this.imass = 0;
         this.nimass = 0;
+        this.update(); // manual update
     } else {
-        this.imass = 1 / mass;
-        this.nimass = -(1 / mass);
+        this.imass = 1 / this.mass;
+        this.nimass = -(1 / this.mass);
     }
-    this.matrix = Matrix23.create();
-    this.matrix[7] = true;
-    this.wbody = [];
 
-    this.moi = Polygon.area(body) *
+    //this.moi = Polygon.area(body) *
 }
 
 Body.prototype.translate2 = function (x, y) {
     Matrix23.translate(this.matrix, this.matrix, [x, y]);
-    this.position[0] = x;
-    this.position[1] = y;
+    this.position[0] = +x;
+    this.position[1] = +y;
 }
 Body.prototype.update = function () {
     if (this.matrix[7]) {
@@ -106,18 +195,27 @@ Body.prototype.wbody = [];
 Body.prototype.moi = 0;
 
 
-var b1 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0));
-var b2 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, Math.PI / 16));
+var world = new World();
 
-b1.translate2(0, 150);
+var b1 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, 0), 0);
+world.addBody(b1);
+
+var b2 = new Body (Polygon.fromCircle(Circle.create(0, 0, 50), 10, Math.PI / 16));
+b2.translate2(50, 82);
+world.addBody(b2);
 
 function update() {
+    // do not clear canvas we dont see debug information
+    if (world.stop) return ;
+
     ctx.save();
     canvas.width = canvas.width;
     Draw.invertAxis(canvas, ctx); // y-up
     ctx.translate(canvas.width * 0.5, canvas.height * 0.5); // center
 
     window.requestAnimFrame(update);
+
+    world.update(0.2);
 
     b1.update();
     b2.update();

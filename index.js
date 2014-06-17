@@ -22,6 +22,18 @@ module.exports = {
     Draw: require("./lib/draw.js"),
 
     NMtree: require("./lib/nmtree.js"),
+
+    Collision : {
+        GJK: require("./lib/collision/gjk.js"),
+        EPA: require("./lib/collision/epa.js"),
+        EdgeClipping: require("./lib/collision/edge-clipping.js"),
+        SAT: require("./lib/collision/sat.js")
+    },
+
+    NumericalIntegration: {
+        RK4: require("./lib/numerical-integration/rk4.js")
+    },
+
     globalize: function(object) {
         var i;
         for (i in this) {
@@ -30,6 +42,3 @@ module.exports = {
     }
 };
 
-module.exports.Polygon.GJK = require("./lib/gjk.js");
-module.exports.Polygon.EPA = require("./lib/epa.js");
-module.exports.Polygon.edgeClipping = require("./lib/edge-clipping.js");

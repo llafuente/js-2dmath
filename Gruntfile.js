@@ -38,7 +38,7 @@ module.exports = function (grunt) {
 
         watch: {
           scripts: {
-            files: ['lib/*.js', '*.js', 'test/*.js'],
+            files: ['lib/*.js', 'lib/*/*.js', '*.js', 'test/*.js'],
             tasks: ['dist'],
             options: {
               debounceDelay: 250
