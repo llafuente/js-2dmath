@@ -107,7 +107,7 @@ World.prototype._update = function(dt) {
                 Collision.elastic(aPos, a.velocity, a.mass, bPos, b.velocity, b.mass);
                 */
 
-                Collision.Resolve.basic(a.velocity, a.restitution, a.imass, b.velocity, b.restitution, b.imass, result.overlapN)
+                Collision.Resolve.linear(a.velocity, a.restitution, a.imass, b.velocity, b.restitution, b.imass, result.overlapN);
             }
         }
     });
