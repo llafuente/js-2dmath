@@ -1,6 +1,6 @@
 {
   "name": "js-2dmath",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "description": "Fast 2d geometry math: Vector2, Rectangle, Circle, Matrix2x3 (2D transformation), Circle, BoundingBox, Line2, Segment2, Intersections, Distances, Transitions (animation/tween), Random numbers, Noise",
   "main": "./index.js",
   "keywords": [
@@ -46,7 +46,8 @@
   },
   "dependencies": {
     "array-enhancements": "*",
-    "object-enhancements": "*"
+    "object-enhancements": "*",
+    "funlinify": "0.0.1"
   },
   "devDependencies": {
     "argumentify": "*",

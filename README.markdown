@@ -10,8 +10,8 @@ So the objective is "**Be fast**"
 
 * API completeness
 * Testing
-* use falafel to create an asm.js build
-* Numerical integrators
+* Use falafel/esprima to create an asm.js build
+* More Numerical integrators
 * AI: Path-finding, Steer, Backtracking
 * IK: FABRIK
 * Minkowski distance, euclidean, Manhattan
@@ -20,18 +20,23 @@ So the objective is "**Be fast**"
 * did I miss anything useful?
 
 
-## Performance? HOW?/TIPS
+## Performance
+
+Performance is based on good practices.
 
 * Avoid **new**
 * Use arrays instead of objects, this is huge performance boost!
-* Avoid creating unnecessary variables (reuse intermediate variables) only "create" & "clone" methods should create new variables.
-* Cache every function call to a single variable. example: Vec2.add -> vec2_add, even Math.*
-* If access a multi-dimensional array in a loop, cache the array access. for(i...) carr=arr[i]; carr[X]
-* Do not use forEach, map, every etc. or other looping method that require apply/call, both are costly.
-
-I'm sure I miss/ignore some of my own performance tips, **PR if you find any error or a better way!**
+* Avoid creating unnecessary variables (reuse intermediate variables) only `create` & `clone` methods should create new variables.
+* Cache every function call to a single variable. example: `Vec2.add` => `vec2_add`, even `Math.*`
+* If access a multi-dimensional array in a loop, cache the array access. `for(i...) carr=arr[i]; carr[X]`
+* Do not use `forEach`, `map`, `every` etc. or other looping method that require `apply`/`call` usage, both are costly.
 
 See some [performance test](https://github.com/llafuente/js-2dmath/blob/master/js-performance-tests.markdown) that prove it.
+
+[funlinify](https://github.com/llafuente/funlinify) It's a library that do function inline expansion for javascript. It's in early stage but it works perfectly for our usage here.
+
+Obviously I ignore myself in some parts of this library. Feel free to issue me :)
+
 
 ## Grunt
 
@@ -42,24 +47,25 @@ npm install -g grunt-cli
 
 ### grunt dist
 
-Build debug (*debug/js-2dmath-browser-debug.js*), browser (*dist/js-2dmath-browser.js*), uglify and documentation (*docs/.markdown*) in one step.
+Create distribution packages using [browserify](https://github.com/substack/node-browserify) and documentation.
 
-All three builds are connected that's why are connected in this build step.
+* debug: *debug/js-2dmath-browser-debug.js*
+  * [argumentify](https://github.com/llafuente/argumentify) Assert on invalid arguments to properly debug your app.
 
-js-2dmath has a friendly debug build using falafel so you can debug properly your app.
-Based on the documentation information build a new JS with many assertions.
-Force you to use valid sanitized inputs (Arrays, not NaN, not undefined, not null) to every function.
+* dist: *dist/js-2dmath-browser.js*
+  * [funlinify](https://github.com/llafuente/funlinify) inline function
 
-** TODO ** include tests!
+* dist.min: *js-2dmath-browser.min.js*
+  * [funlinify](https://github.com/llafuente/funlinify) inline function
+  * [uglify](https://github.com/mishoo/UglifyJS)
 
 ### grunt watch
 
 Watch every change and rebuild the distribution code.
 
-
 ## What can you do with js-2dmath?
 
-See some examples that we use as tests :)
+See some examples.
 
 * [Angles](http://htmlpreview.github.io/?https://github.com/llafuente/js-2dmath/blob/master/test/angle.html)
 * [Beizer](http://htmlpreview.github.io/?https://github.com/llafuente/js-2dmath/blob/master/test/beizer.html)

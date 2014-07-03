@@ -108,6 +108,7 @@ module.exports = function (grunt) {
 
         require('browserify')()
             .require('./index.js', {expose: "js-2dmath"})
+            .transform('funlinify')
             .bundle()
             .pipe(fs.createWriteStream('dist/js-2dmath-browser.js'))
             .on("close", function() {
