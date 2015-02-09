@@ -62,10 +62,10 @@ cPoly.prototype.translate = function (vec2) {
 
 //setup
 
-var A = new cPoly(Circle.create(0, 0, 25), 4, Math.HALF_PI * 0.5),
-    B = new cPoly(Circle.create(0, 0, 25), 4, 0),
+var A = new cPoly(Circle.create(0, 0, 25), 8, 0),
+    B = new cPoly(Circle.create(0, 0, 25), 8, 0),
     positions = [
-        [-5, 5],
+        [0, 45],
         //[-5, -5],
         //[5, -5],
         //[5, -5]
@@ -76,15 +76,19 @@ var A = new cPoly(Circle.create(0, 0, 25), 4, Math.HALF_PI * 0.5),
 positions.forEach(function(pos) {
     B.translate(pos);
 
-    var intersection = Intersection.polygon_polygon(A.points, B.points);
 
     Draw.polygon(ctx, A.points, "blue");
     Draw.polygon(ctx, B.points, "green");
+
+    /*
+    var intersection = Intersection.polygon_polygon(A.points, B.points);
     intersection.points.forEach(function(p) {
         Draw.vec2(ctx, p, "red");
     });
+    */
 
-    var out_response = Collision.Response.create();
+    var epa_response = Collision.Response.create(),
+      sat_response = Collision.Response.create();
 
     console.log("");
     console.log("");
@@ -93,20 +97,36 @@ positions.forEach(function(pos) {
     console.log("");
 
     var gjk_result = Collision.GJK.getPolygonPolygon(A.points, B.points);
-    //console.log("GJK", gjk_result);
+    console.log("GJK", gjk_result);
 
-    Collision.EPA(out_response, A.points, B.points, gjk_result.simplex);
-    console.log("EPA", out_response);
+    Draw.polygon(ctx, gjk_result.simplex, "rgba(1, 0, 0, 0.25)", true);
 
-    Draw.vec2dir(ctx, intersection.points[1], out_response.mtv, out_response.depth, "cyan");
+    Collision.EPA(epa_response, A.points, B.points, gjk_result.simplex);
+    console.log("EPA", epa_response);
 
-    console.log(Collision.SAT.getPolygonPolygon(out_response, A.points, A.normals, [0, 0], B.points, B.normals, [0, 0]));
-    console.log("SAT", out_response);
+    //Draw.vec2dir(ctx, intersection.points[1], epa_response.mtv, epa_response.depth, "gray");
 
-    Draw.vec2dir(ctx, intersection.points[0], out_response.mtv, out_response.depth, "blue");
+    console.log(Collision.SAT.getPolygonPolygon(sat_response, A.points, A.normals, [0, 0], B.points, B.normals, [0, 0]));
+    console.log("SAT", sat_response);
 
-    //A.translate(Vec2.scale([], out_response.mtv, -out_response.depth));
+    //Draw.vec2dir(ctx, intersection.points[0], sat_response.mtv, sat_response.depth, "gray");
+
+    //A.translate(Vec2.scale([], sat_response.mtv, -sat_response.depth));
     //Draw.polygon(ctx, A.points, "yellow");
+
+    console.log(A.points, B.points);
+
+    //var edge_clipping = Collision.Manifold.EdgeClipping(A.points, B.points, [0.5, 0.5]);
+    var edge_clipping = Collision.Manifold.EdgeClipping(A.points, B.points, epa_response.mtv);
+    console.log("EDGE", edge_clipping);
+
+    Draw.polygon(ctx, edge_clipping.incidentEdge, "red");
+    Draw.polygon(ctx, edge_clipping.referenceEdge, "red");
+
+    // draw the mtv offset
+    A.translate(Vec2.scale(epa_response.mtv, epa_response.mtv, -epa_response.depth));
+    Draw.polygon(ctx, A.points, "rgba(0, 0, 1, 0.5)");
+    A.translate(Vec2.negate(epa_response.normal, epa_response.normal));
 
     B.translate(Vec2.negate(pos, pos));
 });
