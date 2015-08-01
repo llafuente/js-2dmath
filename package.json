@@ -28,8 +28,7 @@
   },
   "scripts": {
     "test": "tap test/test-*.js",
-    "browserify": "browserify -r ./index.js:js-2dmath -o js-2dmath-browser.js",
-    "postinstall": "grunt dist"
+    "browserify": "browserify -r ./index.js:js-2dmath -o js-2dmath-browser.js"
   },
   "repository": {
     "type": "git",
